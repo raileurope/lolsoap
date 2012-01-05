@@ -5,9 +5,26 @@ out so you don't have to.
 
 https://github.com/loco2/lolsoap
 
+## Aims ##
+
+* A collection of classes to make dealing with SOAP requests and
+  responses, and WSDL documents, easier.
+* The classes are intended to be loosely coupled and non-prescriptive
+  about how they are used.
+* LolSoap does not know anything about what HTTP library you want to
+  use, and does not care whether you're doing the IO in a synchronous
+  asynchronous fashion. This does mean you have to provide a little bit
+  of glue code, but the benefit is flexibility.
+* Don't monkey-patch anything not defined in the library.
+
 ## Synopsis ##
 
 Nothing yet.
+
+## Bugs/Features ##
+
+* SOAP 1.1 is not supported. Patches to add support will be considered
+  if they don't add too much extra complexity.
 
 ## Authors ##
 
