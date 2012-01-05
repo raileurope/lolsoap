@@ -25,6 +25,8 @@ Nothing yet.
 
 * SOAP 1.1 is not supported. Patches to add support will be considered
   if they don't add too much extra complexity.
+* WSSE is not supported.
+* Assumes that you are able to supply a WSDL document for the service.
 
 ## Authors ##
 
