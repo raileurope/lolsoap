@@ -4,6 +4,7 @@ module LolSoap
   class WSDL
     require 'lolsoap/wsdl/operation'
     require 'lolsoap/wsdl/type'
+    require 'lolsoap/wsdl/null_type'
 
     def self.parse(raw)
       new(WSDLParser.parse(raw))

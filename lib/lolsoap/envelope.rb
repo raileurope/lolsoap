@@ -4,9 +4,10 @@ module LolSoap
   class Envelope
     attr_reader :wsdl, :operation, :doc
 
-    def initialize(wsdl, operation)
+    def initialize(wsdl, operation, builder = Nokogiri::XML::Builder.new)
       @wsdl      = wsdl
       @operation = operation
+      @builder   = builder
 
       initialize_doc
     end
@@ -19,12 +20,17 @@ module LolSoap
 
     private
 
+    attr_reader :builder
+
     def initialize_doc
-      builder = Nokogiri::XML::Builder.new do |xml|
-        xml.Envelope(namespaces) do |env|
-          env['soap'].Header
-          env['soap'].Body do |body|
-            body[operation.input_prefix].send(operation.input_name)
+      builder.Envelope(namespaces) do |env|
+        env['soap'].Header do |header|
+          @header = header
+        end
+
+        env['soap'].Body do |body|
+          body[operation.input_prefix].send(operation.input_name) do |input|
+            @input = input
           end
         end
       end

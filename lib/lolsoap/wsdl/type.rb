@@ -10,7 +10,11 @@ class LolSoap::WSDL
     end
 
     def elements
-      @elements ||= Hash[@element_types.map { |name, type| [name, wsdl.types[type.split(':').last]] }]
+      load_elements.dup
+    end
+
+    def element(name)
+      load_elements.fetch(name) { NullType.new }
     end
 
     def prefix
@@ -21,6 +25,12 @@ class LolSoap::WSDL
       "<LolSoap::WSDL::Type " \
       "name=#{name.inspect} " \
       "namespace=#{namespace.inspect}>"
+    end
+
+    private
+
+    def load_elements
+      @elements ||= Hash[@element_types.map { |name, type| [name, wsdl.types[type.split(':').last]] }]
     end
   end
 end
