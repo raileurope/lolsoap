@@ -8,11 +8,14 @@ module LolSoap
       :xmlschema => 'http://www.w3.org/2001/XMLSchema'
     }
 
-    attr_reader :raw, :doc
+    attr_reader :doc
 
-    def initialize(raw, xml_parser = Nokogiri::XML::Document)
-      @raw = raw
-      @doc = xml_parser.parse(raw)
+    def self.parse(raw)
+      new(Nokogiri::XML::Document.parse(raw))
+    end
+
+    def initialize(doc)
+      @doc = doc
     end
 
     def namespaces

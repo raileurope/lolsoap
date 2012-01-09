@@ -6,7 +6,7 @@ module LolSoap
     require 'lolsoap/wsdl/type'
 
     def self.parse(raw)
-      new(WSDLParser.new(raw))
+      new(WSDLParser.parse(raw))
     end
 
     attr_reader :parser

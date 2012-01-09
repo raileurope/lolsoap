@@ -3,7 +3,8 @@ require 'lolsoap/wsdl_parser'
 
 module LolSoap
   describe WSDLParser do
-    subject { WSDLParser.new(File.read(TEST_ROOT + '/fixtures/stock_quote.wsdl')) }
+    let(:doc) { Nokogiri::XML(File.read(TEST_ROOT + '/fixtures/stock_quote.wsdl')) }
+    subject { WSDLParser.new(doc) }
 
     describe '#namespaces' do
       it 'returns the namespaces used' do
