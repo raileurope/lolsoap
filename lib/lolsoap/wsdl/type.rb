@@ -13,6 +13,10 @@ class LolSoap::WSDL
       @elements ||= Hash[@element_types.map { |name, type| [name, wsdl.types[type.split(':').last]] }]
     end
 
+    def prefix
+      wsdl.prefixes[namespace]
+    end
+
     def inspect
       "<LolSoap::WSDL::Type " \
       "name=#{name.inspect} " \

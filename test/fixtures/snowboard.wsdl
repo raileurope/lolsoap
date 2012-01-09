@@ -14,35 +14,35 @@
   <wsdl:types>
 
     <!-- all type declarations are in a chunk of xsd -->
-    <xsd:schema targetNamespace="http://namespaces.snowboard-info.com"
+    <xsd:schema targetNamespace="http://schemas.snowboard-info.com/EndorsementSearch.xsd"
       xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 
       <!-- xsd definition: GetEndorsingBoarder [manufacturer string, model string] -->
       <xsd:element name="GetEndorsingBoarder">
-	<xsd:complexType>
-	  <xsd:sequence>
-	    <xsd:element name="manufacturer" type="string"/>
+  <xsd:complexType>
+    <xsd:sequence>
+      <xsd:element name="manufacturer" type="string"/>
             <xsd:element name="model" type="string"/>
-	  </xsd:sequence>
-	</xsd:complexType>
+    </xsd:sequence>
+  </xsd:complexType>
       </xsd:element>
 
       <!-- xsd definition: GetEndorsingBoarderResponse [... endorsingBoarder string ...] -->
       <xsd:element name="GetEndorsingBoarderResponse">
-	<xsd:complexType>
-	  <xsd:all>
-	    <xsd:element name="endorsingBoarder" type="string"/>
-	  </xsd:all>
-	</xsd:complexType>
+  <xsd:complexType>
+    <xsd:all>
+      <xsd:element name="endorsingBoarder" type="string"/>
+    </xsd:all>
+  </xsd:complexType>
       </xsd:element>
 
       <!-- xsd definition: GetEndorsingBoarderFault [... errorMessage string ...] -->
       <xsd:element name="GetEndorsingBoarderFault">
-	<xsd:complexType>
-	  <xsd:all>
-	    <xsd:element name="errorMessage" type="string"/>
-	  </xsd:all>
-	</xsd:complexType>
+  <xsd:complexType>
+    <xsd:all>
+      <xsd:element name="errorMessage" type="string"/>
+    </xsd:all>
+  </xsd:complexType>
       </xsd:element>
 
     </xsd:schema>
@@ -88,15 +88,15 @@
       <!-- furthur specify that the messages in the wsdl:operation "GetEndorsingBoarder" use SOAP? @@@ -->
       <wsdl:input>
         <soap:body use="literal"
-		   namespace="http://schemas.snowboard-info.com/EndorsementSearch.xsd"/>
+       namespace="http://schemas.snowboard-info.com/EndorsementSearch.xsd"/>
       </wsdl:input>
       <wsdl:output>
         <soap:body use="literal"
-		   namespace="http://schemas.snowboard-info.com/EndorsementSearch.xsd"/>
+       namespace="http://schemas.snowboard-info.com/EndorsementSearch.xsd"/>
       </wsdl:output>
       <wsdl:fault>
         <soap:body use="literal"
-		   namespace="http://schemas.snowboard-info.com/EndorsementSearch.xsd"/>
+       namespace="http://schemas.snowboard-info.com/EndorsementSearch.xsd"/>
       </wsdl:fault>
     </wsdl:operation>
   </wsdl:binding>

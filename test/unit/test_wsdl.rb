@@ -1,6 +1,5 @@
 require 'helper'
 require 'lolsoap/wsdl'
-require 'ostruct'
 
 module LolSoap
   describe WSDL do
@@ -41,12 +40,16 @@ module LolSoap
       end
 
       describe '#operations' do
+        before do
+          def subject.types; @types ||= { 'washHands' => Object.new }; end
+        end
+
         it 'returns a hash of operations' do
           subject.operations.length.must_equal 1
           subject.operations['washHands'].tap do |op|
             op.wsdl.must_equal   subject
             op.action.must_equal "urn:washHands"
-            op.input.must_equal  "washHands"
+            op.input.must_equal  subject.types['washHands']
           end
         end
       end
@@ -82,6 +85,12 @@ module LolSoap
             t.elements['name'].must_be_nil
             t.elements['hex'].must_be_nil
           end
+        end
+      end
+
+      describe '#prefixes' do
+        it 'returns the prefixes-to-namespace mapping' do
+          subject.prefixes.must_equal({ namespace => 'bla' })
         end
       end
     end

@@ -18,7 +18,7 @@ module LolSoap
     def operations
       @operations ||= Hash[
         parser.operations.map do |k, op|
-          [op[:input], Operation.new(self, op[:action], op[:input])]
+          [op[:input], Operation.new(self, op[:action], types[op[:input]])]
         end
       ]
     end
@@ -41,6 +41,10 @@ module LolSoap
 
     def namespaces
       parser.namespaces
+    end
+
+    def prefixes
+      namespaces.invert
     end
 
     # We are using Wasabi to parse the WSDL document. This is strictly an

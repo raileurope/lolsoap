@@ -8,6 +8,9 @@ class LolSoap::WSDL
       @input  = input
     end
 
+    def input_prefix; input.prefix; end
+    def input_name;   input.name;   end
+
     def inspect
       "<LolSoap::WSDL::Operation " \
       "action=#{action.inspect} " \
