@@ -1,6 +1,5 @@
 source "http://rubygems.org"
 
-gem 'wasabi'
 gem 'nokogiri'
 
 group :development do

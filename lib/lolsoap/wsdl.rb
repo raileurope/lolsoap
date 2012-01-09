@@ -1,24 +1,24 @@
-require 'wasabi'
-require 'nokogiri'
+require 'lolsoap/wsdl_parser'
 
 module LolSoap
   class WSDL
     require 'lolsoap/wsdl/operation'
     require 'lolsoap/wsdl/type'
 
-    attr_reader :raw
+    def self.parse(raw)
+      new(WSDLParser.new(raw))
+    end
 
-    # @private
-    attr_writer :parser
+    attr_reader :parser
 
-    def initialize(raw)
-      @raw = raw
+    def initialize(parser)
+      @parser = parser
     end
 
     def operations
       @operations ||= Hash[
         parser.operations.map do |k, op|
-          [op[:input], Operation.new(self, op[:action], types[op[:input]])]
+          [k, Operation.new(self, op[:action], types[op[:input][:name]])]
         end
       ]
     end
@@ -26,11 +26,7 @@ module LolSoap
     def types
       @types ||= Hash[
         parser.types.map do |name, type|
-          elements  = type.dup
-          namespace = elements.delete(:namespace)
-          elements  = Hash[elements.map { |k, v| [k, v[:type]] }]
-
-          [name, Type.new(self, name, namespace, elements)]
+          [name, Type.new(self, name, type[:namespace], type[:elements])]
         end
       ]
     end
@@ -52,18 +48,6 @@ module LolSoap
       "namespaces=#{namespaces.inspect} " \
       "operations=#{operations.inspect} " \
       "types=#{types.inspect}>"
-    end
-
-    # We are using Wasabi to parse the WSDL document. This is strictly an
-    # implementation detail, and should not be relied upon.
-    #
-    # @private
-    def parser
-      @parser ||= begin
-        parser = Wasabi::Parser.new Nokogiri::XML(raw)
-        parser.parse
-        parser
-      end
     end
   end
 end

@@ -4,69 +4,69 @@ require 'lolsoap/wsdl'
 module LolSoap
   describe WSDL do
     describe 'with a doc that can be parsed' do
-      subject { WSDL.new(nil) }
-
       let(:namespace) { 'http://lolsoap.api/bla' }
+      let(:parser) { OpenStruct.new(:namespaces => { 'bla' => namespace }) }
 
-      let(:parser) do
-        OpenStruct.new(
-          :endpoint => 'http://lolsoap.api/v1',
-          :operations => {
-            :wash_hands => {
-              :action => "urn:washHands",
-              :input  => "washHands"
-            }
-          },
-          :namespaces => {
-            'bla' => namespace
-          },
-          :types => {
-            'Brush' => {
-              'handleColor' => { :type => 'bla:Color' },
-              'age'         => { :type => 'xs:int' },
-              :namespace => namespace
-            },
-            'Color' => {
-              'name' => { :type => 'xs:string' },
-              'hex'  => { :type => 'xs:string' },
-              :namespace => namespace
-            }
-          }
-        )
-      end
-
-      before do
-        subject.parser = parser
-      end
+      subject { WSDL.new(parser) }
 
       describe '#operations' do
-        before do
-          def subject.types; @types ||= { 'washHands' => Object.new }; end
-        end
-
         it 'returns a hash of operations' do
+          def subject.types; @types ||= { 'WashHandsRequest' => Object.new }; end
+          parser.operations = {
+            'washHands' => {
+              :action => 'urn:washHands',
+              :input  => { :name => 'WashHandsRequest' }
+            }
+          }
+
           subject.operations.length.must_equal 1
           subject.operations['washHands'].tap do |op|
             op.wsdl.must_equal   subject
             op.action.must_equal "urn:washHands"
-            op.input.must_equal  subject.types['washHands']
+            op.input.must_equal  subject.types['WashHandsRequest']
           end
         end
       end
 
       describe '#endpoint' do
         it 'returns the endpoint' do
+          parser.endpoint = 'http://lolsoap.api/v1'
           subject.endpoint.must_equal 'http://lolsoap.api/v1'
         end
       end
 
       describe '#namespaces' do
         it 'returns a namespaces hash' do
-          subject.namespaces.must_equal parser.namespaces
+          subject.namespaces.must_equal({ 'bla' => namespace })
+        end
+      end
+
+      describe '#prefixes' do
+        it 'returns the prefixes-to-namespace mapping' do
+          subject.prefixes.must_equal({ namespace => 'bla' })
         end
       end
 
       describe '#types' do
+        before do
+          parser.types = {
+            'Brush' => {
+              :elements => {
+                'handleColor' => 'bla:Color',
+                'age'         => 'xs:int'
+              },
+              :namespace => namespace
+            },
+            'Color' => {
+              :elements => {
+                'name' => 'xs:string',
+                'hex'  => 'xs:string'
+              },
+              :namespace => namespace
+            }
+          }
+        end
+
         it 'returns a hash of types' do
           subject.types.length.must_equal 2
 
@@ -85,12 +85,6 @@ module LolSoap
             t.elements['name'].must_be_nil
             t.elements['hex'].must_be_nil
           end
-        end
-      end
-
-      describe '#prefixes' do
-        it 'returns the prefixes-to-namespace mapping' do
-          subject.prefixes.must_equal({ namespace => 'bla' })
         end
       end
     end

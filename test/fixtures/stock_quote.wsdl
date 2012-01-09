@@ -4,19 +4,12 @@
              targetNamespace="http://example.com/stockquote.wsdl"
              xmlns:tns="http://example.com/stockquote.wsdl"
              xmlns:xsd1="http://example.com/stockquote.xsd"
-             xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+             xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap12/"
              xmlns="http://schemas.xmlsoap.org/wsdl/">
 
   <types>
     <schema targetNamespace="http://example.com/stockquote.xsd"
-            xmlns="http://www.w3.org/2000/10/XMLSchema">
-      <element name="TradePriceRequest">
-        <complexType>
-          <all>
-            <element name="tickerSymbol" type="string"/>
-          </all>
-        </complexType>
-      </element>
+            xmlns="http://www.w3.org/2001/XMLSchema">
       <element name="TradePrice">
          <complexType>
            <all>
@@ -24,6 +17,15 @@
            </all>
          </complexType>
       </element>
+    </schema>
+
+    <schema targetNamespace="http://example.com/stockquote.xsd"
+            xmlns="http://www.w3.org/2001/XMLSchema">
+      <complexType name="TradePriceRequest">
+        <sequence>
+          <element name="tickerSymbol" type="string"/>
+        </sequence>
+      </complexType>
     </schema>
   </types>
 
