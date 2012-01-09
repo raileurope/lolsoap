@@ -47,6 +47,13 @@ module LolSoap
       namespaces.invert
     end
 
+    def inspect
+      "<LolSoap::WSDL " \
+      "namespaces=#{namespaces.inspect} " \
+      "operations=#{operations.inspect} " \
+      "types=#{types.inspect}>"
+    end
+
     # We are using Wasabi to parse the WSDL document. This is strictly an
     # implementation detail, and should not be relied upon.
     #
