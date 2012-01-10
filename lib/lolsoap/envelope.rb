@@ -5,6 +5,9 @@ module LolSoap
   class Envelope
     attr_reader :wsdl, :operation, :doc
 
+    SOAP_PREFIX    = 'soap'
+    SOAP_NAMESPACE = 'http://schemas.xmlsoap.org/soap/envelope/'
+
     def initialize(wsdl, operation, doc = Nokogiri::XML::Document.new)
       @wsdl      = wsdl
       @operation = operation
@@ -37,6 +40,14 @@ module LolSoap
       doc.to_xml
     end
 
+    def soap_prefix
+      SOAP_PREFIX
+    end
+
+    def soap_namespace
+      SOAP_NAMESPACE
+    end
+
     private
 
     attr_reader :input
@@ -45,14 +56,14 @@ module LolSoap
       doc.root = root = doc.create_element 'Envelope'
 
       namespaces = Hash[wsdl.namespaces.map { |prefix, uri| [prefix, root.add_namespace(prefix, uri)] }]
-      namespaces['soap'] = root.add_namespace('soap', 'http://schemas.xmlsoap.org/soap/envelope/')
+      namespaces[soap_prefix] = root.add_namespace(soap_prefix, soap_namespace)
 
       @header = doc.create_element 'Header'
 
       @body  = doc.create_element 'Body'
       @input = doc.create_element operation.input_name
 
-      [root, @header, @body].each { |el| el.namespace = namespaces['soap'] }
+      [root, @header, @body].each { |el| el.namespace = namespaces[soap_prefix] }
       @input.namespace = namespaces[operation.input_prefix]
 
       @body << @input
