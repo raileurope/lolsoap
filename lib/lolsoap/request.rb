@@ -14,6 +14,10 @@ module LolSoap
       envelope.header(&block)
     end
 
+    def soap_namespace
+      request.soap_namespace
+    end
+
     def url
       envelope.endpoint
     end
