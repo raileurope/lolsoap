@@ -15,7 +15,7 @@ module LolSoap
     end
 
     def soap_namespace
-      request.soap_namespace
+      envelope.soap_namespace
     end
 
     def url

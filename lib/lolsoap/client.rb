@@ -1,3 +1,8 @@
+require 'lolsoap/wsdl'
+require 'lolsoap/request'
+require 'lolsoap/envelope'
+require 'lolsoap/response'
+
 module LolSoap
   # client = Client.new(File.read('foo.wsdl'))
   #
@@ -13,21 +18,16 @@ module LolSoap
   class Client
     attr_reader :wsdl
 
-    # wsdl - if it responds to to_str, then it's assumed to be the XML WSDL data.
-    #        otherwise, assumed to be an object conforming to the public interface of LolSoap::WSDL
     def initialize(wsdl)
-      @wsdl = wsdl.respond_to?(:to_str) ? WSDL.new(wsdl.to_str) : wsdl
+      @wsdl = wsdl.respond_to?(:to_str) ? WSDL.parse(wsdl.to_str) : wsdl
     end
 
-    # action - the name of the action to be performed
-    # body   - something that returns the body XML when to_s is called on it
-    def request(action, body)
-      Request.new(wsdl, action, body)
+    def request(name)
+      Request.new(Envelope.new(wsdl, wsdl.operation(name)))
     end
 
-    # raw_response - not sure yet, possibly [status, headers, body] ?
-    def response(raw_response)
-      Response.new(wsdl, raw_response)
+    def response(request, raw)
+      Response.parse(request, raw)
     end
   end
 end
