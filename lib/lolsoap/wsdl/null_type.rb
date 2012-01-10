@@ -11,5 +11,9 @@ class LolSoap::WSDL
     def element(name)
       NullType.new
     end
+
+    def ==(other)
+      self.class === other
+    end
   end
 end

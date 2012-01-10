@@ -17,19 +17,19 @@ module LolSoap
     end
 
     def operations
-      @operations ||= Hash[
-        parser.operations.map do |k, op|
-          [k, Operation.new(self, op[:action], types[op[:input][:name]])]
-        end
-      ]
+      load_operations.dup
+    end
+
+    def operation(name)
+      load_operations[name]
     end
 
     def types
-      @types ||= Hash[
-        parser.types.map do |name, type|
-          [name, Type.new(self, name, type[:namespace], type[:elements])]
-        end
-      ]
+      load_types.dup
+    end
+
+    def type(name)
+      load_types.fetch(name) { NullType.new }
     end
 
     def endpoint
@@ -49,6 +49,24 @@ module LolSoap
       "namespaces=#{namespaces.inspect} " \
       "operations=#{operations.inspect} " \
       "types=#{types.inspect}>"
+    end
+
+    private
+
+    def load_operations
+      @operations ||= Hash[
+        parser.operations.map do |k, op|
+          [k, Operation.new(self, op[:action], type(op[:input][:name]))]
+        end
+      ]
+    end
+
+    def load_types
+      @types ||= Hash[
+        parser.types.map do |name, type|
+          [name, Type.new(self, name, type[:namespace], type[:elements])]
+        end
+      ]
     end
   end
 end

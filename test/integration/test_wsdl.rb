@@ -12,7 +12,7 @@ module LolSoap
         o.action.must_equal 'http://example.com/GetLastTradePrice'
       end
 
-      subject.types.length.must_equal 2
+      subject.types.length.must_equal 3
       subject.types['TradePriceRequest'].tap do |t|
         t.name.must_equal 'TradePriceRequest'
         t.namespace.must_equal 'http://example.com/stockquote.xsd'

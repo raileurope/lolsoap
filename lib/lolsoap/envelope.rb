@@ -1,42 +1,51 @@
 require 'nokogiri'
+require 'lolsoap/builder'
 
 module LolSoap
   class Envelope
     attr_reader :wsdl, :operation, :doc
 
-    def initialize(wsdl, operation, builder = Nokogiri::XML::Builder.new)
+    def initialize(wsdl, operation, doc = Nokogiri::XML::Document.new)
       @wsdl      = wsdl
       @operation = operation
-      @builder   = builder
+      @doc       = doc
 
       initialize_doc
     end
 
-    def namespaces
-      namespaces = Hash[wsdl.namespaces.map { |k, v| ["xmlns:#{k}", v] }]
-      namespaces['xmlns:soap'] = 'http://schemas.xmlsoap.org/soap/envelope/'
-      namespaces
+    def body(klass = Builder)
+      builder = klass.new(input, operation.input)
+      yield builder if block_given?
+      builder
+    end
+
+    def header(klass = Builder)
+      builder = klass.new(@header)
+      yield builder if block_given?
+      builder
     end
 
     private
 
-    attr_reader :builder
+    attr_reader :input
 
     def initialize_doc
-      builder.Envelope(namespaces) do |env|
-        env['soap'].Header do |header|
-          @header = header
-        end
+      doc.root = root = doc.create_element 'Envelope'
 
-        env['soap'].Body do |body|
-          body[operation.input_prefix].send(operation.input_name) do |input|
-            @input = input
-          end
-        end
-      end
+      namespaces = Hash[wsdl.namespaces.map { |prefix, uri| [prefix, root.add_namespace(prefix, uri)] }]
+      namespaces['soap'] = root.add_namespace('soap', 'http://schemas.xmlsoap.org/soap/envelope/')
 
-      @doc = builder.doc
-      @doc.root.namespace = @doc.root.namespace_definitions.find { |d| d.prefix == 'soap' }
+      @header = doc.create_element 'Header'
+
+      @body  = doc.create_element 'Body'
+      @input = doc.create_element operation.input_name
+
+      [root, @header, @body].each { |el| el.namespace = namespaces['soap'] }
+      @input.namespace = namespaces[operation.input_prefix]
+
+      @body << @input
+      root  << @header
+      root  << @body
     end
   end
 end

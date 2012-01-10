@@ -11,6 +11,7 @@ module LolSoap
         subject.namespaces.must_equal({
           'tns'  => 'http://example.com/stockquote.wsdl',
           'xsd1' => 'http://example.com/stockquote.xsd',
+          'xsd2' => 'http://example.com/stockquote2.xsd',
           'soap' => 'http://schemas.xmlsoap.org/wsdl/soap12/'
         })
       end
@@ -28,12 +29,17 @@ module LolSoap
           'TradePriceRequest' => {
             :name      => 'TradePriceRequest',
             :namespace => 'http://example.com/stockquote.xsd',
-            :elements  => { 'tickerSymbol' => 'string' }
+            :elements  => { 'tickerSymbol' => 'string', 'specialTickerSymbol' => 'xsd2:TickerSymbol' }
           },
           'TradePrice' => {
             :name      => 'TradePrice',
             :namespace => 'http://example.com/stockquote.xsd',
             :elements  => { 'price' => 'float' }
+          },
+          'TickerSymbol' => {
+            :name      => 'TickerSymbol',
+            :namespace => 'http://example.com/stockquote2.xsd',
+            :elements  => { 'name' => 'string' }
           }
         })
       end

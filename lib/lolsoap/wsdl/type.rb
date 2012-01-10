@@ -23,14 +23,14 @@ class LolSoap::WSDL
 
     def inspect
       "<LolSoap::WSDL::Type " \
-      "name=#{name.inspect} " \
-      "namespace=#{namespace.inspect}>"
+      "name=#{(prefix + ':' + name).inspect} " \
+      "elements=#{elements.inspect}>"
     end
 
     private
 
     def load_elements
-      @elements ||= Hash[@element_types.map { |name, type| [name, wsdl.types[type.split(':').last]] }]
+      @elements ||= Hash[@element_types.map { |name, type| [name, wsdl.type(type.split(':').last)] }]
     end
   end
 end

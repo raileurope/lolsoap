@@ -4,10 +4,9 @@ require 'lolsoap/wsdl'
 class LolSoap::WSDL
   describe Type do
     let(:wsdl) do
-      OpenStruct.new(
-        :prefixes => { 'http://example.com/foo' => 'foo' },
-        :types    => { 'Color' => Object.new }
-      )
+      wsdl = OpenStruct.new(:prefixes => { 'http://example.com/foo' => 'foo' })
+      def wsdl.type(name); @types ||= { 'Color' => Object.new }; @types[name]; end
+      wsdl
     end
     subject { Type.new(wsdl, 'WashHandsRequest', 'http://example.com/foo', { 'soapColor' => 'Color' }) }
 
@@ -19,17 +18,17 @@ class LolSoap::WSDL
 
     describe '#elements' do
       it 'returns a hash of all elements' do
-        subject.elements.must_equal({ 'soapColor' => wsdl.types['Color'] })
+        subject.elements.must_equal({ 'soapColor' => wsdl.type('Color') })
       end
     end
 
     describe '#element' do
       it 'returns a specific element' do
-        subject.element('soapColor').must_equal wsdl.types['Color']
+        subject.element('soapColor').must_equal wsdl.type('Color')
       end
 
       it 'returns a null object if the element does not exit' do
-        subject.element('omg').is_a?(NullType).must_equal true
+        subject.element('omg').must_equal NullType.new
       end
     end
   end

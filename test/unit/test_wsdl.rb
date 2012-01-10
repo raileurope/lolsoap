@@ -9,21 +9,31 @@ module LolSoap
 
       subject { WSDL.new(parser) }
 
-      describe '#operations' do
-        it 'returns a hash of operations' do
-          def subject.types; @types ||= { 'WashHandsRequest' => Object.new }; end
+      describe 'with operations' do
+        before do
+          def subject.type(n); @types ||= { 'WashHandsRequest' => Object.new }; @types[n] end
           parser.operations = {
             'washHands' => {
               :action => 'urn:washHands',
               :input  => { :name => 'WashHandsRequest' }
             }
           }
+        end
 
-          subject.operations.length.must_equal 1
-          subject.operations['washHands'].tap do |op|
-            op.wsdl.must_equal   subject
-            op.action.must_equal "urn:washHands"
-            op.input.must_equal  subject.types['WashHandsRequest']
+        describe '#operations' do
+          it 'returns a hash of operations' do
+            subject.operations.length.must_equal 1
+            subject.operations['washHands'].tap do |op|
+              op.wsdl.must_equal   subject
+              op.action.must_equal "urn:washHands"
+              op.input.must_equal  subject.types['WashHandsRequest']
+            end
+          end
+        end
+
+        describe '#operation' do
+          it 'returns a single operation' do
+            subject.operation('washHands').must_equal subject.operations['washHands']
           end
         end
       end
@@ -47,7 +57,7 @@ module LolSoap
         end
       end
 
-      describe '#types' do
+      describe 'with types' do
         before do
           parser.types = {
             'Brush' => {
@@ -67,23 +77,35 @@ module LolSoap
           }
         end
 
-        it 'returns a hash of types' do
-          subject.types.length.must_equal 2
+        describe '#types' do
+          it 'returns a hash of types' do
+            subject.types.length.must_equal 2
 
-          subject.types['Brush'].tap do |t|
-            t.wsdl.must_equal subject
-            t.namespace.must_equal namespace
-            t.elements.length.must_equal 2
-            t.elements['handleColor'].must_equal subject.types['Color']
-            t.elements['age'].must_be_nil
+            subject.types['Brush'].tap do |t|
+              t.wsdl.must_equal subject
+              t.namespace.must_equal namespace
+              t.elements.length.must_equal 2
+              t.elements['handleColor'].must_equal subject.types['Color']
+              t.elements['age'].must_equal WSDL::NullType.new
+            end
+
+            subject.types['Color'].tap do |t|
+              t.wsdl.must_equal subject
+              t.namespace.must_equal namespace
+              t.elements.length.must_equal 2
+              t.elements['name'].must_equal WSDL::NullType.new
+              t.elements['hex'].must_equal WSDL::NullType.new
+            end
+          end
+        end
+
+        describe '#type' do
+          it 'returns a single type' do
+            subject.type('Color').must_equal subject.types['Color']
           end
 
-          subject.types['Color'].tap do |t|
-            t.wsdl.must_equal subject
-            t.namespace.must_equal namespace
-            t.elements.length.must_equal 2
-            t.elements['name'].must_be_nil
-            t.elements['hex'].must_be_nil
+          it 'returns a null object if a type is missing' do
+            subject.type('FooBar').must_equal WSDL::NullType.new
           end
         end
       end
