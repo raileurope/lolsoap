@@ -10,17 +10,13 @@ module LolSoap
   #
   # http_req = request.http
   # http.post(http_req.url, http_req.headers, http_req.body)
-  class Session
+  class Client
     attr_reader :wsdl
 
     # wsdl - if it responds to to_str, then it's assumed to be the XML WSDL data.
     #        otherwise, assumed to be an object conforming to the public interface of LolSoap::WSDL
     def initialize(wsdl)
       @wsdl = wsdl.respond_to?(:to_str) ? WSDL.new(wsdl.to_str) : wsdl
-    end
-
-    def build(action, &block)
-      BodyBuilder.new(wsdl, action).define(&block)
     end
 
     # action - the name of the action to be performed
