@@ -8,7 +8,7 @@ module LolSoap
       OpenStruct.new(:input_prefix => 'foo', :input_name => 'WashHandsRequest', :input => Object.new)
     end
 
-    subject { LolSoap::Envelope.new(wsdl, operation) }
+    subject { Envelope.new(wsdl, operation) }
 
     let(:doc) { subject.doc }
     let(:header) { doc.at_xpath('/soap:Envelope/soap:Header', doc.namespaces) }
@@ -72,6 +72,27 @@ module LolSoap
         builder_klass.expect(:new, builder, [header])
 
         subject.header(builder_klass).must_equal builder
+      end
+    end
+
+    describe '#endpoint' do
+      it 'delegates to wsdl' do
+        wsdl.endpoint = 'lol'
+        subject.endpoint.must_equal 'lol'
+      end
+    end
+
+    describe '#to_xml' do
+      it 'returns the xml of the doc' do
+        def subject.doc; OpenStruct.new(:to_xml => '<lol>'); end
+        subject.to_xml.must_equal '<lol>'
+      end
+    end
+
+    describe '#action' do
+      it "returns the operation's action" do
+        operation.action = 'lol'
+        subject.action.must_equal 'lol'
       end
     end
   end

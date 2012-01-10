@@ -25,6 +25,18 @@ module LolSoap
       builder
     end
 
+    def endpoint
+      wsdl.endpoint
+    end
+
+    def action
+      operation.action
+    end
+
+    def to_xml
+      doc.to_xml
+    end
+
     private
 
     attr_reader :input

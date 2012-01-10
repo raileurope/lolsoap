@@ -3,6 +3,7 @@ module LolSoap
     attr_reader :envelope
 
     def initialize(envelope)
+      @envelope = envelope
     end
 
     def body(&block)
@@ -13,8 +14,20 @@ module LolSoap
       envelope.header(&block)
     end
 
-    def http
-      # return an object representing the HTTP request
+    def url
+      envelope.endpoint
+    end
+
+    def headers
+      {
+        'Content-Type'   => 'application/soap+xml;charset=UTF-8',
+        'Content-Length' => content.bytesize.to_s,
+        'SOAPAction'     => envelope.action
+      }
+    end
+
+    def content
+      @content ||= envelope.to_xml
     end
   end
 end
