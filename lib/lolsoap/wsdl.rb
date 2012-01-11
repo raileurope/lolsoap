@@ -53,8 +53,8 @@ module LolSoap
     def inspect
       "<LolSoap::WSDL " \
       "namespaces=#{namespaces.inspect} " \
-      "operations=#{operations.inspect} " \
-      "types=#{types.inspect}>"
+      "operations=#{operations.keys.inspect} " \
+      "types=#{types.keys.inspect}>"
     end
 
     private

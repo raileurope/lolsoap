@@ -17,6 +17,10 @@ class LolSoap::WSDL
       @singular == true
     end
 
+    def inspect
+      "<LolSoap::WSDL::Element name=#{name.inspect} type=#{@type_name.inspect}>"
+    end
+
     private
 
     def wsdl; @wsdl; end

@@ -21,5 +21,11 @@ class LolSoap::WSDL
         subject.singular?.must_equal true
       end
     end
+
+    describe '#inspect' do
+      it 'works' do
+        subject.inspect
+      end
+    end
   end
 end

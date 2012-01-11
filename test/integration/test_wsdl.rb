@@ -18,5 +18,11 @@ module LolSoap
         t.namespace.must_equal 'http://example.com/stockquote.xsd'
       end
     end
+
+    describe '#inspect' do
+      it 'works' do
+        subject.inspect
+      end
+    end
   end
 end

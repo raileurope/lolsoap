@@ -34,5 +34,11 @@ class LolSoap::WSDL
         subject.sub_type('soapColor').must_equal elements['soapColor'].type
       end
     end
+
+    describe '#inspect' do
+      it 'works' do
+        subject.inspect
+      end
+    end
   end
 end
