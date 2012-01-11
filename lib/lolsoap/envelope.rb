@@ -50,7 +50,7 @@ module LolSoap
 
     private
 
-    attr_reader :input
+    def input; @input; end
 
     def initialize_doc
       doc.root = root = doc.create_element 'Envelope'
