@@ -40,6 +40,10 @@ module LolSoap
       parser.namespaces
     end
 
+    def type_namespaces
+      Hash[parser.types.map { |k, t| [prefixes[t[:namespace]], t[:namespace]] }]
+    end
+
     def prefixes
       namespaces.invert
     end

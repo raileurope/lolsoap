@@ -3,7 +3,7 @@ require 'lolsoap/envelope'
 
 module LolSoap
   describe Envelope do
-    let(:wsdl) { OpenStruct.new(:namespaces => { 'foo' => 'http://example.com/foo' }) }
+    let(:wsdl) { OpenStruct.new(:type_namespaces => { 'foo' => 'http://example.com/foo' }) }
     let(:operation) do
       OpenStruct.new(:input_prefix => 'foo', :input_name => 'WashHandsRequest', :input => Object.new)
     end

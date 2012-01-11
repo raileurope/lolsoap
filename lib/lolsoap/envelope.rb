@@ -55,7 +55,7 @@ module LolSoap
     def initialize_doc
       doc.root = root = doc.create_element 'Envelope'
 
-      namespaces = Hash[wsdl.namespaces.map { |prefix, uri| [prefix, root.add_namespace(prefix, uri)] }]
+      namespaces = Hash[wsdl.type_namespaces.map { |prefix, uri| [prefix, root.add_namespace(prefix, uri)] }]
       namespaces[soap_prefix] = root.add_namespace(soap_prefix, soap_namespace)
 
       @header = doc.create_element 'Header'

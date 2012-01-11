@@ -108,6 +108,13 @@ module LolSoap
             subject.type('FooBar').must_equal WSDL::NullType.new
           end
         end
+
+        describe '#type_namespaces' do
+          it 'returns only the namespaces that used by types' do
+            parser.namespaces['foo'] = 'bar'
+            subject.type_namespaces.must_equal 'bla' => namespace
+          end
+        end
       end
     end
   end
