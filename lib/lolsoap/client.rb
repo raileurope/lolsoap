@@ -4,17 +4,6 @@ require 'lolsoap/envelope'
 require 'lolsoap/response'
 
 module LolSoap
-  # client = Client.new(File.read('foo.wsdl'))
-  #
-  # request = client.request('washHands')
-  # request.body do |b|
-  #   b.soapScent 'Lemon'
-  #   b.duration '5 mins'
-  #   ...
-  # end
-  #
-  # http_req = request.http
-  # http.post(http_req.url, http_req.headers, http_req.body)
   class Client
     attr_reader :wsdl
 

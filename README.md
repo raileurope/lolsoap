@@ -12,14 +12,52 @@ https://github.com/loco2/lolsoap
 * The classes are intended to be loosely coupled and non-prescriptive
   about how they are used.
 * LolSoap does not know anything about what HTTP library you want to
-  use, and does not care whether you're doing the IO in a synchronous
+  use, and does not care whether you're doing the IO in a synchronous or
   asynchronous fashion. This does mean you have to provide a little bit
   of glue code, but the benefit is flexibility.
-* Don't monkey-patch anything not defined in the library.
+* No monkey-patching.
+* Runs without warnings.
 
 ## Synopsis ##
 
-Nothing yet.
+``` ruby
+# You will need your own HTTP client
+http = MyHttpClient.new
+
+# LolSoap::Client is just a thing wrapper object that handles creating
+# other objects for your (for a given WSDL file)
+client = LolSoap::Client.new(File.read('lolapi.wsdl'))
+
+# Create a request object
+request = client.request('getLols')
+
+# Populate the request with some data. Namespacing is taken care of
+# using the type data from the WSDL.
+request.body do |b|
+  b.lolFactor '11'
+  b.lolDuration 'lolever'
+  ...
+end
+
+# See the full request XML
+puts request.content
+
+# Send that request!
+raw_response = http.post(request.url, request.headers, request.content)
+
+# Create a response object
+response = client.response(request, raw_response)
+
+# Get access to the XML structure (a Nokogiri::XML::Document)
+p response.doc
+
+# Get access to the first node inside the Body
+p response.body
+
+# Turn the body into a hash. The WSDL schema is used to work out which
+# elements are supposed to be collections and which are just singular.
+p response.body_hash
+```
 
 ## Bugs/Features ##
 
@@ -27,6 +65,30 @@ Nothing yet.
   if they don't add too much extra complexity.
 * WSSE is not supported.
 * Assumes that you are able to supply a WSDL document for the service.
+
+## Overview ##
+
+These are some of the key classes. If you want, you can require them
+directly (e.g. `require 'lolsoap/request'` rather than having to
+`require 'lolsoap'`).
+
+The main ones:
+
+* `LolSoap::Request` - A HTTP request to be sent
+* `LolSoap::Envelope` - The SOAP envelope in the body of a request
+* `LolSoap::Response` - The API's response
+* `LolSoap::WSDL` - A WSDL document
+
+The others:
+
+* `LolSoap::WSDLParser` - Lower level representation of the WSDL
+  document
+* `LolSoap::Builder` - XML builder object that knows about types, and
+  therefore how elements should be namespaced.
+* `LolSoap::Fault` - A SOAP 'fault' (error)
+* `LolSoap::HashBuilder` - Builds hashes from the API response, using
+  the WSDL type data to determine which elements are collection
+  elements.
 
 ## Authors ##
 
