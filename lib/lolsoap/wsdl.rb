@@ -8,6 +8,7 @@ module LolSoap
     require 'lolsoap/wsdl/element'
     require 'lolsoap/wsdl/null_element'
 
+    # Create a new instance by parsing a raw string of XML
     def self.parse(raw)
       new(WSDLParser.parse(raw))
     end
@@ -18,36 +19,44 @@ module LolSoap
       @parser = parser
     end
 
+    # Hash of operations that are supports by the SOAP service
     def operations
       load_operations.dup
     end
 
+    # Get a single operation
     def operation(name)
       load_operations[name]
     end
 
+    # Hash of types declared by the service
     def types
       load_types.dup
     end
 
+    # Get a single type, or a NullType if the type doesn't exist
     def type(name)
       load_types.fetch(name) { NullType.new }
     end
 
+    # The SOAP endpoint URL
     def endpoint
       parser.endpoint
     end
 
+    # Hash of namespaces used in the WSDL document (keys are prefixes)
     def namespaces
       parser.namespaces
     end
 
-    def type_namespaces
-      Hash[parser.types.map { |k, t| [prefixes[t[:namespace]], t[:namespace]] }]
-    end
-
+    # Hash of namespace prefixes used in the WSDL document (keys are namespace URIs)
     def prefixes
       namespaces.invert
+    end
+
+    # Namespaces used by the types (a subset of #namespaces)
+    def type_namespaces
+      Hash[parser.types.map { |k, t| [prefixes[t[:namespace]], t[:namespace]] }]
     end
 
     def inspect
@@ -59,6 +68,7 @@ module LolSoap
 
     private
 
+    # @private
     def load_operations
       @operations ||= Hash[
         parser.operations.map do |k, op|
@@ -67,6 +77,7 @@ module LolSoap
       ]
     end
 
+    # @private
     def load_types
       @types ||= Hash[
         parser.types.map do |name, type|
@@ -75,6 +86,7 @@ module LolSoap
       ]
     end
 
+    # @private
     def build_elements(elements)
       Hash[
         elements.map do |name, el|

@@ -5,7 +5,10 @@ module LolSoap
   class Envelope
     attr_reader :wsdl, :operation, :doc
 
+    # @private
     SOAP_PREFIX    = 'soap'
+
+    # @private
     SOAP_NAMESPACE = 'http://www.w3.org/2003/05/soap-envelope'
 
     def initialize(wsdl, operation, doc = Nokogiri::XML::Document.new)
@@ -16,12 +19,19 @@ module LolSoap
       initialize_doc
     end
 
+    # Build the body of the envelope
+    #
+    # @example
+    #   env.body do |b|
+    #     b.some 'data'
+    #   end
     def body(klass = Builder)
       builder = klass.new(input, operation.input)
       yield builder if block_given?
       builder
     end
 
+    # Build the header of the envelope
     def header(klass = Builder)
       builder = klass.new(@header)
       yield builder if block_given?
@@ -58,8 +68,10 @@ module LolSoap
 
     private
 
+    # @private
     def input; @input; end
 
+    # @private
     def initialize_doc
       doc.root = root = doc.create_element 'Envelope'
 

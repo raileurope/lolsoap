@@ -1,6 +1,19 @@
 require 'lolsoap/wsdl'
 
 module LolSoap
+  # Used to build XML, with namespaces automatically added.
+  #
+  # @example General
+  #   builder = Builder.new(node, type)
+  #   builder.someTag do |t|
+  #     t.foo 'bar'
+  #   end
+  #   # => <ns1:someTag><ns1:foo>bar</ns1:foo></ns1:someTag>
+  #
+  # @example Explicitly specifying a namespace prefix
+  #   builder = Builder.new(node, type)
+  #   builder['ns2'].someTag
+  #   # => <ns2:someTag/>
   class Builder
     RESERVED_METHODS = %w(object_id respond_to_missing? inspect === to_s)
 
@@ -9,6 +22,7 @@ module LolSoap
       undef_method m unless RESERVED_METHODS.include?(m.to_s) || m =~ /^__/
     end
 
+    # @private
     class Prefix
       instance_methods.each do |m|
         undef_method m unless RESERVED_METHODS.include?(m.to_s) || m =~ /^__/
@@ -35,10 +49,13 @@ module LolSoap
       @type = type
     end
 
+    # Add a tag manually, rather than through method_missing. This is so you can still
+    # add tags for the very small number of tags that are also existing methods.
     def __tag__(name, *args, &block)
       __prefixed_tag__(@type.prefix, @type.sub_type(name.to_s), name, *args, &block)
     end
 
+    # @private
     def __prefixed_tag__(prefix, sub_type, name, *args)
       sub_node = @node.document.create_element(name.to_s, *args)
       sub_node.namespace = @node.namespace_scopes.find { |n| n.prefix == prefix }
@@ -50,14 +67,17 @@ module LolSoap
       builder
     end
 
+    # Node accessor. Named to prevent method_missing conflict.
     def __node__
       @node
     end
 
+    # Type accessor. Named to prevent method_missing conflict.
     def __type__
       @type
     end
 
+    # Specify a namespace prefix explicitly
     def [](prefix)
       Prefix.new(self, prefix)
     end

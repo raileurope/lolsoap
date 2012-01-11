@@ -1,4 +1,6 @@
 module LolSoap
+  # Turns an XML node into a hash data structure. Works out which elements
+  # are supposed to be collections based on the type information.
   class HashBuilder
     attr_reader :node, :type
 
@@ -21,6 +23,7 @@ module LolSoap
 
     private
 
+    # @private
     def children_hash
       hash = {}
       children.each do |child|

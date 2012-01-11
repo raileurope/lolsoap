@@ -7,6 +7,7 @@ module LolSoap
   class Response
     attr_reader :request, :doc
 
+    # Create a new instance from a raw XML string
     def self.parse(request, raw)
       new(request, Nokogiri::XML::Document.parse(raw))
     end
@@ -18,22 +19,27 @@ module LolSoap
       raise FaultRaised.new(fault) if fault
     end
 
+    # Namespace used for SOAP Envelope tags
     def soap_namespace
       request.soap_namespace
     end
 
+    # The XML node for the body of the envelope
     def body
       @body ||= doc.at_xpath('/soap:Envelope/soap:Body/*', 'soap' => soap_namespace)
     end
 
+    # Convert the body node to a Hash, using WSDL type data to determine the structure
     def body_hash(builder = HashBuilder)
       builder.new(body, request.output_type).output
     end
 
+    # The XML node for the header of the envelope
     def header
       @header ||= doc.at_xpath('/soap:Envelope/soap:Header', 'soap' => soap_namespace)
     end
 
+    # SOAP fault, if any (an exception will be raised in the initializer, if there is one)
     def fault
       @fault ||= begin
         node = doc.at_xpath('/soap:Envelope/soap:Body/soap:Fault', 'soap' => soap_namespace)

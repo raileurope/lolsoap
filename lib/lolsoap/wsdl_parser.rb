@@ -1,6 +1,7 @@
 require 'nokogiri'
 
 module LolSoap
+  # @private
   class WSDLParser
     NS = {
       :wsdl      => 'http://schemas.xmlsoap.org/wsdl/',
