@@ -24,8 +24,8 @@ https://github.com/loco2/lolsoap
 # You will need your own HTTP client
 http = MyHttpClient.new
 
-# LolSoap::Client is just a thing wrapper object that handles creating
-# other objects for your (for a given WSDL file)
+# LolSoap::Client is just a thin wrapper object that handles creating
+# other objects for you, with a given WSDL file
 client = LolSoap::Client.new(File.read('lolapi.wsdl'))
 
 # Create a request object
