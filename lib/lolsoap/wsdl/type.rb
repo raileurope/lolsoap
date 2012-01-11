@@ -1,6 +1,6 @@
 class LolSoap::WSDL
   class Type
-    attr_reader :wsdl, :name, :namespace
+    attr_reader :name, :namespace
 
     def initialize(wsdl, name, namespace, elements)
       @wsdl          = wsdl
@@ -28,6 +28,8 @@ class LolSoap::WSDL
     end
 
     private
+
+    def wsdl; @wsdl; end
 
     def load_elements
       @elements ||= Hash[@element_types.map { |name, type| [name, wsdl.type(type.split(':').last)] }]

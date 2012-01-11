@@ -82,7 +82,6 @@ module LolSoap
             subject.types.length.must_equal 2
 
             subject.types['Brush'].tap do |t|
-              t.wsdl.must_equal subject
               t.namespace.must_equal namespace
               t.elements.length.must_equal 2
               t.elements['handleColor'].must_equal subject.types['Color']
@@ -90,7 +89,6 @@ module LolSoap
             end
 
             subject.types['Color'].tap do |t|
-              t.wsdl.must_equal subject
               t.namespace.must_equal namespace
               t.elements.length.must_equal 2
               t.elements['name'].must_equal WSDL::NullType.new
