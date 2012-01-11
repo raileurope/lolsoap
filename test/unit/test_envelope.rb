@@ -16,7 +16,7 @@ module LolSoap
 
     it 'has a skeleton SOAP envelope structure when first created' do
       doc.namespaces.must_equal(
-        'xmlns:soap' => 'http://schemas.xmlsoap.org/soap/envelope/',
+        'xmlns:soap' => Envelope::SOAP_NAMESPACE,
         'xmlns:foo'  => 'http://example.com/foo'
       )
 

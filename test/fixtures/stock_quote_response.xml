@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:m="http://example.com/stockquote.xsd">
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:m="http://example.com/stockquote.xsd">
 <soap:Body>
   <m:GetStockPriceResponse>
     <m:Price>34.5</m:Price>

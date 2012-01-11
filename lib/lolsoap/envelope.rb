@@ -6,7 +6,7 @@ module LolSoap
     attr_reader :wsdl, :operation, :doc
 
     SOAP_PREFIX    = 'soap'
-    SOAP_NAMESPACE = 'http://schemas.xmlsoap.org/soap/envelope/'
+    SOAP_NAMESPACE = 'http://www.w3.org/2003/05/soap-envelope'
 
     def initialize(wsdl, operation, doc = Nokogiri::XML::Document.new)
       @wsdl      = wsdl
