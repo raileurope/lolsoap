@@ -22,11 +22,24 @@ module LolSoap
     private
 
     def children_hash
-      Hash[
-        children.map do |child|
-          [child.name, self.class.new(child, type).output]
+      hash = {}
+      children.each do |child|
+        element = type.element(child.name)
+        output  = self.class.new(child, element.type).output
+
+        if Array === hash[child.name] || !element.singular?
+          hash[child.name] ||= []
+          hash[child.name] << output
+        else
+          if hash.include?(child.name)
+            hash[child.name] = [hash[child.name]]
+            hash[child.name] << output
+          else
+            hash[child.name] = output
+          end
         end
-      ]
+      end
+      hash
     end
   end
 end

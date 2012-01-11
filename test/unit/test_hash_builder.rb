@@ -5,15 +5,17 @@ require 'nokogiri'
 
 module LolTypes
   class Type
-    def element(name); @elements[name]; end
+    def element(name)
+      elements.fetch(name) { LolSoap::WSDL::NullElement.new }
+    end
   end
 
   class Person < Type
     def elements
       @elements ||= {
-        'name'    => LolTypes.name,
-        'age'     => LolSoap::WSDL::NullType.new,
-        'friends' => LolTypes.person
+        'name'    => OpenStruct.new(:type => LolTypes.name,               :singular? => true),
+        'age'     => OpenStruct.new(:type => LolSoap::WSDL::NullType.new, :singular? => true),
+        'friends' => OpenStruct.new(:type => LolTypes.person,             :singular? => false)
       }
     end
   end
@@ -21,8 +23,8 @@ module LolTypes
   class Name < Type
     def elements
       @elements ||= {
-        'firstName' => LolSoap::WSDL::NullType.new,
-        'lastName'  => LolSoap::WSDL::NullType.new
+        'firstName' => OpenStruct.new(:type => LolSoap::WSDL::NullType.new, :singular? => true),
+        'lastName'  => OpenStruct.new(:type => LolSoap::WSDL::NullType.new, :singular? => true)
       }
     end
   end
@@ -61,6 +63,65 @@ module LolSoap
 
       builder = HashBuilder.new(node, LolTypes.person)
       builder.output.must_equal({ 'foo' => 'bar' })
+    end
+
+    it 'converts fields which can occur multiple times into arrays' do
+      xml = Nokogiri::XML::Builder.new do
+        person do
+          friends { age '20' }
+        end
+      end
+      node = xml.doc.root
+
+      builder = HashBuilder.new(node, LolTypes.person)
+      builder.output.must_equal({
+        'friends' => [
+          { 'age' => '20' }
+        ]
+      })
+
+      xml = Nokogiri::XML::Builder.new do
+        person do
+          friends { age '20' }
+          friends { age '50' }
+          friends { age '30' }
+        end
+      end
+      node = xml.doc.root
+
+      builder = HashBuilder.new(node, LolTypes.person)
+      builder.output.must_equal({
+        'friends' => [
+          { 'age' => '20' },
+          { 'age' => '50' },
+          { 'age' => '30' }
+        ]
+      })
+    end
+
+    it 'converts fields which occur multiple times, even if their element says they shouldnt, into arrays' do
+      xml = Nokogiri::XML::Builder.new do
+        person do
+          age '20'
+          age '30'
+        end
+      end
+      node = xml.doc.root
+
+      builder = HashBuilder.new(node, LolTypes.person)
+      builder.output.must_equal({ 'age' => ['20', '30'] })
+
+      xml = Nokogiri::XML::Builder.new do
+        person do
+          age '20'
+          age '30'
+          age '40'
+        end
+      end
+      node = xml.doc.root
+
+      builder = HashBuilder.new(node, LolTypes.person)
+      builder.output.must_equal({ 'age' => ['20', '30', '40'] })
     end
   end
 end

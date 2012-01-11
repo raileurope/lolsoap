@@ -4,6 +4,10 @@ class LolSoap::WSDL
       NullType.new
     end
 
+    def singular?
+      true
+    end
+
     def ==(other)
       self.class === other
     end
