@@ -93,9 +93,10 @@ module LolSoap
       it 'is a hash of operations with their action and input type' do
         subject.operations.must_equal({
           'GetLastTradePrice' => {
-            :name => 'GetLastTradePrice',
+            :name   => 'GetLastTradePrice',
             :action => 'http://example.com/GetLastTradePrice',
-            :input => subject.types['TradePriceRequest']
+            :input  => subject.types['TradePriceRequest'],
+            :output => subject.types['TradePrice']
           }
         })
       end

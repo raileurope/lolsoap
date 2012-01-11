@@ -11,11 +11,16 @@ module LolSoap
 
       describe 'with operations' do
         before do
-          def subject.type(n); @types ||= { 'WashHandsRequest' => Object.new }; @types[n] end
+          def subject.type(n)
+            @types ||= { 'WashHandsRequest' => Object.new, 'WashHandsResponse' => Object.new }
+            @types[n]
+          end
+
           parser.operations = {
             'washHands' => {
               :action => 'urn:washHands',
-              :input  => { :name => 'WashHandsRequest' }
+              :input  => { :name => 'WashHandsRequest' },
+              :output => { :name => 'WashHandsResponse' }
             }
           }
         end
@@ -27,6 +32,7 @@ module LolSoap
               op.wsdl.must_equal   subject
               op.action.must_equal "urn:washHands"
               op.input.must_equal  subject.types['WashHandsRequest']
+              op.output.must_equal subject.types['WashHandsResponse']
             end
           end
         end

@@ -1,5 +1,6 @@
 require 'lolsoap/errors'
 require 'lolsoap/fault'
+require 'lolsoap/hash_builder'
 require 'nokogiri'
 
 module LolSoap
@@ -22,11 +23,15 @@ module LolSoap
     end
 
     def body
-      doc.at_xpath('/soap:Envelope/soap:Body/*', 'soap' => soap_namespace)
+      @body ||= doc.at_xpath('/soap:Envelope/soap:Body/*', 'soap' => soap_namespace)
+    end
+
+    def body_hash(builder = HashBuilder)
+      builder.new(body, request.output_type).output
     end
 
     def header
-      doc.at_xpath('/soap:Envelope/soap:Header', 'soap' => soap_namespace)
+      @header ||= doc.at_xpath('/soap:Envelope/soap:Header', 'soap' => soap_namespace)
     end
 
     def fault

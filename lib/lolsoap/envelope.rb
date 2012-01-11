@@ -36,6 +36,14 @@ module LolSoap
       operation.action
     end
 
+    def input_type
+      operation.input
+    end
+
+    def output_type
+      operation.output
+    end
+
     def to_xml
       doc.to_xml
     end
@@ -61,10 +69,10 @@ module LolSoap
       @header = doc.create_element 'Header'
 
       @body  = doc.create_element 'Body'
-      @input = doc.create_element operation.input_name
+      @input = doc.create_element input_type.name
 
       [root, @header, @body].each { |el| el.namespace = namespaces[soap_prefix] }
-      @input.namespace = namespaces[operation.input_prefix]
+      @input.namespace = namespaces[input_type.prefix]
 
       @body << @input
       root  << @header

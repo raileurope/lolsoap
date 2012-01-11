@@ -22,6 +22,14 @@ module LolSoap
       envelope.endpoint
     end
 
+    def input_type
+      envelope.input_type
+    end
+
+    def output_type
+      envelope.output_type
+    end
+
     def headers
       {
         'Content-Type'   => 'application/soap+xml;charset=UTF-8',

@@ -4,7 +4,7 @@ require 'lolsoap/response'
 
 module LolSoap
   describe Response do
-    let(:request) { OpenStruct.new(:soap_namespace => Envelope::SOAP_NAMESPACE) }
+    let(:request) { OpenStruct.new(:soap_namespace => Envelope::SOAP_NAMESPACE, :output => Object.new) }
     let(:doc) { Nokogiri::XML(File.read(TEST_ROOT + '/fixtures/stock_quote_response.xml')) }
 
     subject { Response.new(request, doc) }
@@ -12,6 +12,16 @@ module LolSoap
     describe '#body' do
       it 'returns the first node under the envelope body' do
         subject.body.must_equal doc.at_xpath('/soap:Envelope/soap:Body/m:GetStockPriceResponse')
+      end
+    end
+
+    describe '#body_hash' do
+      it 'builds a hash from the body node' do
+        builder = OpenStruct.new(:output => Object.new)
+        builder_klass = MiniTest::Mock.new
+        builder_klass.expect(:new, builder, [subject.body, request.output])
+
+        subject.body_hash(builder_klass).must_equal builder.output
       end
     end
 

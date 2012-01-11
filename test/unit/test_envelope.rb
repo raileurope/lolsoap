@@ -5,7 +5,7 @@ module LolSoap
   describe Envelope do
     let(:wsdl) { OpenStruct.new(:type_namespaces => { 'foo' => 'http://example.com/foo' }) }
     let(:operation) do
-      OpenStruct.new(:input_prefix => 'foo', :input_name => 'WashHandsRequest', :input => Object.new)
+      OpenStruct.new(:input => OpenStruct.new(:prefix => 'foo', :name => 'WashHandsRequest'))
     end
 
     subject { Envelope.new(wsdl, operation) }
@@ -93,6 +93,19 @@ module LolSoap
       it "returns the operation's action" do
         operation.action = 'lol'
         subject.action.must_equal 'lol'
+      end
+    end
+
+    describe '#input_type' do
+      it "returns the operation's input" do
+        subject.input_type.must_equal operation.input
+      end
+    end
+
+    describe '#output' do
+      it "returns the operation's output" do
+        operation.output = 'lol'
+        subject.output_type.must_equal 'lol'
       end
     end
   end

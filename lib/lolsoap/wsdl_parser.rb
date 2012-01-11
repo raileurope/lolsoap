@@ -92,7 +92,15 @@ module LolSoap
             name   = op.attribute('name').to_s
             action = op.at_xpath('./soap:operation/@soapAction', 'soap' => NS[:soap]).to_s
 
-            [name, { :name => name, :action => action, :input => port_type_operations[name][:input] }]
+            [
+              name,
+              {
+                :name   => name,
+                :action => action,
+                :input  => port_type_operations[name][:input],
+                :output => port_type_operations[name][:output]
+              }
+            ]
           end
         ]
       end

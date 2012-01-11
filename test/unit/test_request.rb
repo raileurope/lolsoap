@@ -6,7 +6,7 @@ module LolSoap
     let(:envelope) { OpenStruct.new }
     subject { Request.new(envelope) }
 
-    [:header, :body].each do |method|
+    [:header, :body, :soap_namespace, :input_type, :output_type].each do |method|
       describe "##{method}" do
         let(:envelope) { MiniTest::Mock.new }
 

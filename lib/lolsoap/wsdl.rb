@@ -62,7 +62,7 @@ module LolSoap
     def load_operations
       @operations ||= Hash[
         parser.operations.map do |k, op|
-          [k, Operation.new(self, op[:action], type(op[:input][:name]))]
+          [k, Operation.new(self, op[:action], type(op[:input][:name]), type(op[:output][:name]))]
         end
       ]
     end
