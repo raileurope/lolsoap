@@ -14,11 +14,10 @@ module LolSoap
       node
     end
     let(:type) do
-      type = Object.new
+      type = OpenStruct.new(:prefix => 'a')
       def type.element(name)
-        elements ||= { 'foo' => OpenStruct.new(:prefix => 'a'), 'bar' => OpenStruct.new(:prefix => nil),
-                       'clone' => OpenStruct.new(:prefix => nil) }
-        elements[name]
+        @elements ||= { 'foo' => Object.new, 'bar' => Object.new, 'clone' => Object.new }
+        @elements[name]
       end
       type
     end
@@ -46,15 +45,8 @@ module LolSoap
         end
       end
 
-      it 'adds the element with no prefix if the type is unknown' do
-        expect_node_added nil, 'bar' do
-          subject.__tag__(:bar)
-        end
-      end
-
-
       it 'yields to a block, if given' do
-        expect_node_added nil, 'bar' do
+        expect_node_added node.namespace_scopes[1], 'bar' do
           block = nil
           ret = subject.__tag__(:bar) { |b| block = b }
           block.object_id.must_equal ret.object_id
@@ -64,13 +56,13 @@ module LolSoap
 
     describe 'method missing' do
       it 'delegates to __tag__' do
-        expect_node_added nil, 'bar', 'baz' do
+        expect_node_added node.namespace_scopes[1], 'bar', 'baz' do
           subject.bar 'baz'
         end
       end
 
       it 'supports standard methods that are usually defined' do
-        expect_node_added nil, 'clone' do
+        expect_node_added node.namespace_scopes[1], 'clone' do
           subject.clone
         end
       end

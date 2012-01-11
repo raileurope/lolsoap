@@ -36,8 +36,7 @@ module LolSoap
     end
 
     def __tag__(name, *args, &block)
-      sub_type = @type.element(name.to_s)
-      __prefixed_tag__(sub_type.prefix, sub_type, name, *args, &block)
+      __prefixed_tag__(@type.prefix, @type.element(name.to_s), name, *args, &block)
     end
 
     def __prefixed_tag__(prefix, sub_type, name, *args)
