@@ -5,6 +5,8 @@ out so you don't have to.
 
 https://github.com/loco2/lolsoap
 
+[![Build Status](https://secure.travis-ci.org/loco2/lolsoap.png)](http://travis-ci.org/loco2/lolsoap)
+
 ## Aims ##
 
 * A collection of classes to make dealing with SOAP requests and
