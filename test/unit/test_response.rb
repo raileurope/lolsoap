@@ -1,4 +1,5 @@
 require 'helper'
+require 'lolsoap/envelope'
 require 'lolsoap/response'
 
 module LolSoap
@@ -18,6 +19,11 @@ module LolSoap
       it 'returns the header element' do
         subject.header.must_equal doc.at_xpath('/soap:Envelope/soap:Header')
       end
+    end
+
+    it 'should raise a FaultRaised error when initialized, if there is a SOAP fault' do
+      lambda { Response.new(request, Nokogiri::XML(File.read(TEST_ROOT + '/fixtures/stock_quote_fault.xml'))) }.
+        must_raise FaultRaised
     end
   end
 end

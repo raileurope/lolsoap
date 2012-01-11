@@ -20,7 +20,7 @@ module LolSoap
 
     describe '#reason' do
       it 'returns the reason' do
-        subject.reason.must_match /^Omg.*crashed!$/
+        subject.reason.must_match(/^Omg.*crashed!$/)
       end
     end
 

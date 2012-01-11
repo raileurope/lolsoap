@@ -1,3 +1,5 @@
+require 'lolsoap/errors'
+require 'lolsoap/fault'
 require 'nokogiri'
 
 module LolSoap
@@ -11,6 +13,8 @@ module LolSoap
     def initialize(request, doc)
       @request = request
       @doc     = doc
+
+      raise FaultRaised.new(fault) if fault
     end
 
     def soap_namespace
@@ -23,6 +27,13 @@ module LolSoap
 
     def header
       doc.at_xpath('/soap:Envelope/soap:Header', 'soap' => soap_namespace)
+    end
+
+    def fault
+      @fault ||= begin
+        node = doc.at_xpath('/soap:Envelope/soap:Body/soap:Fault', 'soap' => soap_namespace)
+        Fault.new(request, node) if node
+      end
     end
   end
 end
