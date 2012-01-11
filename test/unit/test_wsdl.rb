@@ -62,15 +62,31 @@ module LolSoap
           parser.types = {
             'Brush' => {
               :elements => {
-                'handleColor' => 'bla:Color',
-                'age'         => 'xs:int'
+                'handleColor' => {
+                  :name     => 'handleColor',
+                  :type     => 'bla:Color',
+                  :singular => true
+                },
+                'age' => {
+                  :name     => 'age',
+                  :type     => 'xs:int',
+                  :singular => false
+                }
               },
               :namespace => namespace
             },
             'Color' => {
               :elements => {
-                'name' => 'xs:string',
-                'hex'  => 'xs:string'
+                'name' => {
+                  :name     => 'name',
+                  :type     => 'xs:string',
+                  :singular => true
+                },
+                'hex' => {
+                  :name     => 'hex',
+                  :type     => 'xs:string',
+                  :singular => true
+                }
               },
               :namespace => namespace
             }
@@ -84,15 +100,17 @@ module LolSoap
             subject.types['Brush'].tap do |t|
               t.namespace.must_equal namespace
               t.elements.length.must_equal 2
-              t.elements['handleColor'].must_equal subject.types['Color']
-              t.elements['age'].must_equal WSDL::NullType.new
+              t.element('handleColor').type.must_equal subject.types['Color']
+              t.element('handleColor').singular?.must_equal true
+              t.element('age').type.must_equal WSDL::NullType.new
+              t.element('age').singular?.must_equal false
             end
 
             subject.types['Color'].tap do |t|
               t.namespace.must_equal namespace
               t.elements.length.must_equal 2
-              t.elements['name'].must_equal WSDL::NullType.new
-              t.elements['hex'].must_equal WSDL::NullType.new
+              t.element('name').type.must_equal WSDL::NullType.new
+              t.element('hex').type.must_equal WSDL::NullType.new
             end
           end
         end

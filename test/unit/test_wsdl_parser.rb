@@ -29,17 +29,40 @@ module LolSoap
           'TradePriceRequest' => {
             :name      => 'TradePriceRequest',
             :namespace => 'http://example.com/stockquote.xsd',
-            :elements  => { 'tickerSymbol' => 'string', 'specialTickerSymbol' => 'xsd2:TickerSymbol' }
+            :elements  => {
+              'tickerSymbol' => {
+                :name     => 'tickerSymbol',
+                :type     => 'string',
+                :singular => false
+              },
+              'specialTickerSymbol' => {
+                :name     => 'specialTickerSymbol',
+                :type     => 'xsd2:TickerSymbol',
+                :singular => false
+              }
+            }
           },
           'TradePrice' => {
             :name      => 'TradePrice',
             :namespace => 'http://example.com/stockquote.xsd',
-            :elements  => { 'price' => 'float' }
+            :elements  => {
+              'price' => {
+                :name     => 'price',
+                :type     => 'float',
+                :singular => true
+              }
+            }
           },
           'TickerSymbol' => {
             :name      => 'TickerSymbol',
             :namespace => 'http://example.com/stockquote2.xsd',
-            :elements  => { 'name' => 'string' }
+            :elements  => {
+              'name' => {
+                :name     => 'name',
+                :type     => 'string',
+                :singular => true
+              }
+            }
           }
         })
       end

@@ -5,6 +5,8 @@ module LolSoap
     require 'lolsoap/wsdl/operation'
     require 'lolsoap/wsdl/type'
     require 'lolsoap/wsdl/null_type'
+    require 'lolsoap/wsdl/element'
+    require 'lolsoap/wsdl/null_element'
 
     def self.parse(raw)
       new(WSDLParser.parse(raw))
@@ -68,7 +70,15 @@ module LolSoap
     def load_types
       @types ||= Hash[
         parser.types.map do |name, type|
-          [name, Type.new(self, name, type[:namespace], type[:elements])]
+          [name, Type.new(self, name, type[:namespace], build_elements(type[:elements]))]
+        end
+      ]
+    end
+
+    def build_elements(elements)
+      Hash[
+        elements.map do |name, el|
+          [name, Element.new(self, name, el[:type], el[:singular])]
         end
       ]
     end

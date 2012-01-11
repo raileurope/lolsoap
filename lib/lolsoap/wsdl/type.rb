@@ -3,18 +3,22 @@ class LolSoap::WSDL
     attr_reader :name, :namespace
 
     def initialize(wsdl, name, namespace, elements)
-      @wsdl          = wsdl
-      @name          = name
-      @namespace     = namespace
-      @element_types = elements
+      @wsdl      = wsdl
+      @name      = name
+      @namespace = namespace
+      @elements  = elements
     end
 
     def elements
-      load_elements.dup
+      @elements.dup
     end
 
     def element(name)
-      load_elements.fetch(name) { NullType.new }
+      @elements.fetch(name) { NullElement.new }
+    end
+
+    def sub_type(name)
+      element(name).type
     end
 
     def prefix
@@ -30,9 +34,5 @@ class LolSoap::WSDL
     private
 
     def wsdl; @wsdl; end
-
-    def load_elements
-      @elements ||= Hash[@element_types.map { |name, type| [name, wsdl.type(type.split(':').last)] }]
-    end
   end
 end

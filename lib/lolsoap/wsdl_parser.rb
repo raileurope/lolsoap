@@ -51,7 +51,7 @@ module LolSoap
               {
                 :name      => name,
                 :namespace => namespace,
-                :elements  => Hash[elements.map { |e| [e.attribute('name').to_s, e.attribute('type').to_s] }]
+                :elements  => Hash[elements.map { |e| [e.attribute('name').to_s, element_hash(e)] }]
               }
             ]
           end
@@ -96,6 +96,17 @@ module LolSoap
           end
         ]
       end
+    end
+
+    private
+
+    def element_hash(el)
+      max_occurs = el.attribute('maxOccurs').to_s
+      {
+        :name     => el.attribute('name').to_s,
+        :type     => el.attribute('type').to_s,
+        :singular => max_occurs.empty? || max_occurs == '1'
+      }
     end
   end
 end

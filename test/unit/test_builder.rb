@@ -15,9 +15,9 @@ module LolSoap
     end
     let(:type) do
       type = OpenStruct.new(:prefix => 'a')
-      def type.element(name)
-        @elements ||= { 'foo' => Object.new, 'bar' => Object.new, 'clone' => Object.new }
-        @elements[name]
+      def type.sub_type(name)
+        @sub_types ||= { 'foo' => Object.new, 'bar' => Object.new, 'clone' => Object.new }
+        @sub_types[name]
       end
       type
     end
@@ -41,7 +41,7 @@ module LolSoap
         expect_node_added node.namespace_scopes[1], 'foo', 'bar' do |sub_node|
           sub_builder = subject.__tag__(:foo, 'bar')
           sub_builder.__node__.object_id.must_equal sub_node.object_id
-          sub_builder.__type__.must_equal type.element('foo')
+          sub_builder.__type__.must_equal type.sub_type('foo')
         end
       end
 

@@ -20,8 +20,8 @@
       </element>
       <complexType name="TradePriceRequest">
         <sequence>
-          <element name="tickerSymbol" type="string"/>
-          <element name="specialTickerSymbol" type="xsd2:TickerSymbol"/>
+          <element name="tickerSymbol" type="string" maxOccurs="5"/>
+          <element name="specialTickerSymbol" type="xsd2:TickerSymbol" maxOccurs="unbounded"/>
         </sequence>
       </complexType>
     </schema>
@@ -30,7 +30,7 @@
             xmlns="http://www.w3.org/2001/XMLSchema">
       <complexType name="TickerSymbol">
         <sequence>
-          <element name="name" type="string"/>
+          <element name="name" type="string" maxOccurs="1"/>
         </sequence>
       </complexType>
     </schema>
