@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+<soap:Body>
+  <soap:Fault>
+    <soap:Code>
+      <soap:Value>soap:Sender</soap:Value>
+    </soap:Code>
+    <soap:Reason>
+      <soap:Text>Omg! stock market has crashed!</soap:Text>
+    </soap:Reason>
+    <soap:Detail>
+      <Foo>Some detail</Foo>
+    </soap:Detail>
+  </soap:Fault>
+</soap:Body>
+</soap:Envelope>

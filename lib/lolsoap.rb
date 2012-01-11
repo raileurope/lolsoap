@@ -2,6 +2,7 @@ module LolSoap
   require 'lolsoap/builder'
   require 'lolsoap/client'
   require 'lolsoap/envelope'
+  require 'lolsoap/fault'
   require 'lolsoap/request'
   require 'lolsoap/response'
   require 'lolsoap/wsdl'
