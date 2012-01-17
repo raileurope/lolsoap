@@ -3,7 +3,9 @@
 A library for dealing with SOAP requests and responses. We tear our hair
 out so you don't have to.
 
-https://github.com/loco2/lolsoap
+* Code: https://github.com/loco2/lolsoap
+* Gem: http://rubygems.org/gems/lolsoap
+* Docs: http://rubydoc.info/gems/lolsoap/frames
 
 [![Build Status](https://secure.travis-ci.org/loco2/lolsoap.png)](http://travis-ci.org/loco2/lolsoap)
 
