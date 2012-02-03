@@ -10,10 +10,12 @@ module LolSoap
     end
 
     def output
-      if children.any?
-        children_hash
-      else
-        node.text.to_s
+      unless nil_value?
+        if children.any?
+          children_hash
+        else
+          content
+        end
       end
     end
 
@@ -24,25 +26,37 @@ module LolSoap
     private
 
     # @private
+    def nil_value?
+      !!node['nil'] && node.attributes['nil'].namespace.prefix == "xsi"
+    end
+
+    # @private
     def children_hash
       hash = {}
       children.each do |child|
         element = type.element(child.name)
         output  = self.class.new(child, element.type).output
 
-        if Array === hash[child.name] || !element.singular?
+        if !element.singular?
           hash[child.name] ||= []
-          hash[child.name] << output
+        end
+
+        if hash.include?(child.name) && !(Array === hash[child.name])
+          hash[child.name] = [hash[child.name]]
+        end
+
+        if Array === hash[child.name]
+          hash[child.name] << output unless output.nil?
         else
-          if hash.include?(child.name)
-            hash[child.name] = [hash[child.name]]
-            hash[child.name] << output
-          else
-            hash[child.name] = output
-          end
+          hash[child.name] = output
         end
       end
       hash
+    end
+
+    # @private
+    def content
+      node.text.to_s
     end
   end
 end
