@@ -10,12 +10,10 @@ module LolSoap
     end
 
     def output
-      unless nil_value?
-        if children.any?
-          children_hash
-        else
-          content
-        end
+      if children.any?
+        children_hash
+      else
+        content
       end
     end
 
@@ -24,11 +22,6 @@ module LolSoap
     end
 
     private
-
-    # @private
-    def nil_value?
-      !!node['nil'] && node.attributes['nil'].namespace.prefix == "xsi"
-    end
 
     # @private
     def children_hash
@@ -56,7 +49,17 @@ module LolSoap
 
     # @private
     def content
-      node.text.to_s
+      node.text.to_s unless nil_value?
+    end
+
+    # @private
+    def nil_value?
+      parent.search('./*[@xsi:nil=1]', 'xsi' => "http://www.w3.org/2001/XMLSchema-instance").include?(node)
+    end
+
+    # @private
+    def parent
+      node.ancestors.first
     end
   end
 end
