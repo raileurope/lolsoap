@@ -13,7 +13,7 @@ module LolSoap
       if children.any?
         children_hash
       else
-        node.text.to_s
+        content
       end
     end
 
@@ -30,19 +30,36 @@ module LolSoap
         element = type.element(child.name)
         output  = self.class.new(child, element.type).output
 
-        if Array === hash[child.name] || !element.singular?
+        if !element.singular?
           hash[child.name] ||= []
-          hash[child.name] << output
+        end
+
+        if hash.include?(child.name) && !(Array === hash[child.name])
+          hash[child.name] = [hash[child.name]]
+        end
+
+        if Array === hash[child.name]
+          hash[child.name] << output unless output.nil?
         else
-          if hash.include?(child.name)
-            hash[child.name] = [hash[child.name]]
-            hash[child.name] << output
-          else
-            hash[child.name] = output
-          end
+          hash[child.name] = output
         end
       end
       hash
+    end
+
+    # @private
+    def content
+      node.text.to_s unless nil_value?
+    end
+
+    # @private
+    def nil_value?
+      parent.search('./*[@xsi:nil=1]', 'xsi' => "http://www.w3.org/2001/XMLSchema-instance").include?(node)
+    end
+
+    # @private
+    def parent
+      node.ancestors.first
     end
   end
 end

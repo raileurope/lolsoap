@@ -123,5 +123,29 @@ module LolSoap
       builder = HashBuilder.new(node, LolTypes.person)
       builder.output.must_equal({ 'age' => ['20', '30', '40'] })
     end
+
+    it 'converts fields with xsi:nil attribute into nils' do
+      xml = Nokogiri::XML <<-XML
+        <name>
+          <firstName xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="1" />
+        </name>
+      XML
+      node = xml.root
+
+      builder = HashBuilder.new(node, LolTypes.name)
+      builder.output.must_equal({ 'firstName' => nil })
+    end
+
+    it 'converts elements with xsi:nil attribute which can occur multiple times into empty arrays' do
+      xml = Nokogiri::XML <<-XML
+        <person>
+          <friends xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="1" />
+        </person>
+      XML
+      node = xml.root
+
+      builder = HashBuilder.new(node, LolTypes.person)
+      builder.output.must_equal({ 'friends' => [] })
+    end
   end
 end
