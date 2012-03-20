@@ -60,7 +60,7 @@ module LolSoap
     end
 
     def inspect
-      "<LolSoap::WSDL " \
+      "<#{self.class} " \
       "namespaces=#{namespaces.inspect} " \
       "operations=#{operations.keys.inspect} " \
       "types=#{types.keys.inspect}>"

@@ -18,7 +18,7 @@ class LolSoap::WSDL
     end
 
     def inspect
-      "<LolSoap::WSDL::Element name=#{name.inspect} type=#{@type_name.inspect}>"
+      "<#{self.class} name=#{name.inspect} type=#{@type_name.inspect}>"
     end
 
     private

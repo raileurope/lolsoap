@@ -26,7 +26,7 @@ class LolSoap::WSDL
     end
 
     def inspect
-      "<LolSoap::WSDL::Type " \
+      "<#{self.class} " \
       "name=#{(prefix + ':' + name).inspect} " \
       "elements=#{elements.inspect}>"
     end

@@ -10,7 +10,7 @@ class LolSoap::WSDL
     end
 
     def inspect
-      "<LolSoap::WSDL::Operation " \
+      "<#{self.class} " \
       "action=#{action.inspect} " \
       "input=#{input.inspect}>"
     end
