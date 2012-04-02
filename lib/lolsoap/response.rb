@@ -9,7 +9,14 @@ module LolSoap
 
     # Create a new instance from a raw XML string
     def self.parse(request, raw)
-      new(request, Nokogiri::XML::Document.parse(raw))
+      new(
+        request,
+        Nokogiri::XML::Document.parse(
+          raw, nil, nil,
+          Nokogiri::XML::ParseOptions::DEFAULT_XML &
+            Nokogiri::XML::ParseOptions::STRICT
+        )
+      )
     end
 
     def initialize(request, doc)

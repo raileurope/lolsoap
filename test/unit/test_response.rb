@@ -9,6 +9,12 @@ module LolSoap
 
     subject { Response.new(request, doc) }
 
+    describe '.parse' do
+      it 'raises an error if there is invalid XML' do
+        lambda { Response.parse(request, '<a') }.must_raise Nokogiri::XML::SyntaxError
+      end
+    end
+
     describe '#body' do
       it 'returns the first node under the envelope body' do
         subject.body.must_equal doc.at_xpath('/soap:Envelope/soap:Body/m:GetStockPriceResponse')
