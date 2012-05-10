@@ -37,10 +37,28 @@ module LolSoap
       envelope.output_type
     end
 
+    # The MIME type of the request. This is always application/soap+xml,
+    # but it could be overridden in a subclass.
+    def mime
+      'application/soap+xml'
+    end
+
+    # The charset of the request. This is always UTF-8, but it could be
+    # overridden in a subclass.
+    def charset
+      'UTF-8'
+    end
+
+    # The full content type of the request, assembled from the #mime and
+    # #charset.
+    def content_type
+     "#{mime};charset=#{charset}"
+    end
+
     # Headers that must be set when making the request
     def headers
       {
-        'Content-Type'   => 'application/soap+xml;charset=UTF-8',
+        'Content-Type'   => content_type,
         'Content-Length' => content.bytesize.to_s,
         'SOAPAction'     => envelope.action
       }
