@@ -10,15 +10,11 @@ module LolSoap
     end
 
     def output
-      if children.any?
+      if node.first_element_child
         children_hash
       else
         content
       end
-    end
-
-    def children
-      @children ||= node.children.select(&:element?)
     end
 
     private
@@ -26,22 +22,23 @@ module LolSoap
     # @private
     def children_hash
       hash = {}
-      children.each do |child|
+      node.element_children.each do |child|
         element = type.element(child.name)
         output  = self.class.new(child, element.type).output
+        val     = hash[child.name]
 
-        if !element.singular?
-          hash[child.name] ||= []
-        end
-
-        if hash.include?(child.name) && !(Array === hash[child.name])
-          hash[child.name] = [hash[child.name]]
-        end
-
-        if Array === hash[child.name]
-          hash[child.name] << output unless output.nil?
+        if output
+          if val
+            if val.is_a?(Array)
+              val << output
+            else
+              hash[child.name] = [val, output]
+            end
+          else
+            hash[child.name] = element.singular? ? output : [output]
+          end
         else
-          hash[child.name] = output
+          hash[child.name] = element.singular? ? nil : []
         end
       end
       hash
@@ -54,12 +51,7 @@ module LolSoap
 
     # @private
     def nil_value?
-      parent.search('./*[@xsi:nil=1]', 'xsi' => "http://www.w3.org/2001/XMLSchema-instance").include?(node)
-    end
-
-    # @private
-    def parent
-      node.ancestors.first
+      node.attribute_with_ns('nil', 'http://www.w3.org/2001/XMLSchema-instance')
     end
   end
 end
