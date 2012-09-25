@@ -3,7 +3,12 @@ require 'lolsoap/wsdl_parser'
 
 module LolSoap
   describe WSDLParser do
-    let(:doc) { Nokogiri::XML(File.read(TEST_ROOT + '/fixtures/stock_quote.wsdl')) }
+    def raw_doc
+      File.read(TEST_ROOT + '/fixtures/stock_quote.wsdl')
+    end
+
+    let(:doc) { Nokogiri::XML(raw_doc) }
+
     subject { WSDLParser.new(doc) }
 
     describe '#namespaces' do
@@ -99,6 +104,16 @@ module LolSoap
             :output => subject.types['TradePrice']
           }
         })
+      end
+    end
+
+    describe 'soap 1.1' do
+      def raw_doc
+        super.sub("http://schemas.xmlsoap.org/wsdl/soap12/", "http://schemas.xmlsoap.org/wsdl/soap/")
+      end
+
+      it 'is supported' do
+        subject.operations.empty?.must_equal false
       end
     end
   end

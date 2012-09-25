@@ -5,7 +5,8 @@ module LolSoap
   class WSDLParser
     NS = {
       :wsdl      => 'http://schemas.xmlsoap.org/wsdl/',
-      :soap      => 'http://schemas.xmlsoap.org/wsdl/soap12/',
+      :soap      => 'http://schemas.xmlsoap.org/wsdl/soap/',
+      :soap12    => 'http://schemas.xmlsoap.org/wsdl/soap12/',
       :xmlschema => 'http://www.w3.org/2001/XMLSchema'
     }
 
@@ -30,7 +31,7 @@ module LolSoap
     def endpoint
       @endpoint ||= doc.at_xpath(
         '/d:definitions/d:service/d:port/soap:address/@location',
-        'd' => NS[:wsdl], 'soap' => NS[:soap]
+        'd' => ns[:wsdl], 'soap' => ns[:soap]
       ).to_s
     end
 
@@ -39,12 +40,12 @@ module LolSoap
         types = doc.xpath(
           '/d:definitions/d:types/s:schema/s:element[@name]',
           '/d:definitions/d:types/s:schema/s:complexType[@name]',
-          'd' => NS[:wsdl], 's' => NS[:xmlschema]
+          'd' => ns[:wsdl], 's' => ns[:xmlschema]
         )
         Hash[
           types.map do |type|
-            namespace = type.at_xpath('ancestor::s:schema/@targetNamespace', 's' => NS[:xmlschema]).to_s
-            elements  = type.xpath('.//s:element', 's' => NS[:xmlschema])
+            namespace = type.at_xpath('ancestor::s:schema/@targetNamespace', 's' => ns[:xmlschema]).to_s
+            elements  = type.xpath('.//s:element', 's' => ns[:xmlschema])
             name      = type.attribute('name').to_s
 
             [
@@ -62,8 +63,8 @@ module LolSoap
 
     def messages
       @messages ||= Hash[
-        doc.xpath('/d:definitions/d:message', 'd' => NS[:wsdl]).map do |msg|
-          element = msg.at_xpath('./d:part/@element', 'd' => NS[:wsdl]).to_s
+        doc.xpath('/d:definitions/d:message', 'd' => ns[:wsdl]).map do |msg|
+          element = msg.at_xpath('./d:part/@element', 'd' => ns[:wsdl]).to_s
           [msg.attribute('name').to_s, types[element.split(':').last]]
         end
       ]
@@ -71,9 +72,9 @@ module LolSoap
 
     def port_type_operations
       @port_type_operations ||= Hash[
-        doc.xpath('/d:definitions/d:portType/d:operation', 'd' => NS[:wsdl]).map do |op|
-          input  = op.at_xpath('./d:input/@message',  'd' => NS[:wsdl]).to_s.split(':').last
-          output = op.at_xpath('./d:output/@message', 'd' => NS[:wsdl]).to_s.split(':').last
+        doc.xpath('/d:definitions/d:portType/d:operation', 'd' => ns[:wsdl]).map do |op|
+          input  = op.at_xpath('./d:input/@message',  'd' => ns[:wsdl]).to_s.split(':').last
+          output = op.at_xpath('./d:output/@message', 'd' => ns[:wsdl]).to_s.split(':').last
           name   = op.attribute('name').to_s
 
           [name, { :name => name, :input => messages[input], :output => messages[output] }]
@@ -85,13 +86,13 @@ module LolSoap
       @operations ||= begin
         binding = doc.at_xpath(
           '/d:definitions/d:service/d:port/soap:address/../@binding',
-          'd' => NS[:wsdl], 'soap' => NS[:soap]
+          'd' => ns[:wsdl], 'soap' => ns[:soap]
         ).to_s.split(':').last
 
         Hash[
-          doc.xpath("/d:definitions/d:binding[@name='#{binding}']/d:operation", 'd' => NS[:wsdl]).map do |op|
+          doc.xpath("/d:definitions/d:binding[@name='#{binding}']/d:operation", 'd' => ns[:wsdl]).map do |op|
             name   = op.attribute('name').to_s
-            action = op.at_xpath('./soap:operation/@soapAction', 'soap' => NS[:soap]).to_s
+            action = op.at_xpath('./soap:operation/@soapAction', 'soap' => ns[:soap]).to_s
 
             [
               name,
@@ -116,6 +117,20 @@ module LolSoap
         :type     => el.attribute('type').to_s,
         :singular => max_occurs.empty? || max_occurs == '1'
       }
+    end
+
+    def ns
+      @ns ||= begin
+        ns = { :wsdl => NS[:wsdl], :xmlschema => NS[:xmlschema] }
+
+        if namespaces.values.include?(NS[:soap12])
+          ns[:soap] = NS[:soap12]
+        else
+          ns[:soap] = NS[:soap]
+        end
+
+        ns
+      end
     end
   end
 end
