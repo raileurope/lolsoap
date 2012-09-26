@@ -43,7 +43,7 @@
   </message>
 
   <message name="GetLastTradePriceOutput">
-    <part name="body" element="xsd1:TradePrice"/>
+    <part name="body" element="xsd3:TradePrice"/>
   </message>
 
   <portType name="StockQuotePortType">

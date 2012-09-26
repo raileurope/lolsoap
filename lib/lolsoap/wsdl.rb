@@ -26,7 +26,7 @@ module LolSoap
 
     # Get a single operation
     def operation(name)
-      load_operations[name]
+      load_operations.fetch(name)
     end
 
     # Hash of types declared by the service

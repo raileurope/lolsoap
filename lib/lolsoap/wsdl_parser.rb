@@ -10,7 +10,7 @@ module LolSoap
         @parser           = parser
         @node             = node
         @target_namespace = target_namespace
-        @prefix, @name    = parse_prefix(node.attr('name'))
+        @prefix, @name    = prefix_and_name(node.attr('name'))
       end
 
       def name_with_prefix
@@ -20,13 +20,12 @@ module LolSoap
       def elements
         Hash[
           node.xpath('.//xs:element', parser.ns).map do |element|
-            prefix, name = parse_prefix(element.attr('name'))
-            max_occurs   = element.attribute('maxOccurs').to_s
+            max_occurs = element.attribute('maxOccurs').to_s
 
             [
-              name,
+              prefix_and_name(element.attr('name')).last,
               {
-                :type     => parse_prefix(element.attr('type')).join(':'),
+                :type     => prefix_and_name(element.attr('type')).join(':'),
                 :singular => max_occurs.empty? || max_occurs == '1'
               }
             ]
@@ -34,20 +33,8 @@ module LolSoap
         ]
       end
 
-      private
-
-      def parse_prefix(string)
-        prefix, name = string.to_s.split(':')
-
-        if name
-          # Ensure we always use the same prefix for a given namespace
-          prefix = parser.prefixes.fetch(parser.namespaces.fetch(prefix))
-        else
-          name   = prefix
-          prefix = parser.prefixes.fetch(target_namespace)
-        end
-
-        [prefix, name]
+      def prefix_and_name(string)
+        parser.prefix_and_name(string, target_namespace)
       end
     end
 
@@ -112,10 +99,8 @@ module LolSoap
     def messages
       @messages ||= Hash[
         doc.xpath('/d:definitions/d:message', ns).map do |msg|
-          [
-            msg.attribute('name').to_s,
-            msg.at_xpath('./d:part/@element', ns).to_s
-          ]
+          element = msg.at_xpath('./d:part/@element', ns).to_s
+          [msg.attribute('name').to_s, prefix_and_name(element).join(':')]
         end
       ]
     end
@@ -160,6 +145,20 @@ module LolSoap
         'xs' => NS[:xmlschema],
         's'  => namespaces.values.include?(NS[:soap12]) ? NS[:soap12] : NS[:soap]
       }
+    end
+
+    def prefix_and_name(prefixed_name, default_namespace = nil)
+      prefix, name = prefixed_name.to_s.split(':')
+
+      if name
+        # Ensure we always use the same prefix for a given namespace
+        prefix = prefixes.fetch(namespaces.fetch(prefix))
+      else
+        name   = prefix
+        prefix = prefixes.fetch(default_namespace)
+      end
+
+      [prefix, name]
     end
   end
 end
