@@ -10,7 +10,7 @@ class LolSoap::WSDL
     end
 
     def type
-      @type ||= wsdl.type(@type_name.split(':').last)
+      @type ||= wsdl.type(@type_name)
     end
 
     def singular?

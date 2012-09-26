@@ -31,40 +31,36 @@ module LolSoap
     describe '#types' do
       it 'returns the types, with attributes and namespace' do
         subject.types.must_equal({
-          'TradePriceRequest' => {
-            :name      => 'TradePriceRequest',
-            :namespace => 'http://example.com/stockquote.xsd',
-            :elements  => {
+          'xsd1:TradePriceRequest' => {
+            :prefix   => 'xsd1',
+            :name     => 'TradePriceRequest',
+            :elements => {
               'tickerSymbol' => {
-                :name     => 'tickerSymbol',
-                :type     => 'string',
+                :type     => 'xs:string',
                 :singular => false
               },
               'specialTickerSymbol' => {
-                :name     => 'specialTickerSymbol',
                 :type     => 'xsd2:TickerSymbol',
                 :singular => false
               }
             }
           },
-          'TradePrice' => {
-            :name      => 'TradePrice',
-            :namespace => 'http://example.com/stockquote.xsd',
-            :elements  => {
+          'xsd1:TradePrice' => {
+            :prefix   => 'xsd1',
+            :name     => 'TradePrice',
+            :elements => {
               'price' => {
-                :name     => 'price',
-                :type     => 'float',
+                :type     => 'xs:float',
                 :singular => true
               }
             }
           },
-          'TickerSymbol' => {
-            :name      => 'TickerSymbol',
-            :namespace => 'http://example.com/stockquote2.xsd',
-            :elements  => {
+          'xsd2:TickerSymbol' => {
+            :prefix   => 'xsd2',
+            :name     => 'TickerSymbol',
+            :elements => {
               'name' => {
-                :name     => 'name',
-                :type     => 'string',
+                :type     => 'xs:string',
                 :singular => true
               }
             }
@@ -76,8 +72,8 @@ module LolSoap
     describe '#messages' do
       it 'maps message names to types' do
         subject.messages.must_equal({
-          'GetLastTradePriceInput'  => subject.types['TradePriceRequest'],
-          'GetLastTradePriceOutput' => subject.types['TradePrice']
+          'GetLastTradePriceInput'  => 'xsd1:TradePriceRequest',
+          'GetLastTradePriceOutput' => 'xsd1:TradePrice'
         })
       end
     end
@@ -86,9 +82,8 @@ module LolSoap
       it 'is a hash containing input and output types' do
         subject.port_type_operations.must_equal({
           'GetLastTradePrice' => {
-            :name   => 'GetLastTradePrice',
-            :input  => subject.types['TradePriceRequest'],
-            :output => subject.types['TradePrice']
+            :input  => 'xsd1:TradePriceRequest',
+            :output => 'xsd1:TradePrice'
           }
         })
       end
@@ -98,10 +93,9 @@ module LolSoap
       it 'is a hash of operations with their action and input type' do
         subject.operations.must_equal({
           'GetLastTradePrice' => {
-            :name   => 'GetLastTradePrice',
             :action => 'http://example.com/GetLastTradePrice',
-            :input  => subject.types['TradePriceRequest'],
-            :output => subject.types['TradePrice']
+            :input  => 'xsd1:TradePriceRequest',
+            :output => 'xsd1:TradePrice'
           }
         })
       end

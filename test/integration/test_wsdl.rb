@@ -8,14 +8,13 @@ module LolSoap
     it 'should successfully parse a WSDL document' do
       subject.operations.length.must_equal 1
       subject.operations['GetLastTradePrice'].tap do |o|
-        o.input.must_equal  subject.types['TradePriceRequest']
+        o.input.must_equal  subject.types['xsd1:TradePriceRequest']
         o.action.must_equal 'http://example.com/GetLastTradePrice'
       end
 
       subject.types.length.must_equal 3
-      subject.types['TradePriceRequest'].tap do |t|
-        t.name.must_equal 'TradePriceRequest'
-        t.namespace.must_equal 'http://example.com/stockquote.xsd'
+      subject.types['xsd1:TradePriceRequest'].tap do |t|
+        t.prefix.must_equal 'xsd1'
       end
     end
 

@@ -14,23 +14,24 @@
       <element name="TradePrice">
          <complexType>
            <all>
-             <element name="price" type="float"/>
+             <element name="price" type="xs:float"/>
            </all>
          </complexType>
       </element>
       <complexType name="TradePriceRequest">
         <sequence>
-          <element name="tickerSymbol" type="string" maxOccurs="5"/>
+          <element name="tickerSymbol" type="xs:string" maxOccurs="5"/>
           <element name="specialTickerSymbol" type="xsd2:TickerSymbol" maxOccurs="unbounded"/>
         </sequence>
       </complexType>
     </schema>
 
     <schema targetNamespace="http://example.com/stockquote2.xsd"
+            xs="http://www.w3.org/2001/XMLSchema"
             xmlns="http://www.w3.org/2001/XMLSchema">
       <complexType name="TickerSymbol">
         <sequence>
-          <element name="name" type="string" maxOccurs="1"/>
+          <element name="name" type="xs:string" maxOccurs="1"/>
         </sequence>
       </complexType>
     </schema>

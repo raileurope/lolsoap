@@ -56,7 +56,7 @@ module LolSoap
 
     # Namespaces used by the types (a subset of #namespaces)
     def type_namespaces
-      Hash[parser.types.map { |k, t| [prefixes[t[:namespace]], t[:namespace]] }]
+      Hash[load_types.values.map { |type| [type.prefix, namespaces[type.prefix]] }]
     end
 
     def inspect
@@ -72,7 +72,7 @@ module LolSoap
     def load_operations
       @operations ||= Hash[
         parser.operations.map do |k, op|
-          [k, Operation.new(self, op[:action], type(op[:input][:name]), type(op[:output][:name]))]
+          [k, Operation.new(self, op[:action], type(op[:input]), type(op[:output]))]
         end
       ]
     end
@@ -80,8 +80,8 @@ module LolSoap
     # @private
     def load_types
       @types ||= Hash[
-        parser.types.map do |name, type|
-          [name, Type.new(self, name, type[:namespace], build_elements(type[:elements]))]
+        parser.types.map do |prefixed_name, type|
+          [prefixed_name, Type.new(type[:name], type[:prefix], build_elements(type[:elements]))]
         end
       ]
     end

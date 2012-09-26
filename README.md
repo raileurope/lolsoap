@@ -65,10 +65,11 @@ p response.body_hash
 
 ## Bugs/Features ##
 
-* SOAP 1.1 is not supported. Patches to add support will be considered
-  if they don't add too much extra complexity.
 * WSSE is not supported.
 * Assumes that you are able to supply a WSDL document for the service.
+* Some of the finer details of namespace handling may be glossed over.
+  This is just pragmatism; patches to improve namespace handling are
+  welcome.
 
 ## Overview ##
 
@@ -99,6 +100,22 @@ The others:
 * [Jon Leighton](http://jonathanleighton.com/)
 
 Development sponsored by [Loco2](http://loco2.com/).
+
+## Changelog ##
+
+### 0.2 (unreleased) ###
+
+* SOAP 1.1 support
+* Better handling of namespaces in the XML schema. You should now be
+  able to have two types a:foo and b:foo and it will Just Work. This
+  introduces some API incompatibilities with version 1.1. Specifically,
+  `LolSoap::WSDL#types` is now keyed based on a prefixed type name
+  rather than an unprefixed type name. This shouldn't affect you if
+  you're not using `LolSoap::WSDL#types` directly.
+
+### 0.1 ###
+
+Initial release
 
 ## License ##
 

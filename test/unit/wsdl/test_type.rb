@@ -3,13 +3,13 @@ require 'lolsoap/wsdl'
 
 class LolSoap::WSDL
   describe Type do
-    let(:wsdl) { OpenStruct.new(:prefixes => { 'http://example.com/foo' => 'foo' }) }
     let(:elements) { { 'soapColor' => OpenStruct.new(:type => Object.new) } }
-    subject { Type.new(wsdl, 'WashHandsRequest', 'http://example.com/foo', elements) }
+
+    subject { Type.new('WashHandsRequest', 'prfx', elements) }
 
     describe '#prefix' do
-      it 'returns the prefix from the WSDL doc' do
-        subject.prefix.must_equal 'foo'
+      it 'returns the prefix' do
+        subject.prefix.must_equal 'prfx'
       end
     end
 

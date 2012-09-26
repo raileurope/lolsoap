@@ -1,12 +1,11 @@
 class LolSoap::WSDL
   class Type
-    attr_reader :name, :namespace
+    attr_reader :name, :prefix
 
-    def initialize(wsdl, name, namespace, elements)
-      @wsdl      = wsdl
-      @name      = name
-      @namespace = namespace
-      @elements  = elements
+    def initialize(name, prefix, elements)
+      @name     = name
+      @prefix   = prefix
+      @elements = elements
     end
 
     def elements
@@ -21,18 +20,8 @@ class LolSoap::WSDL
       element(name).type
     end
 
-    def prefix
-      wsdl.prefixes[namespace]
-    end
-
     def inspect
-      "<#{self.class} " \
-      "name=#{(prefix + ':' + name).inspect} " \
-      "elements=#{elements.inspect}>"
+      "<#{self.class} name=\"#{prefix}:#{name}\" elements=#{elements.inspect}>"
     end
-
-    private
-
-    def wsdl; @wsdl; end
   end
 end
