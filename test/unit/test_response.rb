@@ -4,7 +4,7 @@ require 'lolsoap/response'
 
 module LolSoap
   describe Response do
-    let(:request) { OpenStruct.new(:soap_namespace => Envelope::SOAP_NAMESPACE, :output => Object.new) }
+    let(:request) { OpenStruct.new(:soap_namespace => Envelope::SOAP_1_2, :output => Object.new) }
     let(:doc) { Nokogiri::XML(File.read(TEST_ROOT + '/fixtures/stock_quote_response.xml')) }
 
     subject { Response.new(request, doc) }

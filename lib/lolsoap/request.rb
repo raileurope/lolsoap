@@ -40,7 +40,11 @@ module LolSoap
     # The MIME type of the request. This is always application/soap+xml,
     # but it could be overridden in a subclass.
     def mime
-      'application/soap+xml'
+      if envelope.soap_version == '1.1'
+        'text/xml'
+      else
+        'application/soap+xml'
+      end
     end
 
     # The charset of the request. This is always UTF-8, but it could be

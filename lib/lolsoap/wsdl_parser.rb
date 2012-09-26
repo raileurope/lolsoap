@@ -38,12 +38,8 @@ module LolSoap
       end
     end
 
-    NS = {
-      :wsdl      => 'http://schemas.xmlsoap.org/wsdl/',
-      :soap      => 'http://schemas.xmlsoap.org/wsdl/soap/',
-      :soap12    => 'http://schemas.xmlsoap.org/wsdl/soap12/',
-      :xmlschema => 'http://www.w3.org/2001/XMLSchema'
-    }
+    SOAP_1_1 = 'http://schemas.xmlsoap.org/wsdl/soap/'
+    SOAP_1_2 = 'http://schemas.xmlsoap.org/wsdl/soap12/'
 
     attr_reader :doc
 
@@ -139,11 +135,15 @@ module LolSoap
       end
     end
 
+    def soap_version
+      @soap_version ||= namespaces.values.include?(SOAP_1_2) ? '1.2' : '1.1'
+    end
+
     def ns
       @ns ||= {
-        'd'  => NS[:wsdl],
-        'xs' => NS[:xmlschema],
-        's'  => namespaces.values.include?(NS[:soap12]) ? NS[:soap12] : NS[:soap]
+        'd'  => 'http://schemas.xmlsoap.org/wsdl/',
+        'xs' => 'http://www.w3.org/2001/XMLSchema',
+        's'  => soap_version == '1.2' ? SOAP_1_2 : SOAP_1_1
       }
     end
 

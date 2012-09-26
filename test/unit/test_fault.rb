@@ -4,10 +4,10 @@ require 'lolsoap/fault'
 
 module LolSoap
   describe Fault do
-    let(:request) { OpenStruct.new(:soap_namespace => Envelope::SOAP_NAMESPACE) }
+    let(:request) { OpenStruct.new(:soap_namespace => Envelope::SOAP_1_2) }
     let(:node) do
       doc = Nokogiri::XML(File.read(TEST_ROOT + '/fixtures/stock_quote_fault.xml'))
-      doc.at_xpath('//soap:Fault', 'soap' => Envelope::SOAP_NAMESPACE)
+      doc.at_xpath('//soap:Fault', 'soap' => Envelope::SOAP_1_2)
     end
 
     subject { Fault.new(request, node) }

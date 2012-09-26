@@ -3,7 +3,13 @@ require 'lolsoap/envelope'
 
 module LolSoap
   describe Envelope do
-    let(:wsdl) { OpenStruct.new(:type_namespaces => { 'foo' => 'http://example.com/foo' }) }
+    let(:wsdl) do
+      OpenStruct.new(
+        :type_namespaces => { 'foo' => 'http://example.com/foo' },
+        :soap_version    => '1.2'
+      )
+    end
+
     let(:operation) do
       OpenStruct.new(:input => OpenStruct.new(:prefix => 'foo', :name => 'WashHandsRequest'))
     end
@@ -16,7 +22,7 @@ module LolSoap
 
     it 'has a skeleton SOAP envelope structure when first created' do
       doc.namespaces.must_equal(
-        'xmlns:soap' => Envelope::SOAP_NAMESPACE,
+        'xmlns:soap' => Envelope::SOAP_1_2,
         'xmlns:foo'  => 'http://example.com/foo'
       )
 
@@ -106,6 +112,16 @@ module LolSoap
       it "returns the operation's output" do
         operation.output = 'lol'
         subject.output_type.must_equal 'lol'
+      end
+    end
+
+    describe '#soap_namespace' do
+      it 'returns the correct envelope namespace according to the SOAP version' do
+        wsdl.soap_version = '1.2'
+        subject.soap_namespace.must_equal Envelope::SOAP_1_2
+
+        wsdl.soap_version = '1.1'
+        subject.soap_namespace.must_equal Envelope::SOAP_1_1
       end
     end
   end

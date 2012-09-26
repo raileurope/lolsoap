@@ -6,18 +6,6 @@ module LolSoap
     let(:envelope) { OpenStruct.new }
     subject { Request.new(envelope) }
 
-    [:header, :body, :soap_namespace, :input_type, :output_type].each do |method|
-      describe "##{method}" do
-        let(:envelope) { MiniTest::Mock.new }
-
-        it 'delegates to the envelope' do
-          ret = Object.new
-          envelope.expect(method, ret)
-          subject.send(method).must_equal ret
-        end
-      end
-    end
-
     describe '#url' do
       it 'returns the envelope endpoint' do
         envelope.endpoint = 'lol'
@@ -42,6 +30,18 @@ module LolSoap
       it 'returns the envelope as an xml string' do
         envelope.to_xml = '<lol>'
         subject.content.must_equal '<lol>'
+      end
+    end
+
+    describe '#mime' do
+      it 'is application/soap+xml for SOAP 1.2' do
+        envelope.soap_version = '1.2'
+        subject.mime.must_equal 'application/soap+xml'
+      end
+
+      it 'is text/xml for SOAP 1.1' do
+        envelope.soap_version = '1.1'
+        subject.mime.must_equal 'text/xml'
       end
     end
   end

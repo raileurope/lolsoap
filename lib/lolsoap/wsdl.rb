@@ -59,6 +59,11 @@ module LolSoap
       Hash[load_types.values.map { |type| [type.prefix, namespaces[type.prefix]] }]
     end
 
+    # The version of SOAP detected.
+    def soap_version
+      parser.soap_version
+    end
+
     def inspect
       "<#{self.class} " \
       "namespaces=#{namespaces.inspect} " \

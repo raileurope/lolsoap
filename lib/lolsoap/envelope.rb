@@ -6,10 +6,10 @@ module LolSoap
     attr_reader :wsdl, :operation, :doc
 
     # @private
-    SOAP_PREFIX    = 'soap'
+    SOAP_1_1 = 'http://schemas.xmlsoap.org/soap/envelope/'
 
     # @private
-    SOAP_NAMESPACE = 'http://www.w3.org/2003/05/soap-envelope'
+    SOAP_1_2 = 'http://www.w3.org/2003/05/soap-envelope'
 
     def initialize(wsdl, operation, doc = Nokogiri::XML::Document.new)
       @wsdl      = wsdl
@@ -59,11 +59,15 @@ module LolSoap
     end
 
     def soap_prefix
-      SOAP_PREFIX
+      'soap'
     end
 
     def soap_namespace
-      SOAP_NAMESPACE
+      soap_version == '1.2' ? SOAP_1_2 : SOAP_1_1
+    end
+
+    def soap_version
+      wsdl.soap_version
     end
 
     private
