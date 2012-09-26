@@ -6,10 +6,12 @@
              xmlns:xsd1="http://example.com/stockquote.xsd"
              xmlns:xsd2="http://example.com/stockquote2.xsd"
              xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap12/"
+             xmlns:xs="http://www.w3.org/2001/XMLSchema"
              xmlns="http://schemas.xmlsoap.org/wsdl/">
 
   <types>
     <schema targetNamespace="http://example.com/stockquote.xsd"
+            xmlns:xsd3="http://example.com/stockquote.xsd"
             xmlns="http://www.w3.org/2001/XMLSchema">
       <element name="TradePrice">
          <complexType>
@@ -18,7 +20,7 @@
            </all>
          </complexType>
       </element>
-      <complexType name="TradePriceRequest">
+      <complexType name="xsd3:TradePriceRequest">
         <sequence>
           <element name="tickerSymbol" type="xs:string" maxOccurs="5"/>
           <element name="specialTickerSymbol" type="xsd2:TickerSymbol" maxOccurs="unbounded"/>
@@ -27,7 +29,6 @@
     </schema>
 
     <schema targetNamespace="http://example.com/stockquote2.xsd"
-            xs="http://www.w3.org/2001/XMLSchema"
             xmlns="http://www.w3.org/2001/XMLSchema">
       <complexType name="TickerSymbol">
         <sequence>

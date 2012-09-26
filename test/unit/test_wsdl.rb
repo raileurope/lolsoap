@@ -57,12 +57,6 @@ module LolSoap
         end
       end
 
-      describe '#prefixes' do
-        it 'returns the prefixes-to-namespace mapping' do
-          subject.prefixes.must_equal({ namespace => 'bla' })
-        end
-      end
-
       describe 'with types' do
         before do
           parser.types = {

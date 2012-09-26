@@ -51,7 +51,7 @@ module LolSoap
 
     # Hash of namespace prefixes used in the WSDL document (keys are namespace URIs)
     def prefixes
-      namespaces.invert
+      parser.prefixes
     end
 
     # Namespaces used by the types (a subset of #namespaces)

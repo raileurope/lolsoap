@@ -39,7 +39,10 @@ module LolSoap
       def parse_prefix(string)
         prefix, name = string.to_s.split(':')
 
-        unless name
+        if name
+          # Ensure we always use the same prefix for a given namespace
+          prefix = parser.prefixes.fetch(parser.namespaces.fetch(prefix))
+        else
           name   = prefix
           prefix = parser.prefixes.fetch(target_namespace)
         end
@@ -73,8 +76,9 @@ module LolSoap
       end
     end
 
+    # We invert the hash in a deterministic way so that the results are repeatable.
     def prefixes
-      @prefixes ||= namespaces.invert
+      @prefixes ||= Hash[namespaces.sort_by { |k, v| k }.uniq { |k, v| v }].invert
     end
 
     def endpoint

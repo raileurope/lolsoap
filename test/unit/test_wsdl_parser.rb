@@ -17,7 +17,9 @@ module LolSoap
           'tns'  => 'http://example.com/stockquote.wsdl',
           'xsd1' => 'http://example.com/stockquote.xsd',
           'xsd2' => 'http://example.com/stockquote2.xsd',
-          'soap' => 'http://schemas.xmlsoap.org/wsdl/soap12/'
+          'xsd3' => 'http://example.com/stockquote.xsd',
+          'soap' => 'http://schemas.xmlsoap.org/wsdl/soap12/',
+          'xs'   => 'http://www.w3.org/2001/XMLSchema'
         })
       end
     end
