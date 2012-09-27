@@ -33,6 +33,10 @@ module LolSoap
         ]
       end
 
+      def attributes
+        node.xpath('.//xs:attribute/@name', parser.ns).map(&:to_s)
+      end
+
       def prefix_and_name(string)
         parser.prefix_and_name(string, target_namespace)
       end
@@ -82,9 +86,10 @@ module LolSoap
             type = Type.new(self, node, target_namespace)
 
             types[type.name_with_prefix] = {
-              :name     => type.name,
-              :prefix   => type.prefix,
-              :elements => type.elements
+              :name       => type.name,
+              :prefix     => type.prefix,
+              :elements   => type.elements,
+              :attributes => type.attributes
             }
           end
         end

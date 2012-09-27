@@ -24,6 +24,7 @@
         <sequence>
           <element name="tickerSymbol" type="xs:string" maxOccurs="5"/>
           <element name="specialTickerSymbol" type="xsd2:TickerSymbol" maxOccurs="unbounded"/>
+          <attribute name="id" type="xs:string"/>
         </sequence>
       </complexType>
     </schema>
