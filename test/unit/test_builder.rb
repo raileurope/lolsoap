@@ -15,6 +15,7 @@ module LolSoap
     end
     let(:type) do
       type = OpenStruct.new(:prefix => 'a')
+      def type.has_attribute?(*); false; end
       def type.sub_type(name)
         @sub_types ||= { 'foo' => Object.new, 'bar' => Object.new, 'clone' => Object.new }
         @sub_types[name]

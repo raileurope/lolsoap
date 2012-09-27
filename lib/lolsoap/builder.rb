@@ -55,6 +55,10 @@ module LolSoap
       __prefixed_tag__(@type.prefix, @type.sub_type(name.to_s), name, *args, &block)
     end
 
+    def __attribute__(name, value)
+      __prefixed_attribute__(@type.prefix, name, value)
+    end
+
     # @private
     def __prefixed_tag__(prefix, sub_type, name, *args)
       sub_node = @node.document.create_element(name.to_s, *args)
@@ -65,6 +69,11 @@ module LolSoap
       builder = __class__.new(sub_node, sub_type)
       yield builder if block_given?
       builder
+    end
+
+    # @private
+    def __prefixed_attribute__(prefix, name, value)
+      @node["#{prefix}:#{name}"] = value
     end
 
     # Node accessor. Named to prevent method_missing conflict.
@@ -88,6 +97,13 @@ module LolSoap
 
     private
 
-    alias method_missing __tag__
+    # alias method_missing __tag__
+    def method_missing(name, *args, &block)
+      if @type.has_attribute?(name.to_s)
+        __attribute__(name, *args)
+      else
+        __tag__(name, *args, &block)
+      end
+    end
   end
 end

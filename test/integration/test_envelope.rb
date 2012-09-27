@@ -21,6 +21,7 @@ module LolSoap
           s.name 'LOCOLOCOLOCO'
         end
         b.lol
+        b.id "42"
       end
 
       el = doc.at_xpath('//xsd1:TradePriceRequest/xsd1:tickerSymbol', doc.namespaces)
@@ -30,6 +31,9 @@ module LolSoap
       el = doc.at_xpath('//xsd1:TradePriceRequest/xsd1:specialTickerSymbol/xsd2:name', doc.namespaces)
       el.wont_equal nil
       el.text.to_s.must_equal 'LOCOLOCOLOCO'
+
+      attr = doc.at_xpath('//xsd1:TradePriceRequest/@xsd1:id', doc.namespaces)
+      attr.to_s.must_equal "42"
     end
 
     it 'creates some header' do

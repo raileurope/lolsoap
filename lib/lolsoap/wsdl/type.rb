@@ -21,6 +21,10 @@ class LolSoap::WSDL
       element(name).type
     end
 
+    def attributes
+      @attributes.dup
+    end
+
     def attribute(name)
       @attributes.fetch(name)
     end
@@ -30,7 +34,9 @@ class LolSoap::WSDL
     end
 
     def inspect
-      "<#{self.class} name=\"#{prefix}:#{name}\" elements=#{elements.inspect}>"
+      "<#{self.class} name=\"#{prefix}:#{name}\" " \
+        "elements=#{elements.inspect} " \
+        "attributes=#{attributes.inspect}>"
     end
   end
 end

@@ -36,7 +36,9 @@ client = LolSoap::Client.new(File.read('lolapi.wsdl'))
 request = client.request('getLols')
 
 # Populate the request with some data. Namespacing is taken care of
-# using the type data from the WSDL.
+# using the type data from the WSDL. The WSDL also tells us whether
+# a given name (e.g. lolFactor below) should be treated as an
+# attribute or a sub-element.
 request.body do |b|
   b.lolFactor '11'
   b.lolDuration 'lolever'
@@ -112,6 +114,8 @@ Development sponsored by [Loco2](http://loco2.com/).
   `LolSoap::WSDL#types` is now keyed based on a prefixed type name
   rather than an unprefixed type name. This shouldn't affect you if
   you're not using `LolSoap::WSDL#types` directly.
+* Add support for building attributes with `LolSoap::Builder` based on
+  the XML Schema information.
 
 ### 0.1 ###
 
