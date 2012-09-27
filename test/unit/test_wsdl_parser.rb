@@ -46,7 +46,11 @@ module LolSoap
                 :singular => false
               }
             },
-            :attributes => ['id']
+            :attributes => {
+              'id' => {
+                :type => 'xs:string'
+              }
+            }
           },
           'xsd1:TradePrice' => {
             :prefix   => 'xsd1',
@@ -57,7 +61,7 @@ module LolSoap
                 :singular => true
               }
             },
-            :attributes => []
+            :attributes => {}
           },
           'xsd2:TickerSymbol' => {
             :prefix   => 'xsd2',
@@ -68,7 +72,7 @@ module LolSoap
                 :singular => true
               }
             },
-            :attributes => []
+            :attributes => {}
           }
         })
       end
