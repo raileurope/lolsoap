@@ -2,10 +2,11 @@ class LolSoap::WSDL
   class Type
     attr_reader :name, :prefix
 
-    def initialize(name, prefix, elements)
-      @name     = name
-      @prefix   = prefix
-      @elements = elements
+    def initialize(name, prefix, elements, attributes)
+      @name       = name
+      @prefix     = prefix
+      @elements   = elements
+      @attributes = attributes
     end
 
     def elements
@@ -18,6 +19,14 @@ class LolSoap::WSDL
 
     def sub_type(name)
       element(name).type
+    end
+
+    def attribute(name)
+      @attributes.fetch(name)
+    end
+
+    def has_attribute?(name)
+      @attributes.include?(name)
     end
 
     def inspect

@@ -5,7 +5,7 @@ class LolSoap::WSDL
   describe Type do
     let(:elements) { { 'soapColor' => OpenStruct.new(:type => Object.new) } }
 
-    subject { Type.new('WashHandsRequest', 'prfx', elements) }
+    subject { Type.new('WashHandsRequest', 'prfx', elements, {}) }
 
     describe '#prefix' do
       it 'returns the prefix' do

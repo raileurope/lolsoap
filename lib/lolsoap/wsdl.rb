@@ -5,7 +5,9 @@ module LolSoap
     require 'lolsoap/wsdl/operation'
     require 'lolsoap/wsdl/type'
     require 'lolsoap/wsdl/null_type'
+    require 'lolsoap/wsdl/type_component'
     require 'lolsoap/wsdl/element'
+    require 'lolsoap/wsdl/attribute'
     require 'lolsoap/wsdl/null_element'
 
     # Create a new instance by parsing a raw string of XML
@@ -81,7 +83,15 @@ module LolSoap
     def load_types(parser)
       Hash[
         parser.types.map do |prefixed_name, type|
-          [prefixed_name, Type.new(type[:name], type[:prefix], build_elements(type[:elements]))]
+          [
+            prefixed_name,
+            Type.new(
+              type[:name],
+              type[:prefix],
+              build_elements(type[:elements]),
+              build_attributes(type[:attributes])
+            )
+          ]
         end
       ]
     end
@@ -91,6 +101,15 @@ module LolSoap
       Hash[
         elements.map do |name, el|
           [name, Element.new(self, name, el[:type], el[:singular])]
+        end
+      ]
+    end
+
+    # @private
+    def build_attributes(attributes)
+      Hash[
+        attributes.map do |name, attr|
+          [name, Attribute.new(self, name, attr[:type])]
         end
       ]
     end
