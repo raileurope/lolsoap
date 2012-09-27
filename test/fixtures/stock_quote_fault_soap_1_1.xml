@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+<soap:Body>
+  <soap:Fault>
+    <soap:faultcode>soap:Sender</soap:faultcode>
+    <soap:faultstring>Omg! stock market has crashed!</soap:faultstring>
+    <soap:detail><Foo>Some detail</Foo></soap:detail>
+  </soap:Fault>
+</soap:Body>
+</soap:Envelope>

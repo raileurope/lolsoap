@@ -22,6 +22,11 @@ module LolSoap
       envelope.soap_namespace
     end
 
+    # The SOAP version in use
+    def soap_version
+      envelope.soap_version
+    end
+
     # URL to be POSTed to
     def url
       envelope.endpoint
@@ -40,7 +45,7 @@ module LolSoap
     # The MIME type of the request. This is always application/soap+xml,
     # but it could be overridden in a subclass.
     def mime
-      if envelope.soap_version == '1.1'
+      if soap_version == '1.1'
         'text/xml'
       else
         'application/soap+xml'
