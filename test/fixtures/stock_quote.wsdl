@@ -16,7 +16,7 @@
       <element name="TradePrice">
          <complexType>
            <all>
-             <element name="price" type="xs:float"/>
+             <element name="xsd3:price" type="xs:float"/>
            </all>
          </complexType>
       </element>
@@ -24,7 +24,7 @@
         <sequence>
           <element name="tickerSymbol" type="xs:string" maxOccurs="5"/>
           <element name="specialTickerSymbol" type="xsd2:TickerSymbol" maxOccurs="unbounded"/>
-          <attribute name="id" type="xs:string"/>
+          <attribute name="xsd3:id" type="xs:string"/>
         </sequence>
       </complexType>
     </schema>

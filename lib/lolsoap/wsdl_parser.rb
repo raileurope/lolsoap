@@ -34,7 +34,9 @@ module LolSoap
       end
 
       def attributes
-        node.xpath('.//xs:attribute/@name', parser.ns).map(&:to_s)
+        node.xpath('.//xs:attribute', parser.ns).map do |node|
+          prefix_and_name(node.attr('name')).last
+        end
       end
 
       def prefix_and_name(string)
