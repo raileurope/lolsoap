@@ -56,7 +56,7 @@ module LolSoap
     end
 
     def __attribute__(name, value)
-      @node[name.to_s] = value
+      @node[name.to_s] = value.to_s
     end
 
     # @private
