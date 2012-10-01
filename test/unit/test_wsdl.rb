@@ -28,11 +28,7 @@ module LolSoap
                   :singular => false
                 }
               },
-              :attributes => {
-                'id' => {
-                  :type => 'bla:Color'
-                }
-              },
+              :attributes => ['id'],
               :prefix => 'bla'
             },
             'bla:Color' => {
@@ -46,7 +42,7 @@ module LolSoap
                   :singular => true
                 }
               },
-              :attributes => {},
+              :attributes => [],
               :prefix => 'bla'
             }
           }
@@ -96,7 +92,7 @@ module LolSoap
             t.element('handleColor').singular?.must_equal true
             t.element('age').type.must_equal WSDL::NullType.new
             t.element('age').singular?.must_equal false
-            t.attribute('id').type.must_equal subject.types['bla:Color']
+            t.attributes.must_equal ['id']
           end
 
           subject.types['bla:Color'].tap do |t|

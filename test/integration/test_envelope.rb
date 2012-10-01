@@ -32,7 +32,7 @@ module LolSoap
       el.wont_equal nil
       el.text.to_s.must_equal 'LOCOLOCOLOCO'
 
-      attr = doc.at_xpath('//xsd1:TradePriceRequest/@xsd1:id', doc.namespaces)
+      attr = doc.at_xpath('//xsd1:TradePriceRequest/@id', doc.namespaces)
       attr.to_s.must_equal "42"
     end
 

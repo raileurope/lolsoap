@@ -1,3 +1,5 @@
+require 'set'
+
 class LolSoap::WSDL
   class Type
     attr_reader :name, :prefix
@@ -6,7 +8,7 @@ class LolSoap::WSDL
       @name       = name
       @prefix     = prefix
       @elements   = elements
-      @attributes = attributes
+      @attributes = Set.new(attributes)
     end
 
     def elements
@@ -22,11 +24,7 @@ class LolSoap::WSDL
     end
 
     def attributes
-      @attributes.dup
-    end
-
-    def attribute(name)
-      @attributes.fetch(name)
+      @attributes.to_a
     end
 
     def has_attribute?(name)

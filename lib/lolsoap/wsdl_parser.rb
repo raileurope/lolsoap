@@ -34,14 +34,7 @@ module LolSoap
       end
 
       def attributes
-        Hash[
-          node.xpath('.//xs:attribute', parser.ns).map do |node|
-            [
-              prefix_and_name(node.attr('name')).last,
-              { :type => prefix_and_name(node.attr('type')).join(':') }
-            ]
-          end
-        ]
+        node.xpath('.//xs:attribute/@name', parser.ns).map(&:text)
       end
 
       def prefix_and_name(string)

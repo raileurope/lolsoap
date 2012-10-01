@@ -56,7 +56,7 @@ module LolSoap
     end
 
     def __attribute__(name, value)
-      __prefixed_attribute__(@type.prefix, name, value)
+      @node[name.to_s] = value
     end
 
     # @private
@@ -69,11 +69,6 @@ module LolSoap
       builder = __class__.new(sub_node, sub_type)
       yield builder if block_given?
       builder
-    end
-
-    # @private
-    def __prefixed_attribute__(prefix, name, value)
-      @node["#{prefix}:#{name}"] = value
     end
 
     # Node accessor. Named to prevent method_missing conflict.
