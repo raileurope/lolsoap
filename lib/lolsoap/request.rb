@@ -1,10 +1,12 @@
 module LolSoap
   # Represents a HTTP request containing a SOAP Envelope
   class Request
-    attr_reader :envelope
+    attr_reader   :envelope
+    attr_accessor :xml_options
 
     def initialize(envelope)
-      @envelope = envelope
+      @envelope    = envelope
+      @xml_options = {}
     end
 
     # @see Envelope#body
@@ -75,7 +77,7 @@ module LolSoap
 
     # The content to be sent in the HTTP request
     def content
-      @content ||= envelope.to_xml
+      @content ||= envelope.to_xml(xml_options)
     end
   end
 end
