@@ -54,8 +54,8 @@ module LolSoap
       operation.output
     end
 
-    def to_xml
-      doc.to_xml
+    def to_xml(options = {})
+      doc.to_xml(options)
     end
 
     def soap_prefix
