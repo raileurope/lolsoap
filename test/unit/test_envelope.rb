@@ -90,7 +90,11 @@ module LolSoap
 
     describe '#to_xml' do
       it 'returns the xml of the doc' do
-        def subject.doc; OpenStruct.new(:to_xml => '<lol>'); end
+        def subject.doc
+          doc = Object.new
+          def doc.to_xml(options); '<lol>'; end
+          doc
+        end
         subject.to_xml.must_equal '<lol>'
       end
     end

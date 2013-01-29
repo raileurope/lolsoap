@@ -15,7 +15,7 @@ module LolSoap
 
     describe '#headers' do
       it 'returns the necessary headers' do
-        envelope.to_xml = '<lol>'
+        def envelope.to_xml(options); '<lol>'; end
         envelope.action = 'http://example.com/LolOutLoud'
 
         subject.headers.must_equal({
@@ -28,7 +28,7 @@ module LolSoap
 
     describe '#content' do
       it 'returns the envelope as an xml string' do
-        envelope.to_xml = '<lol>'
+        def envelope.to_xml(options); '<lol>'; end
         subject.content.must_equal '<lol>'
       end
     end
