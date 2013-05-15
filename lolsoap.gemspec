@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "lolsoap"
-  s.version = "0.1.4"
+  s.version = "0.2.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Jon Leighton"]
-  s.date = "2012-05-17"
+  s.date = "2013-05-15"
   s.description = "A library for dealing with SOAP requests and responses. We tear our hair out so you don't have to."
   s.email = "j@jonathanleighton.com"
   s.extra_rdoc_files = [
@@ -45,6 +45,7 @@ Gem::Specification.new do |s|
     "lolsoap.gemspec",
     "test/fixtures/stock_quote.wsdl",
     "test/fixtures/stock_quote_fault.xml",
+    "test/fixtures/stock_quote_fault_soap_1_1.xml",
     "test/fixtures/stock_quote_response.xml",
     "test/helper.rb",
     "test/integration/test_client.rb",
@@ -67,7 +68,7 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/loco2/lolsoap"
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
-  s.rubygems_version = "1.8.15"
+  s.rubygems_version = "1.8.24"
   s.summary = "A library for dealing with SOAP requests and responses."
 
   if s.respond_to? :specification_version then
