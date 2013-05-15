@@ -105,7 +105,7 @@ Development sponsored by [Loco2](http://loco2.com/).
 
 ## Changelog ##
 
-### 0.2 (unreleased) ###
+### 0.2 ###
 
 * SOAP 1.1 support
 * Better handling of namespaces in the XML schema. You should now be
