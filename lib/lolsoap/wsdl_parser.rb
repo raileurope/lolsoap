@@ -38,8 +38,10 @@ module LolSoap
       end
 
       def base_type
-        @base_type = if extension = node.at_xpath('.//xs:extension/@base', parser.ns)
-          parser.abstract_types[extension.to_s]
+        @base_type ||= begin
+          if extension = node.at_xpath('.//xs:extension/@base', parser.ns)
+            parser.abstract_types[extension.to_s]
+          end
         end
       end
 
