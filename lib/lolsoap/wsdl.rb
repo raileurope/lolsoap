@@ -26,6 +26,7 @@ module LolSoap
     attr_reader :soap_version
 
     def initialize(parser)
+      @parser       = parser
       @types        = load_types(parser)
       @operations   = load_operations(parser)
       @endpoint     = parser.endpoint
@@ -72,7 +73,7 @@ module LolSoap
     def load_operations(parser)
       Hash[
         parser.operations.map do |k, op|
-          [k, Operation.new(self, op[:action], type(op[:input]), type(op[:output]))]
+          [k, Operation.new(self, op[:action], operation_type(op[:input]), operation_type(op[:output]))]
         end
       ]
     end
@@ -101,6 +102,17 @@ module LolSoap
           [name, Element.new(self, name, el[:type], el[:singular])]
         end
       ]
+    end
+
+    # @private
+    def operation_type(name)
+      if @types[name]
+        @types[name]
+      elsif el = @parser.elements[name]
+        el[:type]
+      else
+        NullType.new
+      end
     end
   end
 end

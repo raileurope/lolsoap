@@ -73,6 +73,29 @@ module LolSoap
               }
             },
             :attributes => []
+          },
+          'xsd1:TimestampRequest' => {
+            :prefix   => 'xsd1',
+            :name     => 'TimestampRequest',
+            :elements => {
+              'accountId' => {
+                :type     => 'xs:string',
+                :singular => true
+              }
+            },
+            :attributes => ['signature']
+          }
+        })
+      end
+    end
+
+    describe '#elements' do
+      it 'returns the elements with types' do
+        subject.elements.must_equal({
+          "xsd1:Timestamp" => {
+            :name   => "Timestamp",
+            :prefix => "xsd1",
+            :type   => "xs:string"
           }
         })
       end
@@ -82,7 +105,9 @@ module LolSoap
       it 'maps message names to types' do
         subject.messages.must_equal({
           'GetLastTradePriceInput'  => 'xsd1:TradePriceRequest',
-          'GetLastTradePriceOutput' => 'xsd1:TradePrice'
+          'GetLastTradePriceOutput' => 'xsd1:TradePrice',
+          'GetTimestampInput'       => 'xsd1:TimestampRequest',
+          'GetTimestampOutput'      => 'xsd1:Timestamp'
         })
       end
     end
@@ -93,6 +118,10 @@ module LolSoap
           'GetLastTradePrice' => {
             :input  => 'xsd1:TradePriceRequest',
             :output => 'xsd1:TradePrice'
+          },
+          'GetTimestamp' => {
+            :input  => 'xsd1:TimestampRequest',
+            :output => 'xsd1:Timestamp'
           }
         })
       end
@@ -105,6 +134,11 @@ module LolSoap
             :action => 'http://example.com/GetLastTradePrice',
             :input  => 'xsd1:TradePriceRequest',
             :output => 'xsd1:TradePrice'
+          },
+          'GetTimestamp' => {
+            :action => 'http://example.com/GetTimestamp',
+            :input  => 'xsd1:TimestampRequest',
+            :output => 'xsd1:Timestamp'
           }
         })
       end

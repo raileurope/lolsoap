@@ -6,13 +6,17 @@ module LolSoap
     subject { WSDL.parse(File.read(TEST_ROOT + '/fixtures/stock_quote.wsdl')) }
 
     it 'should successfully parse a WSDL document' do
-      subject.operations.length.must_equal 1
+      subject.operations.length.must_equal 2
       subject.operations['GetLastTradePrice'].tap do |o|
         o.input.must_equal  subject.types['xsd1:TradePriceRequest']
         o.action.must_equal 'http://example.com/GetLastTradePrice'
       end
+      subject.operations['GetTimestamp'].tap do |o|
+        o.input.must_equal  subject.types['xsd1:TimestampRequest']
+        o.action.must_equal 'http://example.com/GetTimestamp'
+      end
 
-      subject.types.length.must_equal 3
+      subject.types.length.must_equal 4
       subject.types['xsd1:TradePriceRequest'].tap do |t|
         t.prefix.must_equal 'xsd1'
       end

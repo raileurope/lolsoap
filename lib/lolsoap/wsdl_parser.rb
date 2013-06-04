@@ -3,8 +3,8 @@ require 'nokogiri'
 module LolSoap
   # @private
   class WSDLParser
-    class Type
-      attr_reader :parser, :node, :target_namespace, :name, :prefix, :base_type
+    class Node
+      attr_reader :parser, :node, :target_namespace, :name, :prefix
 
       def initialize(parser, node, target_namespace)
         @parser           = parser
@@ -17,6 +17,18 @@ module LolSoap
         "#{prefix}:#{name}"
       end
 
+      def prefix_and_name(string)
+        parser.prefix_and_name(string, target_namespace)
+      end
+    end
+
+    class Element < Node
+      def type
+        node.attr('type')
+      end
+    end
+
+    class Type < Node
       def elements
         parent_elements.merge(own_elements)
       end
@@ -25,12 +37,8 @@ module LolSoap
         parent_attributes + own_attributes
       end
 
-      def prefix_and_name(string)
-        parser.prefix_and_name(string, target_namespace)
-      end
-
       def base_type
-        @base_type = if extension = node.xpath('.//xs:extension/@base', parser.ns).first
+        @base_type = if extension = node.at_xpath('.//xs:extension/@base', parser.ns)
           parser.abstract_types[extension.to_s]
         end
       end
@@ -106,6 +114,10 @@ module LolSoap
 
     def types
       @types ||= build_types 'xs:element[@name][not(@type)] | xs:complexType[@name][not(@abstract)]'
+    end
+
+    def elements
+      @elements ||= build_elements('xs:element[@type]')
     end
 
     def messages
@@ -194,6 +206,24 @@ module LolSoap
         end
       end
       types
+    end
+
+    def build_elements(xpath)
+      elements = {}
+      schemas.each do |schema|
+        target_namespace = schema.attr('targetNamespace').to_s
+
+        schema.xpath(xpath, ns).each do |node|
+          element = Element.new(self, node, target_namespace)
+
+          elements[element.name_with_prefix] = {
+            :name   => element.name,
+            :prefix => element.prefix,
+            :type   => element.type
+          }
+        end
+      end
+      elements
     end
   end
 end
