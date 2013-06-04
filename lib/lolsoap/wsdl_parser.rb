@@ -105,7 +105,7 @@ module LolSoap
     end
 
     def types
-      @types ||= build_types 'xs:element[@name] | xs:complexType[@name][not(@abstract)]'
+      @types ||= build_types 'xs:element[@name][not(@type)] | xs:complexType[@name][not(@abstract)]'
     end
 
     def messages
