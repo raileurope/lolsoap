@@ -109,7 +109,7 @@ module LolSoap
       if @types[name]
         @types[name]
       elsif el = @parser.elements[name]
-        el[:type]
+        type(el[:type])
       else
         NullType.new
       end
