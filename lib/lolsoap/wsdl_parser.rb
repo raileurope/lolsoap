@@ -4,7 +4,7 @@ module LolSoap
   # @private
   class WSDLParser
     class Type
-      attr_reader :parser, :node, :target_namespace, :name, :prefix
+      attr_reader :parser, :node, :target_namespace, :name, :prefix, :base_type
 
       def initialize(parser, node, target_namespace)
         @parser           = parser
@@ -18,6 +18,26 @@ module LolSoap
       end
 
       def elements
+        parent_elements.merge(own_elements)
+      end
+
+      def attributes
+        parent_attributes + own_attributes
+      end
+
+      def prefix_and_name(string)
+        parser.prefix_and_name(string, target_namespace)
+      end
+
+      def base_type
+        @base_type = if extension = node.xpath('.//xs:extension/@base', parser.ns).first
+          parser.abstract_types[extension.to_s]
+        end
+      end
+
+      private
+
+      def own_elements
         Hash[
           node.xpath('.//xs:element', parser.ns).map do |element|
             max_occurs = element.attribute('maxOccurs').to_s
@@ -33,12 +53,16 @@ module LolSoap
         ]
       end
 
-      def attributes
+      def parent_elements
+        base_type ? base_type[:elements] : {}
+      end
+
+      def own_attributes
         node.xpath('.//xs:attribute/@name', parser.ns).map(&:text)
       end
 
-      def prefix_and_name(string)
-        parser.prefix_and_name(string, target_namespace)
+      def parent_attributes
+        base_type ? base_type[:attributes] : []
       end
     end
 
@@ -76,25 +100,12 @@ module LolSoap
       doc.xpath('/d:definitions/d:types/xs:schema', ns)
     end
 
+    def abstract_types
+      @abstract_types ||= build_types 'xs:complexType[@abstract]'
+    end
+
     def types
-      @types ||= begin
-        types = {}
-        schemas.each do |schema|
-          target_namespace = schema.attr('targetNamespace').to_s
-
-          schema.xpath('xs:element[@name] | xs:complexType[@name]', ns).each do |node|
-            type = Type.new(self, node, target_namespace)
-
-            types[type.name_with_prefix] = {
-              :name       => type.name,
-              :prefix     => type.prefix,
-              :elements   => type.elements,
-              :attributes => type.attributes
-            }
-          end
-        end
-        types
-      end
+      @types ||= build_types 'xs:element[@name] | xs:complexType[@name][not(@abstract)]'
     end
 
     def messages
@@ -164,6 +175,25 @@ module LolSoap
       end
 
       [prefix, name]
+    end
+
+    def build_types(xpath)
+      types = {}
+      schemas.each do |schema|
+        target_namespace = schema.attr('targetNamespace').to_s
+
+        schema.xpath(xpath, ns).each do |node|
+          type = Type.new(self, node, target_namespace)
+
+          types[type.name_with_prefix] = {
+            :name       => type.name,
+            :prefix     => type.prefix,
+            :elements   => type.elements,
+            :attributes => type.attributes
+          }
+        end
+      end
+      types
     end
   end
 end

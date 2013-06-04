@@ -37,6 +37,10 @@ module LolSoap
             :prefix   => 'xsd1',
             :name     => 'TradePriceRequest',
             :elements => {
+              'accountId' => {
+                :type     => 'xs:string',
+                :singular => true
+              },
               'tickerSymbol' => {
                 :type     => 'xs:string',
                 :singular => false
@@ -46,7 +50,7 @@ module LolSoap
                 :singular => false
               }
             },
-            :attributes => ['id']
+            :attributes => ['signature', 'id']
           },
           'xsd1:TradePrice' => {
             :prefix   => 'xsd1',
