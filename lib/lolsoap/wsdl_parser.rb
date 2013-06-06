@@ -24,14 +24,14 @@ module LolSoap
 
     class Element < Node
       def type
-        unless node.attr('type').to_s.empty?
-          node.attr('type')
-        else
-          type = Type.new(parser, node.at_xpath('xs:complexType', parser.ns), target_namespace)
+        if complex_type = node.at_xpath('xs:complexType', parser.ns)
+          type = Type.new(parser, complex_type, target_namespace)
           {
             :elements   => type.elements,
             :attributes => type.attributes
           }
+        else
+          node.attr('type').to_s
         end
       end
 
