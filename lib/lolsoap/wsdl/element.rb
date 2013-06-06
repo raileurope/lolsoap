@@ -2,23 +2,27 @@ class LolSoap::WSDL
   class Element
     attr_reader :name
 
-    def initialize(wsdl, name, type_name, singular = true)
+    def initialize(wsdl, name, type, singular = true)
       @wsdl      = wsdl
       @name      = name
-      @type_name = type_name
+      @type      = type
       @singular  = singular
+    end
+
+    def type
+      if @type.is_a?(String)
+        @type = wsdl.type(@type)
+      end
+
+      @type
     end
 
     def singular?
       @singular == true
     end
 
-    def type
-      @type ||= wsdl.type(@type_name)
-    end
-
     def inspect
-      "<#{self.class} name=#{name.inspect} type=#{@type_name.inspect}>"
+      "<#{self.class} name=#{name.inspect} type=#{type.to_s.inspect}>"
     end
 
     private

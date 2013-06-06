@@ -52,16 +52,32 @@ module LolSoap
             },
             :attributes => ['signature', 'id']
           },
-          'xsd1:TradePrice' => {
+          'xsd1:HistoricalPriceRequest' => {
             :prefix   => 'xsd1',
-            :name     => 'TradePrice',
+            :name     => 'HistoricalPriceRequest',
             :elements => {
-              'price' => {
-                :type     => 'xs:float',
+              'accountId' => {
+                :type     => 'xs:string',
+                :singular => true
+              },
+              'dateRange' => {
+                :type     => {
+                  :elements => {
+                    'startDate' => {
+                      :type     => 'xs:string',
+                      :singular => true
+                    },
+                    'endDate' => {
+                      :type     => 'xs:string',
+                      :singular => true
+                    }
+                  },
+                  :attributes => []
+                },
                 :singular => true
               }
             },
-            :attributes => []
+            :attributes => ['signature']
           },
           'xsd2:TickerSymbol' => {
             :prefix   => 'xsd2',
@@ -73,29 +89,43 @@ module LolSoap
               }
             },
             :attributes => []
-          },
-          'xsd1:TimestampRequest' => {
-            :prefix   => 'xsd1',
-            :name     => 'TimestampRequest',
-            :elements => {
-              'accountId' => {
-                :type     => 'xs:string',
-                :singular => true
-              }
-            },
-            :attributes => ['signature']
           }
         })
       end
     end
 
     describe '#elements' do
-      it 'returns the elements with types' do
+      it 'returns the elements with inline types' do
         subject.elements.must_equal({
-          "xsd1:Timestamp" => {
-            :name   => "Timestamp",
+          "xsd1:TradePrice" => {
+            :name   => "TradePrice",
             :prefix => "xsd1",
-            :type   => "xs:string"
+            :type   => {
+              :elements => {
+                'price' => {
+                  :type     => 'xs:float',
+                  :singular => true
+                }
+              },
+              :attributes => []
+            }
+          },
+          "xsd1:HistoricalPrice" => {
+            :name   => "HistoricalPrice",
+            :prefix => "xsd1",
+            :type   => {
+              :elements => {
+                'date' => {
+                  :type     => 'xs:date',
+                  :singular => true
+                },
+                'price' => {
+                  :type     => 'xs:float',
+                  :singular => true
+                }
+              },
+              :attributes => []
+            }
           }
         })
       end
@@ -104,10 +134,10 @@ module LolSoap
     describe '#messages' do
       it 'maps message names to types' do
         subject.messages.must_equal({
-          'GetLastTradePriceInput'  => 'xsd1:TradePriceRequest',
-          'GetLastTradePriceOutput' => 'xsd1:TradePrice',
-          'GetTimestampInput'       => 'xsd1:TimestampRequest',
-          'GetTimestampOutput'      => 'xsd1:Timestamp'
+          'GetLastTradePriceInput'   => 'xsd1:TradePriceRequest',
+          'GetLastTradePriceOutput'  => 'xsd1:TradePrice',
+          'GetHistoricalPriceInput'  => 'xsd1:HistoricalPriceRequest',
+          'GetHistoricalPriceOutput' => 'xsd1:HistoricalPrice'
         })
       end
     end
@@ -119,9 +149,9 @@ module LolSoap
             :input  => 'xsd1:TradePriceRequest',
             :output => 'xsd1:TradePrice'
           },
-          'GetTimestamp' => {
-            :input  => 'xsd1:TimestampRequest',
-            :output => 'xsd1:Timestamp'
+          'GetHistoricalPrice' => {
+            :input  => 'xsd1:HistoricalPriceRequest',
+            :output => 'xsd1:HistoricalPrice'
           }
         })
       end
@@ -135,10 +165,10 @@ module LolSoap
             :input  => 'xsd1:TradePriceRequest',
             :output => 'xsd1:TradePrice'
           },
-          'GetTimestamp' => {
-            :action => 'http://example.com/GetTimestamp',
-            :input  => 'xsd1:TimestampRequest',
-            :output => 'xsd1:Timestamp'
+          'GetHistoricalPrice' => {
+            :action => 'http://example.com/GetHistoricalPrice',
+            :input  => 'xsd1:HistoricalPriceRequest',
+            :output => 'xsd1:HistoricalPrice'
           }
         })
       end

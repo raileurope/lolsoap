@@ -11,12 +11,8 @@ module LolSoap
         o.input.must_equal  subject.types['xsd1:TradePriceRequest']
         o.action.must_equal 'http://example.com/GetLastTradePrice'
       end
-      subject.operations['GetTimestamp'].tap do |o|
-        o.input.must_equal  subject.types['xsd1:TimestampRequest']
-        o.action.must_equal 'http://example.com/GetTimestamp'
-      end
 
-      subject.types.length.must_equal 4
+      subject.types.length.must_equal 3
       subject.types['xsd1:TradePriceRequest'].tap do |t|
         t.prefix.must_equal 'xsd1'
       end

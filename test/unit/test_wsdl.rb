@@ -20,7 +20,19 @@ module LolSoap
             'bla:Brush' => {
               :elements => {
                 'handleColor' => {
-                  :type     => 'bla:Color',
+                  :type     => {
+                    :elements => {
+                      'name' => {
+                        :type     => 'xs:string',
+                        :singular => true
+                      },
+                      'hex' => {
+                        :type     => 'xs:string',
+                        :singular => true
+                      }
+                    },
+                    :attributes => []
+                  },
                   :singular => true
                 },
                 'age' => {
@@ -30,20 +42,25 @@ module LolSoap
               },
               :attributes => ['id'],
               :prefix => 'bla'
-            },
+            }
+         },
+         :elements => {
             'bla:Color' => {
-              :elements => {
-                'name' => {
-                  :type     => 'xs:string',
-                  :singular => true
+              :name   => 'Color',
+              :prefix => 'bla',
+              :type   => {
+                :elements => {
+                  'name' => {
+                    :type     => 'xs:string',
+                    :singular => true
+                  },
+                  'hex' => {
+                    :type     => 'xs:string',
+                    :singular => true
+                  }
                 },
-                'hex' => {
-                  :type     => 'xs:string',
-                  :singular => true
-                }
-              },
-              :attributes => [],
-              :prefix => 'bla'
+                :attributes => []
+              }
             }
           }
         )
@@ -58,7 +75,10 @@ module LolSoap
             op.wsdl.must_equal   subject
             op.action.must_equal "urn:washHands"
             op.input.must_equal  subject.types['bla:Brush']
-            op.output.must_equal subject.types['bla:Color']
+            op.output.tap do |output|
+              output.is_a?(WSDL::Type).must_equal(true)
+              output.elements.keys.sort.must_equal %w(hex name)
+            end
           end
         end
       end
@@ -84,28 +104,25 @@ module LolSoap
 
       describe '#types' do
         it 'returns a hash of types' do
-          subject.types.length.must_equal 2
+          subject.types.length.must_equal 1
 
           subject.types['bla:Brush'].tap do |t|
             t.elements.length.must_equal 2
-            t.element('handleColor').type.must_equal subject.types['bla:Color']
+            t.element('handleColor').type.tap do |type|
+              type.is_a?(WSDL::Type).must_equal true
+              type.elements.keys.sort.must_equal %w(hex name)
+            end
             t.element('handleColor').singular?.must_equal true
             t.element('age').type.must_equal WSDL::NullType.new
             t.element('age').singular?.must_equal false
             t.attributes.must_equal ['id']
-          end
-
-          subject.types['bla:Color'].tap do |t|
-            t.elements.length.must_equal 2
-            t.element('name').type.must_equal WSDL::NullType.new
-            t.element('hex').type.must_equal WSDL::NullType.new
           end
         end
       end
 
       describe '#type' do
         it 'returns a single type' do
-          subject.type('bla:Color').must_equal subject.types['bla:Color']
+          subject.type('bla:Brush').must_equal subject.types['bla:Brush']
         end
 
         it 'returns a null object if a type is missing' do

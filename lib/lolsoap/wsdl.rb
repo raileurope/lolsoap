@@ -82,24 +82,7 @@ module LolSoap
     def load_types(parser)
       Hash[
         parser.types.map do |prefixed_name, type|
-          [
-            prefixed_name,
-            Type.new(
-              type[:name],
-              type[:prefix],
-              build_elements(type[:elements]),
-              type[:attributes]
-            )
-          ]
-        end
-      ]
-    end
-
-    # @private
-    def build_elements(elements)
-      Hash[
-        elements.map do |name, el|
-          [name, Element.new(self, name, el[:type], el[:singular])]
+          [prefixed_name, build_type(type)]
         end
       ]
     end
@@ -109,9 +92,47 @@ module LolSoap
       if @types[name]
         @types[name]
       elsif el = @parser.elements[name]
-        type(el[:type])
+        build_element(el).type
       else
         NullType.new
+      end
+    end
+
+    # @private
+    def build_type(params)
+      Type.new(
+        params[:name],
+        params[:prefix],
+        build_elements(params[:elements]),
+        params[:attributes]
+      )
+    end
+
+    # @private
+    def build_elements(elements)
+      Hash[
+        elements.map do |name, el|
+          [name, build_element(el)]
+        end
+      ]
+    end
+
+    # @private
+    def build_element(params)
+      Element.new(
+        self,
+        params[:name],
+        element_type(params[:type]),
+        params[:singular]
+      )
+    end
+
+    # @private
+    def element_type(data)
+      if data.is_a?(String)
+        data
+      else
+        build_type(data)
       end
     end
   end

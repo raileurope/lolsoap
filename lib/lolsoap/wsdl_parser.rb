@@ -24,7 +24,25 @@ module LolSoap
 
     class Element < Node
       def type
-        node.attr('type')
+        unless node.attr('type').to_s.empty?
+          node.attr('type')
+        else
+          type = Type.new(parser, node.at_xpath('xs:complexType', parser.ns), target_namespace)
+          {
+            :elements   => type.elements,
+            :attributes => type.attributes
+          }
+        end
+      end
+
+      def singular
+        max_occurs.empty? || max_occurs == '1'
+      end
+
+      private
+
+      def max_occurs
+        @max_occurs ||= node.attribute('maxOccurs').to_s
       end
     end
 
@@ -39,7 +57,7 @@ module LolSoap
 
       def base_type
         @base_type ||= begin
-          if extension = node.at_xpath('.//xs:extension/@base', parser.ns)
+          if extension = node.at_xpath('xs:complexContent/xs:extension/@base', parser.ns)
             parser.abstract_types[extension.to_s]
           end
         end
@@ -49,18 +67,20 @@ module LolSoap
 
       def own_elements
         Hash[
-          node.xpath('.//xs:element', parser.ns).map do |element|
-            max_occurs = element.attribute('maxOccurs').to_s
-
+          element_nodes.map do |element|
             [
-              prefix_and_name(element.attr('name')).last,
+              element.name,
               {
-                :type     => prefix_and_name(element.attr('type')).join(':'),
-                :singular => max_occurs.empty? || max_occurs == '1'
+                :type     => element.type,
+                :singular => element.singular
               }
             ]
           end
         ]
+      end
+
+      def element_nodes
+        node.xpath('*/xs:element | xs:complexContent/xs:extension/*/xs:element', parser.ns).map { |el| Element.new(parser, el, target_namespace) }
       end
 
       def parent_elements
@@ -115,11 +135,11 @@ module LolSoap
     end
 
     def types
-      @types ||= build_types 'xs:element[@name][not(@type)] | xs:complexType[@name][not(@abstract)]'
+      @types ||= build_types 'xs:complexType[not(@abstract)]'
     end
 
     def elements
-      @elements ||= build_elements('xs:element[@type]')
+      @elements ||= build_elements('xs:element')
     end
 
     def messages

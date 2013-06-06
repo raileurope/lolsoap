@@ -21,18 +21,39 @@
          </complexType>
       </element>
       <complexType name="xsd3:TradePriceRequest">
-        <extension base="xsd1:BaseRequest">
-          <sequence>
-            <element name="tickerSymbol" type="xs:string" maxOccurs="5"/>
-            <element name="specialTickerSymbol" type="xsd2:TickerSymbol" maxOccurs="unbounded"/>
-            <attribute name="id" type="xs:string"/>
-          </sequence>
-        </extension>
+        <complexContent>
+          <extension base="xsd1:BaseRequest">
+            <sequence>
+              <element name="tickerSymbol" type="xs:string" maxOccurs="5"/>
+              <element name="specialTickerSymbol" type="xsd2:TickerSymbol" maxOccurs="unbounded"/>
+              <attribute name="id" type="xs:string"/>
+            </sequence>
+          </extension>
+        </complexContent>
       </complexType>
-      <element name="xsd3:Timestamp" type="xs:string"/>
-      <complexType name="xsd3:TimestampRequest">
-        <extension base="xsd1:BaseRequest">
-        </extension>
+      <element name="xsd1:HistoricalPrice">
+        <complexType>
+          <sequence>
+            <element name="date" type="xs:date"/>
+            <element name="price" type="xs:float"/>
+          </sequence>
+        </complexType>
+      </element>
+      <complexType name="xsd1:HistoricalPriceRequest">
+        <complexContent>
+          <extension base="xsd1:BaseRequest">
+            <sequence>
+              <element name="dateRange">
+                <complexType>
+                  <sequence>
+                    <element name="startDate" maxOccurs="1" type="xs:string" />
+                    <element name="endDate" maxOccurs="1" type="xs:string" />
+                  </sequence>
+                </complexType>
+              </element>
+            </sequence>
+          </extension>
+        </complexContent>
       </complexType>
       <complexType abstract="true" name="BaseRequest">
         <sequence>
@@ -60,12 +81,12 @@
     <part name="body" element="xsd3:TradePrice"/>
   </message>
 
-  <message name="GetTimestampInput">
-    <part name="body" element="xsd1:TimestampRequest"/>
+  <message name="GetHistoricalPriceInput">
+    <part name="body" element="xsd1:HistoricalPriceRequest"/>
   </message>
 
-  <message name="GetTimestampOutput">
-    <part name="body" element="xsd3:Timestamp"/>
+  <message name="GetHistoricalPriceOutput">
+    <part name="body" element="xsd1:HistoricalPrice"/>
   </message>
 
   <portType name="StockQuotePortType">
@@ -73,9 +94,9 @@
       <input message="tns:GetLastTradePriceInput"/>
       <output message="tns:GetLastTradePriceOutput"/>
     </operation>
-    <operation name="GetTimestamp">
-      <input message="tns:GetTimestampInput"/>
-      <output message="tns:GetTimestampOutput"/>
+    <operation name="GetHistoricalPrice">
+      <input message="tns:GetHistoricalPriceInput"/>
+      <output message="tns:GetHistoricalPriceOutput"/>
     </operation>
   </portType>
 
@@ -90,8 +111,8 @@
         <soap:body use="literal"/>
       </output>
     </operation>
-    <operation name="GetTimestamp">
-      <soap:operation soapAction="http://example.com/GetTimestamp"/>
+    <operation name="GetHistoricalPrice">
+      <soap:operation soapAction="http://example.com/GetHistoricalPrice"/>
       <input>
         <soap:body use="literal"/>
       </input>
