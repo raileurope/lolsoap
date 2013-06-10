@@ -26,7 +26,7 @@ module LolSoap
     #     b.some 'data'
     #   end
     def body(klass = Builder)
-      builder = klass.new(input, operation.input)
+      builder = klass.new(content, input_type)
       yield builder if block_given?
       builder
     end
@@ -46,12 +46,20 @@ module LolSoap
       operation.action
     end
 
-    def input_type
+    def input
       operation.input
     end
 
-    def output_type
+    def input_type
+      input.is_a?(WSDL::Type) ? input : input.type
+    end
+
+    def output
       operation.output
+    end
+
+    def output_type
+      output.is_a?(WSDL::Type) ? output : output.type
     end
 
     def to_xml(options = {})
@@ -73,7 +81,7 @@ module LolSoap
     private
 
     # @private
-    def input; @input; end
+    def content; @content; end
 
     # @private
     def initialize_doc
@@ -84,13 +92,13 @@ module LolSoap
 
       @header = doc.create_element 'Header'
 
-      @body  = doc.create_element 'Body'
-      @input = doc.create_element input_type.name
+      @body    = doc.create_element 'Body'
+      @content = doc.create_element input.name
 
       [root, @header, @body].each { |el| el.namespace = namespaces[soap_prefix] }
-      @input.namespace = namespaces[input_type.prefix]
+      @content.namespace = namespaces[input.prefix]
 
-      @body << @input
+      @body << @content
       root  << @header
       root  << @body
     end

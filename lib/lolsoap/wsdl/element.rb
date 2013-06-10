@@ -1,10 +1,11 @@
 class LolSoap::WSDL
   class Element
-    attr_reader :name
+    attr_reader :name, :prefix
 
-    def initialize(wsdl, name, type, singular = true)
+    def initialize(wsdl, name, prefix, type, singular = true)
       @wsdl      = wsdl
       @name      = name
+      @prefix    = prefix
       @type      = type
       @singular  = singular
     end

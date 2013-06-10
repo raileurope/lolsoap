@@ -76,8 +76,8 @@ module LolSoap
             op.action.must_equal "urn:washHands"
             op.input.must_equal  subject.types['bla:Brush']
             op.output.tap do |output|
-              output.is_a?(WSDL::Type).must_equal(true)
-              output.elements.keys.sort.must_equal %w(hex name)
+              output.is_a?(WSDL::Element).must_equal(true)
+              output.type.elements.keys.sort.must_equal %w(hex name)
             end
           end
         end

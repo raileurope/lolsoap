@@ -6,7 +6,7 @@ class LolSoap::WSDL
     let(:wsdl) { OpenStruct.new }
     let(:type) { OpenStruct.new }
 
-    subject { Element.new(wsdl, 'foo', type, true) }
+    subject { Element.new(wsdl, 'bar', 'foo', type, true) }
 
     describe '#type' do
       describe 'named type' do

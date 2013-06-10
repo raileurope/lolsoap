@@ -19,6 +19,9 @@ module LolSoap
     # Hash of namespaces used in the WSDL document (keys are prefixes)
     attr_reader :namespaces
 
+    # Namespaces used by the types (a subset of #namespaces)
+    attr_reader :type_namespaces
+
     # Hash of namespace prefixes used in the WSDL document (keys are namespace URIs)
     attr_reader :prefixes
 
@@ -26,13 +29,14 @@ module LolSoap
     attr_reader :soap_version
 
     def initialize(parser)
-      @parser       = parser
-      @types        = load_types(parser)
-      @operations   = load_operations(parser)
-      @endpoint     = parser.endpoint
-      @namespaces   = parser.namespaces
-      @prefixes     = parser.prefixes
-      @soap_version = parser.soap_version
+      @parser          = parser
+      @types           = load_types(parser)
+      @operations      = load_operations(parser)
+      @endpoint        = parser.endpoint
+      @namespaces      = parser.namespaces
+      @type_namespaces = load_type_namespaces(parser)
+      @prefixes        = parser.prefixes
+      @soap_version    = parser.soap_version
     end
 
     # Hash of operations that are supports by the SOAP service
@@ -53,11 +57,6 @@ module LolSoap
     # Get a single type, or a NullType if the type doesn't exist
     def type(name)
       @types.fetch(name) { NullType.new }
-    end
-
-    # Namespaces used by the types (a subset of #namespaces)
-    def type_namespaces
-      Hash[@types.values.map { |type| [type.prefix, namespaces[type.prefix]] }]
     end
 
     def inspect
@@ -88,11 +87,20 @@ module LolSoap
     end
 
     # @private
+    def load_type_namespaces(parser)
+      Hash[
+        parser.types.merge(parser.elements).values.map do |el|
+          [el[:prefix], namespaces[el[:prefix]]]
+        end
+      ]
+    end
+
+    # @private
     def operation_type(name)
       if @types[name]
         @types[name]
       elsif el = @parser.elements[name]
-        build_element(el).type
+        build_element(el)
       else
         NullType.new
       end
@@ -122,6 +130,7 @@ module LolSoap
       Element.new(
         self,
         params[:name],
+        params[:prefix],
         element_type(params[:type]),
         params[:singular]
       )
