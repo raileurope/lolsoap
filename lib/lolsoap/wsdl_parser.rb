@@ -71,6 +71,8 @@ module LolSoap
             [
               element.name,
               {
+                :name     => element.name,
+                :prefix   => element.prefix,
                 :type     => element.type,
                 :singular => element.singular
               }
@@ -87,6 +89,7 @@ module LolSoap
         base_type ? base_type.elements : {}
       end
 
+      # FIXME: This still returns all attributes inside the current node, but it needs to return the ones that belong to the current type only
       def own_attributes
         node.xpath('.//xs:attribute/@name', parser.ns).map(&:text)
       end

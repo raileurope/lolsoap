@@ -23,7 +23,11 @@ class LolSoap::WSDL
     end
 
     def inspect
-      "<#{self.class} name=#{name.inspect} type=#{type.to_s.inspect}>"
+      "<#{self.class} name=#{prefix_and_name.inspect} type=#{type.to_s.inspect}>"
+    end
+
+    def prefix_and_name
+      "#{prefix}:#{name}"
     end
 
     private

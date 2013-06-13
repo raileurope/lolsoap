@@ -19,6 +19,10 @@ class LolSoap::WSDL
       @elements.fetch(name) { NullElement.new }
     end
 
+    def element_prefix(name)
+      (@elements.fetch(name) { self }).prefix
+    end
+
     def sub_type(name)
       element(name).type
     end

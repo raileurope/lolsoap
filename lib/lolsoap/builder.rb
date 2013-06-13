@@ -52,7 +52,7 @@ module LolSoap
     # Add a tag manually, rather than through method_missing. This is so you can still
     # add tags for the very small number of tags that are also existing methods.
     def __tag__(name, *args, &block)
-      __prefixed_tag__(@type.prefix, @type.sub_type(name.to_s), name, *args, &block)
+      __prefixed_tag__(@type.element_prefix(name.to_s), @type.sub_type(name.to_s), name, *args, &block)
     end
 
     def __attribute__(name, value)

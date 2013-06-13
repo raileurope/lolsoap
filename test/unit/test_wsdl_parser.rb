@@ -38,14 +38,20 @@ module LolSoap
             :name     => 'TradePriceRequest',
             :elements => {
               'accountId' => {
+                :name     => 'accountId',
+                :prefix   => 'xsd1',
                 :type     => 'xs:string',
                 :singular => true
               },
               'tickerSymbol' => {
+                :name     => 'tickerSymbol',
+                :prefix   => 'xsd1',
                 :type     => 'xs:string',
                 :singular => false
               },
               'specialTickerSymbol' => {
+                :name     => 'specialTickerSymbol',
+                :prefix   => 'xsd1',
                 :type     => 'xsd2:TickerSymbol',
                 :singular => false
               }
@@ -57,17 +63,25 @@ module LolSoap
             :name     => 'HistoricalPriceRequest',
             :elements => {
               'accountId' => {
+                :name     => 'accountId',
+                :prefix   => 'xsd1',
                 :type     => 'xs:string',
                 :singular => true
               },
               'dateRange' => {
+                :name     => 'dateRange',
+                :prefix   => 'xsd1',
                 :type     => {
                   :elements => {
                     'startDate' => {
+                      :name     => 'startDate',
+                      :prefix   => 'xsd1',
                       :type     => 'xs:string',
                       :singular => true
                     },
                     'endDate' => {
+                      :name     => 'endDate',
+                      :prefix   => 'xsd1',
                       :type     => 'xs:string',
                       :singular => true
                     }
@@ -84,6 +98,8 @@ module LolSoap
             :name     => 'TickerSymbol',
             :elements => {
               'name' => {
+                :name     => 'name',
+                :prefix   => 'xsd2',
                 :type     => 'xs:string',
                 :singular => true
               }
@@ -103,6 +119,8 @@ module LolSoap
             :type   => {
               :elements => {
                 'price' => {
+                  :name     => 'price',
+                  :prefix   => 'xsd1',
                   :type     => 'xs:float',
                   :singular => true
                 }
@@ -116,10 +134,14 @@ module LolSoap
             :type   => {
               :elements => {
                 'date' => {
+                  :name     => 'date',
+                  :prefix   => 'xsd1',
                   :type     => 'xs:date',
                   :singular => true
                 },
                 'price' => {
+                  :name     => 'price',
+                  :prefix   => 'xsd1',
                   :type     => 'xs:float',
                   :singular => true
                 }

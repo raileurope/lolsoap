@@ -20,13 +20,19 @@ module LolSoap
             'bla:Brush' => {
               :elements => {
                 'handleColor' => {
+                  :name     => 'handleColor',
+                  :prefix   => 'bla',
                   :type     => {
                     :elements => {
                       'name' => {
+                        :name     => 'name',
+                        :prefix   => 'bla',
                         :type     => 'xs:string',
                         :singular => true
                       },
                       'hex' => {
+                        :name     => 'hex',
+                        :prefix   => 'bla',
                         :type     => 'xs:string',
                         :singular => true
                       }
@@ -36,6 +42,8 @@ module LolSoap
                   :singular => true
                 },
                 'age' => {
+                  :name     => 'age',
+                  :prefix   => 'bla',
                   :type     => 'xs:int',
                   :singular => false
                 }
@@ -51,10 +59,14 @@ module LolSoap
               :type   => {
                 :elements => {
                   'name' => {
+                    :name     => 'name',
+                    :prefix   => 'bla',
                     :type     => 'xs:string',
                     :singular => true
                   },
                   'hex' => {
+                    :name     => 'hex',
+                    :prefix   => 'bla',
                     :type     => 'xs:string',
                     :singular => true
                   }
@@ -112,6 +124,7 @@ module LolSoap
               type.is_a?(WSDL::Type).must_equal true
               type.elements.keys.sort.must_equal %w(hex name)
             end
+            t.element('handleColor').prefix.must_equal 'bla'
             t.element('handleColor').singular?.must_equal true
             t.element('age').type.must_equal WSDL::NullType.new
             t.element('age').singular?.must_equal false
