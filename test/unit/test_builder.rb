@@ -71,6 +71,11 @@ module LolSoap
           subject.clone
         end
       end
+
+      it 'sets content' do
+        subject.__content__ 'zomg'
+        node.content.must_equal 'zomg'
+      end
     end
 
     it 'responds to anything' do
@@ -95,6 +100,5 @@ module LolSoap
         subject.__type__.must_equal type
       end
     end
-
   end
 end

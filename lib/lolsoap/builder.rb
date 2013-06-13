@@ -59,6 +59,10 @@ module LolSoap
       @node[name.to_s] = value.to_s
     end
 
+    def __content__(value)
+      @node.content = value
+    end
+
     # @private
     def __prefixed_tag__(prefix, sub_type, name, *args)
       sub_node = @node.document.create_element(name.to_s, *args)
