@@ -26,8 +26,8 @@
             <sequence>
               <element name="tickerSymbol" type="xs:string" maxOccurs="5"/>
               <element name="specialTickerSymbol" type="xsd2:TickerSymbol" maxOccurs="unbounded"/>
-              <attribute name="id" type="xs:string"/>
             </sequence>
+            <attribute name="id" type="xs:string"/>
           </extension>
         </complexContent>
       </complexType>
@@ -58,8 +58,8 @@
       <complexType abstract="true" name="BaseRequest">
         <sequence>
           <element name="accountId" type="xs:string" maxOccurs="1"/>
-          <attribute name="signature" type="xs:string"/>
         </sequence>
+        <attribute name="signature" type="xs:string"/>
       </complexType>
     </schema>
 
