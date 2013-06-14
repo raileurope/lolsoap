@@ -82,7 +82,7 @@ module LolSoap
       end
 
       def element_nodes
-        node.xpath('*/xs:element | xs:complexContent/xs:extension/*/xs:element', parser.ns).map { |el| Element.new(parser, el, target_namespace) }
+        node.xpath('*/xs:element | */*/xs:element | xs:complexContent/xs:extension/*/xs:element | xs:complexContent/xs:extension/*/*/xs:element', parser.ns).map { |el| Element.new(parser, el, target_namespace) }
       end
 
       def parent_elements
