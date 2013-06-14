@@ -90,7 +90,7 @@ module LolSoap
       end
 
       def own_attributes
-        node.xpath('xs:attribute/@name | xs:complexContent/xs:extension/xs:attribute/@name', parser.ns).map(&:text)
+        node.xpath('xs:attribute/@name | */xs:extension/xs:attribute/@name', parser.ns).map(&:text)
       end
 
       def parent_attributes
