@@ -4,6 +4,8 @@ module LolSoap
   class WSDL
     require 'lolsoap/wsdl/operation'
     require 'lolsoap/wsdl/type'
+    require 'lolsoap/wsdl/named_type_reference'
+    require 'lolsoap/wsdl/immediate_type_reference'
     require 'lolsoap/wsdl/null_type'
     require 'lolsoap/wsdl/element'
     require 'lolsoap/wsdl/null_element'
@@ -29,7 +31,6 @@ module LolSoap
     attr_reader :soap_version
 
     def initialize(parser)
-      @parser          = parser
       @types           = load_types(parser)
       @operations      = load_operations(parser)
       @endpoint        = parser.endpoint
@@ -37,16 +38,6 @@ module LolSoap
       @type_namespaces = load_type_namespaces(parser)
       @prefixes        = parser.prefixes
       @soap_version    = parser.soap_version
-    end
-
-    # Hash of operations that are supports by the SOAP service
-    def operations
-      @operations.dup
-    end
-
-    # Get a single operation
-    def operation(name)
-      @operations.fetch(name)
     end
 
     # Hash of types declared by the service
@@ -59,6 +50,16 @@ module LolSoap
       @types.fetch(name) { NullType.new }
     end
 
+    # Hash of operations that are supports by the SOAP service
+    def operations
+      @operations.dup
+    end
+
+    # Get a single operation
+    def operation(name)
+      @operations.fetch(name)
+    end
+
     def inspect
       "<#{self.class} " \
       "namespaces=#{@namespaces.inspect} " \
@@ -67,15 +68,6 @@ module LolSoap
     end
 
     private
-
-    # @private
-    def load_operations(parser)
-      Hash[
-        parser.operations.map do |k, op|
-          [k, Operation.new(self, op[:action], operation_type(op[:input]), operation_type(op[:output]))]
-        end
-      ]
-    end
 
     # @private
     def load_types(parser)
@@ -87,23 +79,21 @@ module LolSoap
     end
 
     # @private
+    def load_operations(parser)
+      Hash[
+        parser.operations.map do |k, op|
+          [k, Operation.new(self, op[:action], message_format(op[:input], parser), message_format(op[:output], parser))]
+        end
+      ]
+    end
+
+    # @private
     def load_type_namespaces(parser)
       Hash[
         parser.types.merge(parser.elements).values.map do |el|
           [el[:prefix], namespaces[el[:prefix]]]
         end
       ]
-    end
-
-    # @private
-    def operation_type(name)
-      if @types[name]
-        @types[name]
-      elsif el = @parser.elements[name]
-        build_element(el)
-      else
-        NullType.new
-      end
     end
 
     # @private
@@ -131,18 +121,23 @@ module LolSoap
         self,
         params[:name],
         params[:prefix],
-        element_type(params[:type]),
+        type_reference(params[:type]),
         params[:singular]
       )
     end
 
     # @private
-    def element_type(data)
-      if data.is_a?(String)
-        data
+    def type_reference(type)
+      if type.respond_to?(:to_str)
+        NamedTypeReference.new(type, self)
       else
-        build_type(data)
+        ImmediateTypeReference.new(build_type(type))
       end
+    end
+
+    # @private
+    def message_format(element, parser)
+      build_element(parser.elements[element])
     end
   end
 end

@@ -1,21 +1,17 @@
 class LolSoap::WSDL
   class Element
-    attr_reader :name, :prefix
+    attr_reader :name, :prefix, :type_reference
 
-    def initialize(wsdl, name, prefix, type, singular = true)
-      @wsdl      = wsdl
-      @name      = name
-      @prefix    = prefix
-      @type      = type
-      @singular  = singular
+    def initialize(wsdl, name, prefix, type_reference, singular = true)
+      @wsdl           = wsdl
+      @name           = name
+      @prefix         = prefix
+      @type_reference = type_reference
+      @singular       = singular
     end
 
     def type
-      if @type.is_a?(String)
-        @type = wsdl.type(@type)
-      end
-
-      @type
+      type_reference.type
     end
 
     def singular?

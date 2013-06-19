@@ -3,27 +3,19 @@ require 'lolsoap/wsdl'
 
 class LolSoap::WSDL
   describe Element do
-    let(:wsdl) { OpenStruct.new }
-    let(:type) { OpenStruct.new }
+    let(:wsdl)           { MiniTest::Mock.new }
+    let(:type_reference) { MiniTest::Mock.new }
+    let(:type)           { Object.new }
 
-    subject { Element.new(wsdl, 'bar', 'foo', type, true) }
+    subject { Element.new(wsdl, 'bar', 'foo', type_reference, true) }
+
+    before do
+      type_reference.expect(:type, type)
+    end
 
     describe '#type' do
-      describe 'named type' do
-        let(:wsdl) { MiniTest::Mock.new }
-        let(:type) { 'a:WashHandsRequest' }
-
-        it 'ignores the namespace and gets the type from the wsdl' do
-          type = Object.new
-          wsdl.expect(:type, type, ['WashHandsRequest'])
-          subject.type.must_equal type
-        end
-      end
-
-      describe 'inline type' do
-        it 'just returns the type' do
-          subject.type.must_equal type
-        end
+      it 'returns the type via the reference' do
+        subject.type.must_equal type
       end
     end
 

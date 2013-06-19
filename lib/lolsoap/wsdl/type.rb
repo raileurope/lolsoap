@@ -20,7 +20,7 @@ class LolSoap::WSDL
     end
 
     def element_prefix(name)
-      (@elements.fetch(name) { self }).prefix
+      @elements.fetch(name, self).prefix
     end
 
     def sub_type(name)
@@ -36,7 +36,7 @@ class LolSoap::WSDL
     end
 
     def inspect
-      "<#{self.class} name=\"#{name.nil? ? '' : prefix_and_name}\" " \
+      "<#{self.class} name=\"#{prefix_and_name.inspect}\" " \
         "elements=#{elements.inspect} " \
         "attributes=#{attributes.inspect}>"
     end

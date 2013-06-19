@@ -51,7 +51,7 @@ module LolSoap
     end
 
     def input_type
-      input.is_a?(WSDL::Type) ? input : input.type
+      input.type
     end
 
     def output
@@ -59,7 +59,7 @@ module LolSoap
     end
 
     def output_type
-      output.is_a?(WSDL::Type) ? output : output.type
+      output.type
     end
 
     def to_xml(options = {})

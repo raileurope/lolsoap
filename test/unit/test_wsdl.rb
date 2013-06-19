@@ -12,7 +12,7 @@ module LolSoap
           :operations => {
             'washHands' => {
               :action => 'urn:washHands',
-              :input  => 'bla:Brush',
+              :input  => 'bla:brush',
               :output => 'bla:Color'
             }
           },
@@ -53,6 +53,11 @@ module LolSoap
             }
          },
          :elements => {
+            'bla:brush' => {
+              :name   => 'brush',
+              :prefix => 'bla',
+              :type   => 'bla:Brush'
+            },
             'bla:Color' => {
               :name   => 'Color',
               :prefix => 'bla',
@@ -84,9 +89,9 @@ module LolSoap
         it 'returns a hash of operations' do
           subject.operations.length.must_equal 1
           subject.operations['washHands'].tap do |op|
-            op.wsdl.must_equal   subject
-            op.action.must_equal "urn:washHands"
-            op.input.must_equal  subject.types['bla:Brush']
+            op.wsdl.must_equal       subject
+            op.action.must_equal     'urn:washHands'
+            op.input.name.must_equal 'brush'
             op.output.tap do |output|
               output.is_a?(WSDL::Element).must_equal(true)
               output.type.elements.keys.sort.must_equal %w(hex name)

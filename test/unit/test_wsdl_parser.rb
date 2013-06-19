@@ -113,6 +113,11 @@ module LolSoap
     describe '#elements' do
       it 'returns the elements with inline types' do
         subject.elements.must_equal({
+          "xsd1:tradePriceRequest" => {
+            :name   => "tradePriceRequest",
+            :prefix => "xsd1",
+            :type   => "xsd1:TradePriceRequest"
+          },
           "xsd1:TradePrice" => {
             :name   => "TradePrice",
             :prefix => "xsd1",
@@ -127,6 +132,11 @@ module LolSoap
               },
               :attributes => []
             }
+          },
+          "xsd1:historicalPriceRequest" => {
+            :name   => "historicalPriceRequest",
+            :prefix => "xsd1",
+            :type   => "xsd1:HistoricalPriceRequest"
           },
           "xsd1:HistoricalPrice" => {
             :name   => "HistoricalPrice",
@@ -156,9 +166,9 @@ module LolSoap
     describe '#messages' do
       it 'maps message names to types' do
         subject.messages.must_equal({
-          'GetLastTradePriceInput'   => 'xsd1:TradePriceRequest',
+          'GetLastTradePriceInput'   => 'xsd1:tradePriceRequest',
           'GetLastTradePriceOutput'  => 'xsd1:TradePrice',
-          'GetHistoricalPriceInput'  => 'xsd1:HistoricalPriceRequest',
+          'GetHistoricalPriceInput'  => 'xsd1:historicalPriceRequest',
           'GetHistoricalPriceOutput' => 'xsd1:HistoricalPrice'
         })
       end
@@ -168,11 +178,11 @@ module LolSoap
       it 'is a hash containing input and output types' do
         subject.port_type_operations.must_equal({
           'GetLastTradePrice' => {
-            :input  => 'xsd1:TradePriceRequest',
+            :input  => 'xsd1:tradePriceRequest',
             :output => 'xsd1:TradePrice'
           },
           'GetHistoricalPrice' => {
-            :input  => 'xsd1:HistoricalPriceRequest',
+            :input  => 'xsd1:historicalPriceRequest',
             :output => 'xsd1:HistoricalPrice'
           }
         })
@@ -184,12 +194,12 @@ module LolSoap
         subject.operations.must_equal({
           'GetLastTradePrice' => {
             :action => 'http://example.com/GetLastTradePrice',
-            :input  => 'xsd1:TradePriceRequest',
+            :input  => 'xsd1:tradePriceRequest',
             :output => 'xsd1:TradePrice'
           },
           'GetHistoricalPrice' => {
             :action => 'http://example.com/GetHistoricalPrice',
-            :input  => 'xsd1:HistoricalPriceRequest',
+            :input  => 'xsd1:historicalPriceRequest',
             :output => 'xsd1:HistoricalPrice'
           }
         })
