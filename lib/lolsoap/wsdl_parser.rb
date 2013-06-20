@@ -3,7 +3,7 @@ require 'nokogiri'
 module LolSoap
   # @private
   class WSDLParser
-    class Type
+    class Node
       attr_reader :parser, :node, :target_namespace, :name, :prefix
 
       def initialize(parser, node, target_namespace)
@@ -17,28 +17,84 @@ module LolSoap
         "#{prefix}:#{name}"
       end
 
-      def elements
-        Hash[
-          node.xpath('.//xs:element', parser.ns).map do |element|
-            max_occurs = element.attribute('maxOccurs').to_s
+      def prefix_and_name(string)
+        parser.prefix_and_name(string, target_namespace)
+      end
+    end
 
+    class Element < Node
+      def type
+        if complex_type = node.at_xpath('xs:complexType', parser.ns)
+          type = Type.new(parser, complex_type, target_namespace)
+          {
+            :elements   => type.elements,
+            :attributes => type.attributes
+          }
+        else
+          prefix_and_name(node.attr('type').to_s).join(':')
+        end
+      end
+
+      def singular
+        max_occurs.empty? || max_occurs == '1'
+      end
+
+      private
+
+      def max_occurs
+        @max_occurs ||= node.attribute('maxOccurs').to_s
+      end
+    end
+
+    class Type < Node
+      def elements
+        parent_elements.merge(own_elements)
+      end
+
+      def attributes
+        parent_attributes + own_attributes
+      end
+
+      def base_type
+        @base_type ||= begin
+          if extension = node.at_xpath('xs:complexContent/xs:extension/@base', parser.ns)
+            parser.type(extension.to_s)
+          end
+        end
+      end
+
+      private
+
+      def own_elements
+        Hash[
+          element_nodes.map do |element|
             [
-              prefix_and_name(element.attr('name')).last,
+              element.name,
               {
-                :type     => prefix_and_name(element.attr('type')).join(':'),
-                :singular => max_occurs.empty? || max_occurs == '1'
+                :name     => element.name,
+                :prefix   => element.prefix,
+                :type     => element.type,
+                :singular => element.singular
               }
             ]
           end
         ]
       end
 
-      def attributes
-        node.xpath('.//xs:attribute/@name', parser.ns).map(&:text)
+      def element_nodes
+        node.xpath('*/xs:element | */*/xs:element | xs:complexContent/xs:extension/*/xs:element | xs:complexContent/xs:extension/*/*/xs:element', parser.ns).map { |el| Element.new(parser, el, target_namespace) }
       end
 
-      def prefix_and_name(string)
-        parser.prefix_and_name(string, target_namespace)
+      def parent_elements
+        base_type ? base_type.elements : {}
+      end
+
+      def own_attributes
+        node.xpath('xs:attribute/@name | */xs:extension/xs:attribute/@name', parser.ns).map(&:text)
+      end
+
+      def parent_attributes
+        base_type ? base_type.attributes : []
       end
     end
 
@@ -79,21 +135,38 @@ module LolSoap
     def types
       @types ||= begin
         types = {}
-        schemas.each do |schema|
-          target_namespace = schema.attr('targetNamespace').to_s
-
-          schema.xpath('xs:element[@name] | xs:complexType[@name]', ns).each do |node|
-            type = Type.new(self, node, target_namespace)
-
-            types[type.name_with_prefix] = {
-              :name       => type.name,
-              :prefix     => type.prefix,
-              :elements   => type.elements,
-              :attributes => type.attributes
-            }
-          end
+        each_node('xs:complexType[not(@abstract)]') do |node, target_ns|
+          type = Type.new(self, node, target_ns)
+          types[type.name_with_prefix] = {
+            :name       => type.name,
+            :prefix     => type.prefix,
+            :elements   => type.elements,
+            :attributes => type.attributes
+          }
         end
         types
+      end
+    end
+
+    def type(name)
+      name = prefix_and_name(name).last
+      node = doc.at_xpath("//xs:complexType[@name='#{name}']", ns)
+      target_namespace = node.at_xpath('parent::xs:schema/@targetNamespace', ns).to_s
+      Type.new(self, node, target_namespace)
+    end
+
+    def elements
+      @elements ||= begin
+        elements = {}
+        each_node('xs:element') do |node, target_ns|
+          element = Element.new(self, node, target_ns)
+          elements[element.name_with_prefix] = {
+            :name   => element.name,
+            :prefix => element.prefix,
+            :type   => element.type
+          }
+        end
+        elements
       end
     end
 
@@ -164,6 +237,16 @@ module LolSoap
       end
 
       [prefix, name]
+    end
+
+    def each_node(xpath)
+      schemas.each do |schema|
+        target_namespace = schema.attr('targetNamespace').to_s
+
+        schema.xpath(xpath, ns).each do |node|
+          yield node, target_namespace
+        end
+      end
     end
   end
 end

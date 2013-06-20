@@ -37,33 +37,69 @@ module LolSoap
             :prefix   => 'xsd1',
             :name     => 'TradePriceRequest',
             :elements => {
+              'accountId' => {
+                :name     => 'accountId',
+                :prefix   => 'xsd1',
+                :type     => 'xs:string',
+                :singular => true
+              },
               'tickerSymbol' => {
+                :name     => 'tickerSymbol',
+                :prefix   => 'xsd1',
                 :type     => 'xs:string',
                 :singular => false
               },
               'specialTickerSymbol' => {
+                :name     => 'specialTickerSymbol',
+                :prefix   => 'xsd1',
                 :type     => 'xsd2:TickerSymbol',
                 :singular => false
               }
             },
-            :attributes => ['id']
+            :attributes => ['signature', 'id']
           },
-          'xsd1:TradePrice' => {
+          'xsd1:HistoricalPriceRequest' => {
             :prefix   => 'xsd1',
-            :name     => 'TradePrice',
+            :name     => 'HistoricalPriceRequest',
             :elements => {
-              'price' => {
-                :type     => 'xs:float',
+              'accountId' => {
+                :name     => 'accountId',
+                :prefix   => 'xsd1',
+                :type     => 'xs:string',
+                :singular => true
+              },
+              'dateRange' => {
+                :name     => 'dateRange',
+                :prefix   => 'xsd1',
+                :type     => {
+                  :elements => {
+                    'startDate' => {
+                      :name     => 'startDate',
+                      :prefix   => 'xsd1',
+                      :type     => 'xs:string',
+                      :singular => true
+                    },
+                    'endDate' => {
+                      :name     => 'endDate',
+                      :prefix   => 'xsd1',
+                      :type     => 'xs:string',
+                      :singular => true
+                    }
+                  },
+                  :attributes => []
+                },
                 :singular => true
               }
             },
-            :attributes => []
+            :attributes => ['signature']
           },
           'xsd2:TickerSymbol' => {
             :prefix   => 'xsd2',
             :name     => 'TickerSymbol',
             :elements => {
               'name' => {
+                :name     => 'name',
+                :prefix   => 'xsd2',
                 :type     => 'xs:string',
                 :singular => true
               }
@@ -74,11 +110,66 @@ module LolSoap
       end
     end
 
+    describe '#elements' do
+      it 'returns the elements with inline types' do
+        subject.elements.must_equal({
+          "xsd1:tradePriceRequest" => {
+            :name   => "tradePriceRequest",
+            :prefix => "xsd1",
+            :type   => "xsd1:TradePriceRequest"
+          },
+          "xsd1:TradePrice" => {
+            :name   => "TradePrice",
+            :prefix => "xsd1",
+            :type   => {
+              :elements => {
+                'price' => {
+                  :name     => 'price',
+                  :prefix   => 'xsd1',
+                  :type     => 'xs:float',
+                  :singular => true
+                }
+              },
+              :attributes => []
+            }
+          },
+          "xsd1:historicalPriceRequest" => {
+            :name   => "historicalPriceRequest",
+            :prefix => "xsd1",
+            :type   => "xsd1:HistoricalPriceRequest"
+          },
+          "xsd1:HistoricalPrice" => {
+            :name   => "HistoricalPrice",
+            :prefix => "xsd1",
+            :type   => {
+              :elements => {
+                'date' => {
+                  :name     => 'date',
+                  :prefix   => 'xsd1',
+                  :type     => 'xs:date',
+                  :singular => true
+                },
+                'price' => {
+                  :name     => 'price',
+                  :prefix   => 'xsd1',
+                  :type     => 'xs:float',
+                  :singular => true
+                }
+              },
+              :attributes => []
+            }
+          }
+        })
+      end
+    end
+
     describe '#messages' do
       it 'maps message names to types' do
         subject.messages.must_equal({
-          'GetLastTradePriceInput'  => 'xsd1:TradePriceRequest',
-          'GetLastTradePriceOutput' => 'xsd1:TradePrice'
+          'GetLastTradePriceInput'   => 'xsd1:tradePriceRequest',
+          'GetLastTradePriceOutput'  => 'xsd1:TradePrice',
+          'GetHistoricalPriceInput'  => 'xsd1:historicalPriceRequest',
+          'GetHistoricalPriceOutput' => 'xsd1:HistoricalPrice'
         })
       end
     end
@@ -87,8 +178,12 @@ module LolSoap
       it 'is a hash containing input and output types' do
         subject.port_type_operations.must_equal({
           'GetLastTradePrice' => {
-            :input  => 'xsd1:TradePriceRequest',
+            :input  => 'xsd1:tradePriceRequest',
             :output => 'xsd1:TradePrice'
+          },
+          'GetHistoricalPrice' => {
+            :input  => 'xsd1:historicalPriceRequest',
+            :output => 'xsd1:HistoricalPrice'
           }
         })
       end
@@ -99,8 +194,13 @@ module LolSoap
         subject.operations.must_equal({
           'GetLastTradePrice' => {
             :action => 'http://example.com/GetLastTradePrice',
-            :input  => 'xsd1:TradePriceRequest',
+            :input  => 'xsd1:tradePriceRequest',
             :output => 'xsd1:TradePrice'
+          },
+          'GetHistoricalPrice' => {
+            :action => 'http://example.com/GetHistoricalPrice',
+            :input  => 'xsd1:historicalPriceRequest',
+            :output => 'xsd1:HistoricalPrice'
           }
         })
       end

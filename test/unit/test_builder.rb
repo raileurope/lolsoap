@@ -15,6 +15,10 @@ module LolSoap
     end
     let(:type) do
       type = OpenStruct.new(:prefix => 'a')
+      def type.element_prefix(name)
+        @element_prefixes = { 'bar' => 'b' }
+        @element_prefixes.fetch(name) { 'a' }
+      end
       def type.has_attribute?(*); false; end
       def type.sub_type(name)
         @sub_types ||= { 'foo' => Object.new, 'bar' => Object.new, 'clone' => Object.new }
@@ -47,7 +51,7 @@ module LolSoap
       end
 
       it 'yields to a block, if given' do
-        expect_node_added node.namespace_scopes[1], 'bar' do
+        expect_node_added node.namespace_scopes[0], 'bar' do
           block = nil
           ret = subject.__tag__(:bar) { |b| block = b }
           block.object_id.must_equal ret.object_id
@@ -57,7 +61,7 @@ module LolSoap
 
     describe 'method missing' do
       it 'delegates to __tag__' do
-        expect_node_added node.namespace_scopes[1], 'bar', 'baz' do
+        expect_node_added node.namespace_scopes[0], 'bar', 'baz' do
           subject.bar 'baz'
         end
       end
@@ -66,6 +70,11 @@ module LolSoap
         expect_node_added node.namespace_scopes[1], 'clone' do
           subject.clone
         end
+      end
+
+      it 'sets content' do
+        subject.__content__ 'zomg'
+        node.content.must_equal 'zomg'
       end
     end
 
@@ -91,6 +100,5 @@ module LolSoap
         subject.__type__.must_equal type
       end
     end
-
   end
 end

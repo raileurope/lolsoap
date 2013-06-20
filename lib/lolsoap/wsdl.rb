@@ -4,6 +4,8 @@ module LolSoap
   class WSDL
     require 'lolsoap/wsdl/operation'
     require 'lolsoap/wsdl/type'
+    require 'lolsoap/wsdl/named_type_reference'
+    require 'lolsoap/wsdl/immediate_type_reference'
     require 'lolsoap/wsdl/null_type'
     require 'lolsoap/wsdl/element'
     require 'lolsoap/wsdl/null_element'
@@ -19,6 +21,9 @@ module LolSoap
     # Hash of namespaces used in the WSDL document (keys are prefixes)
     attr_reader :namespaces
 
+    # Namespaces used by the types (a subset of #namespaces)
+    attr_reader :type_namespaces
+
     # Hash of namespace prefixes used in the WSDL document (keys are namespace URIs)
     attr_reader :prefixes
 
@@ -26,22 +31,13 @@ module LolSoap
     attr_reader :soap_version
 
     def initialize(parser)
-      @types        = load_types(parser)
-      @operations   = load_operations(parser)
-      @endpoint     = parser.endpoint
-      @namespaces   = parser.namespaces
-      @prefixes     = parser.prefixes
-      @soap_version = parser.soap_version
-    end
-
-    # Hash of operations that are supports by the SOAP service
-    def operations
-      @operations.dup
-    end
-
-    # Get a single operation
-    def operation(name)
-      @operations.fetch(name)
+      @types           = load_types(parser)
+      @operations      = load_operations(parser)
+      @endpoint        = parser.endpoint
+      @namespaces      = parser.namespaces
+      @type_namespaces = load_type_namespaces(parser)
+      @prefixes        = parser.prefixes
+      @soap_version    = parser.soap_version
     end
 
     # Hash of types declared by the service
@@ -54,9 +50,14 @@ module LolSoap
       @types.fetch(name) { NullType.new }
     end
 
-    # Namespaces used by the types (a subset of #namespaces)
-    def type_namespaces
-      Hash[@types.values.map { |type| [type.prefix, namespaces[type.prefix]] }]
+    # Hash of operations that are supports by the SOAP service
+    def operations
+      @operations.dup
+    end
+
+    # Get a single operation
+    def operation(name)
+      @operations.fetch(name)
     end
 
     def inspect
@@ -69,38 +70,74 @@ module LolSoap
     private
 
     # @private
-    def load_operations(parser)
+    def load_types(parser)
       Hash[
-        parser.operations.map do |k, op|
-          [k, Operation.new(self, op[:action], type(op[:input]), type(op[:output]))]
+        parser.types.map do |prefixed_name, type|
+          [prefixed_name, build_type(type)]
         end
       ]
     end
 
     # @private
-    def load_types(parser)
+    def load_operations(parser)
       Hash[
-        parser.types.map do |prefixed_name, type|
-          [
-            prefixed_name,
-            Type.new(
-              type[:name],
-              type[:prefix],
-              build_elements(type[:elements]),
-              type[:attributes]
-            )
-          ]
+        parser.operations.map do |k, op|
+          [k, Operation.new(self, op[:action], message_format(op[:input], parser), message_format(op[:output], parser))]
         end
       ]
+    end
+
+    # @private
+    def load_type_namespaces(parser)
+      Hash[
+        parser.types.merge(parser.elements).values.map do |el|
+          [el[:prefix], namespaces[el[:prefix]]]
+        end
+      ]
+    end
+
+    # @private
+    def build_type(params)
+      Type.new(
+        params[:name],
+        params[:prefix],
+        build_elements(params[:elements]),
+        params[:attributes]
+      )
     end
 
     # @private
     def build_elements(elements)
       Hash[
         elements.map do |name, el|
-          [name, Element.new(self, name, el[:type], el[:singular])]
+          [name, build_element(el)]
         end
       ]
+    end
+
+    # @private
+    def build_element(params)
+      Element.new(
+        self,
+        params[:name],
+        params[:prefix],
+        type_reference(params[:type]),
+        params[:singular]
+      )
+    end
+
+    # @private
+    def type_reference(type)
+      if type.respond_to?(:to_str)
+        NamedTypeReference.new(type, self)
+      else
+        ImmediateTypeReference.new(build_type(type))
+      end
+    end
+
+    # @private
+    def message_format(element, parser)
+      build_element(parser.elements[element])
     end
   end
 end
