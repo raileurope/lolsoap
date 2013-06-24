@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "lolsoap"
-  s.version = "0.2.0"
+  s.version = "0.3.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Jon Leighton"]
-  s.date = "2013-05-15"
+  s.date = "2013-06-24"
   s.description = "A library for dealing with SOAP requests and responses. We tear our hair out so you don't have to."
   s.email = "j@jonathanleighton.com"
   s.extra_rdoc_files = [
@@ -37,6 +37,8 @@ Gem::Specification.new do |s|
     "lib/lolsoap/response.rb",
     "lib/lolsoap/wsdl.rb",
     "lib/lolsoap/wsdl/element.rb",
+    "lib/lolsoap/wsdl/immediate_type_reference.rb",
+    "lib/lolsoap/wsdl/named_type_reference.rb",
     "lib/lolsoap/wsdl/null_element.rb",
     "lib/lolsoap/wsdl/null_type.rb",
     "lib/lolsoap/wsdl/operation.rb",
