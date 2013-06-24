@@ -19,6 +19,10 @@ class LolSoap::WSDL
       @elements.fetch(name) { NullElement.new }
     end
 
+    def element_prefix(name)
+      @elements.fetch(name, self).prefix
+    end
+
     def sub_type(name)
       element(name).type
     end
@@ -32,9 +36,13 @@ class LolSoap::WSDL
     end
 
     def inspect
-      "<#{self.class} name=\"#{prefix}:#{name}\" " \
+      "<#{self.class} name=\"#{prefix_and_name.inspect}\" " \
         "elements=#{elements.inspect} " \
         "attributes=#{attributes.inspect}>"
+    end
+
+    def prefix_and_name
+      "#{prefix}:#{name}"
     end
   end
 end

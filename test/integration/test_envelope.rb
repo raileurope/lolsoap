@@ -10,7 +10,7 @@ module LolSoap
     let(:doc) { subject.doc }
 
     it 'creates an empty envelope' do
-      body = doc.at_xpath('/soap:Envelope/soap:Body/xsd1:TradePriceRequest', doc.namespaces)
+      body = doc.at_xpath('/soap:Envelope/soap:Body/xsd1:tradePriceRequest', doc.namespaces)
       body.wont_equal nil
     end
 
@@ -24,15 +24,15 @@ module LolSoap
         b.id 42
       end
 
-      el = doc.at_xpath('//xsd1:TradePriceRequest/xsd1:tickerSymbol', doc.namespaces)
+      el = doc.at_xpath('//xsd1:tradePriceRequest/xsd1:tickerSymbol', doc.namespaces)
       el.wont_equal nil
       el.text.to_s.must_equal 'LOCO2'
 
-      el = doc.at_xpath('//xsd1:TradePriceRequest/xsd1:specialTickerSymbol/xsd2:name', doc.namespaces)
+      el = doc.at_xpath('//xsd1:tradePriceRequest/xsd1:specialTickerSymbol/xsd2:name', doc.namespaces)
       el.wont_equal nil
       el.text.to_s.must_equal 'LOCOLOCOLOCO'
 
-      attr = doc.at_xpath('//xsd1:TradePriceRequest/@id', doc.namespaces)
+      attr = doc.at_xpath('//xsd1:tradePriceRequest/@id', doc.namespaces)
       attr.to_s.must_equal "42"
     end
 

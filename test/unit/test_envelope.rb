@@ -106,16 +106,16 @@ module LolSoap
       end
     end
 
-    describe '#input_type' do
+    describe '#input' do
       it "returns the operation's input" do
-        subject.input_type.must_equal operation.input
+        subject.input.must_equal operation.input
       end
     end
 
     describe '#output' do
       it "returns the operation's output" do
         operation.output = 'lol'
-        subject.output_type.must_equal 'lol'
+        subject.output.must_equal 'lol'
       end
     end
 
