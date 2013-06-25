@@ -135,7 +135,7 @@ module LolSoap
     def types
       @types ||= begin
         types = {}
-        each_node('xs:complexType[not(@abstract)]') do |node, target_ns|
+        each_node('xs:complexType[not(@abstract="true")]') do |node, target_ns|
           type = Type.new(self, node, target_ns)
           types[type.name_with_prefix] = {
             :name       => type.name,

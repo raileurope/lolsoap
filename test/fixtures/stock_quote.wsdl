@@ -21,7 +21,7 @@
          </complexType>
       </element>
       <element name="tradePriceRequest" type="TradePriceRequest" />
-      <complexType name="xsd1:TradePriceRequest">
+      <complexType name="xsd1:TradePriceRequest" abstract="false">
         <complexContent>
           <extension base="xsd1:BaseRequest">
             <sequence>
