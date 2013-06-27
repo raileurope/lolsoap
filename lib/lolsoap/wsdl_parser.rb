@@ -57,7 +57,7 @@ module LolSoap
 
       def base_type
         @base_type ||= begin
-          if extension = node.at_xpath('xs:complexContent/xs:extension/@base', parser.ns)
+          if extension = node.at_xpath('*/xs:extension/@base', parser.ns)
             parser.type(extension.to_s)
           end
         end
@@ -150,9 +150,10 @@ module LolSoap
 
     def type(name)
       name = prefix_and_name(name).last
-      node = doc.at_xpath("//xs:complexType[@name='#{name}']", ns)
-      target_namespace = node.at_xpath('parent::xs:schema/@targetNamespace', ns).to_s
-      Type.new(self, node, target_namespace)
+      if node = doc.at_xpath("//xs:complexType[@name='#{name}']", ns)
+        target_namespace = node.at_xpath('parent::xs:schema/@targetNamespace', ns).to_s
+        Type.new(self, node, target_namespace)
+      end
     end
 
     def elements

@@ -13,10 +13,17 @@
     <schema targetNamespace="http://example.com/stockquote.xsd"
             xmlns:xsd3="http://example.com/stockquote.xsd"
             xmlns="http://www.w3.org/2001/XMLSchema">
+      <complexType name="Price">
+        <simpleContent>
+          <extension base="xs:string">
+            <attribute name="currency" type="xs:string"/>
+          </extension>
+        </simpleContent>
+      </complexType>
       <element name="TradePrice">
          <complexType>
            <all>
-             <element name="xsd3:price" type="xs:float"/>
+             <element name="xsd3:price" type="Price"/>
            </all>
          </complexType>
       </element>

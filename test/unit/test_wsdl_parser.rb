@@ -33,6 +33,12 @@ module LolSoap
     describe '#types' do
       it 'returns the types, with attributes and namespace' do
         subject.types.must_equal({
+          'xsd1:Price' => {
+            :prefix     => 'xsd1',
+            :name       => 'Price',
+            :elements   => {},
+            :attributes => ['currency']
+          },
           'xsd1:TradePriceRequest' => {
             :prefix   => 'xsd1',
             :name     => 'TradePriceRequest',
@@ -126,7 +132,7 @@ module LolSoap
                 'price' => {
                   :name     => 'price',
                   :prefix   => 'xsd1',
-                  :type     => 'xs:float',
+                  :type     => 'xsd1:Price',
                   :singular => true
                 }
               },
