@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "lolsoap"
-  s.version = "0.3.1"
+  s.version = "0.3.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Jon Leighton"]
-  s.date = "2013-06-25"
+  s.date = "2013-06-27"
   s.description = "A library for dealing with SOAP requests and responses. We tear our hair out so you don't have to."
   s.email = "j@jonathanleighton.com"
   s.extra_rdoc_files = [
