@@ -125,7 +125,7 @@ module LolSoap
     end
 
     def endpoint
-      @endpoint ||= doc.at_xpath('/d:definitions/d:service/d:port/s:address/@location', ns).to_s
+      @endpoint ||= unescape_uri(doc.at_xpath('/d:definitions/d:service/d:port/s:address/@location', ns).to_s)
     end
 
     def schemas
@@ -249,5 +249,14 @@ module LolSoap
         end
       end
     end
+
+    private
+
+    def unescape_uri(str)
+      uri_parser =  URI.const_defined?(:Parser) ? URI::Parser.new : URI
+
+      uri_parser.unescape(str)
+    end
   end
 end
+
