@@ -17,21 +17,21 @@ module LolSoap
 
     def code
       node.at_xpath(
-        soap_version == '1.2' ? './soap:Code/soap:Value' : './soap:faultcode',
+        soap_version == '1.2' ? './soap:Code/soap:Value' : './faultcode',
         'soap' => soap_namespace
       ).text.to_s
     end
 
     def reason
       node.at_xpath(
-        soap_version == '1.2' ? './soap:Reason/soap:Text' : './soap:faultstring',
+        soap_version == '1.2' ? './soap:Reason/soap:Text' : './faultstring',
         'soap' => soap_namespace
       ).text.to_s
     end
 
     def detail
       node.at_xpath(
-        soap_version == '1.2' ? './soap:Detail/*' : './soap:detail/*',
+        soap_version == '1.2' ? './soap:Detail/*' : './detail/*',
         'soap' => soap_namespace
       ).to_xml
     end
