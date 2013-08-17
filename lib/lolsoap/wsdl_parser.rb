@@ -1,4 +1,5 @@
 require 'nokogiri'
+require 'cgi'
 
 module LolSoap
   # @private
@@ -125,7 +126,7 @@ module LolSoap
     end
 
     def endpoint
-      @endpoint ||= unescape_uri(doc.at_xpath('/d:definitions/d:service/d:port/s:address/@location', ns).to_s)
+      @endpoint ||= CGI.unescape(doc.at_xpath('/d:definitions/d:service/d:port/s:address/@location', ns).to_s)
     end
 
     def schemas
@@ -248,14 +249,6 @@ module LolSoap
           yield node, target_namespace
         end
       end
-    end
-
-    private
-
-    def unescape_uri(str)
-      uri_parser =  URI.const_defined?(:Parser) ? URI::Parser.new : URI
-
-      uri_parser.unescape(str)
     end
   end
 end
