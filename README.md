@@ -112,6 +112,10 @@ Development sponsored by [Loco2](http://loco2.com/).
   may use SOAP faults to implement business logic errors.
 * Ruby 1.8 support dropped
 
+### 0.3 ###
+
+* Support for WSDL inline type definitions and type extensions
+
 ### 0.2 ###
 
 * SOAP 1.1 support
