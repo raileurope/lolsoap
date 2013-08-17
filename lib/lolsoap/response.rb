@@ -1,4 +1,3 @@
-require 'lolsoap/errors'
 require 'lolsoap/fault'
 require 'lolsoap/hash_builder'
 require 'nokogiri'
@@ -22,8 +21,6 @@ module LolSoap
     def initialize(request, doc)
       @request = request
       @doc     = doc
-
-      raise FaultRaised.new(fault) if fault
     end
 
     # Namespace used for SOAP Envelope tags
@@ -46,7 +43,7 @@ module LolSoap
       @header ||= doc.at_xpath('/soap:Envelope/soap:Header', 'soap' => soap_namespace)
     end
 
-    # SOAP fault, if any (an exception will be raised in the initializer, if there is one)
+    # SOAP fault, if any
     def fault
       @fault ||= begin
         node = doc.at_xpath('/soap:Envelope/soap:Body/soap:Fault', 'soap' => soap_namespace)

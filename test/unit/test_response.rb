@@ -37,9 +37,9 @@ module LolSoap
       end
     end
 
-    it 'should raise a FaultRaised error when initialized, if there is a SOAP fault' do
-      lambda { Response.new(request, Nokogiri::XML(File.read(TEST_ROOT + '/fixtures/stock_quote_fault.xml'))) }.
-        must_raise FaultRaised
+    it 'should return the soap fault' do
+      response = Response.new(request, Nokogiri::XML(File.read(TEST_ROOT + '/fixtures/stock_quote_fault.xml')))
+      response.fault.wont_equal nil
     end
   end
 end

@@ -105,6 +105,12 @@ Development sponsored by [Loco2](http://loco2.com/).
 
 ## Changelog ##
 
+### 0.4 ###
+
+* Don't raise an exception on when a SOAP fault is detected. Whether or
+  not this is an exceptional situation should be up to the user, as APIs
+  may use SOAP faults to implement business logic errors.
+
 ### 0.2 ###
 
 * SOAP 1.1 support
