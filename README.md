@@ -67,7 +67,6 @@ p response.body_hash
 
 ## Bugs/Features ##
 
-* WSSE is not supported.
 * Assumes that you are able to supply a WSDL document for the service.
 * Some of the finer details of namespace handling may be glossed over.
   This is just pragmatism; patches to improve namespace handling are
@@ -96,6 +95,16 @@ The others:
 * `LolSoap::HashBuilder` - Builds hashes from the API response, using
   the WSDL type data to determine which elements are collection
   elements.
+
+## WSSE ##
+
+To append a WSSE node to the header using the `akami` gem:
+
+```ruby
+wsse = Akami.wsse
+wsse.credentials(username, password)
+request.header.__node__ << wsse.to_xml
+```
 
 ## Authors ##
 
