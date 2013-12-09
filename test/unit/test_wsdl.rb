@@ -5,6 +5,7 @@ module LolSoap
   describe WSDL do
     describe 'with a doc that can be parsed' do
       let(:namespace) { 'http://lolsoap.api/bla' }
+      let(:xs)        { "http://www.w3.org/2001/XMLSchema" }
 
       let(:parser) do
         OpenStruct.new(
@@ -12,70 +13,72 @@ module LolSoap
           :operations => {
             'washHands' => {
               :action => 'urn:washHands',
-              :input  => 'bla:brush',
-              :output => 'bla:Color'
+              :input  => [namespace, 'brush'],
+              :output => [namespace, 'Color']
             }
           },
           :types => {
-            'bla:Brush' => {
+            [namespace, 'Brush'] => {
+              :name => 'Brush',
               :elements => {
                 'handleColor' => {
-                  :name     => 'handleColor',
-                  :prefix   => 'bla',
-                  :type     => {
+                  :name      => 'handleColor',
+                  :namespace => namespace,
+                  :type      => {
                     :elements => {
                       'name' => {
-                        :name     => 'name',
-                        :prefix   => 'bla',
-                        :type     => 'xs:string',
-                        :singular => true
+                        :name      => 'name',
+                        :namespace => namespace,
+                        :singular  => true
                       },
                       'hex' => {
-                        :name     => 'hex',
-                        :prefix   => 'bla',
-                        :type     => 'xs:string',
-                        :singular => true
+                        :name      => 'hex',
+                        :namespace => namespace,
+                        :type      => [xs, "string"],
+                        :singular  => true
                       }
                     },
+                    :namespace  => namespace,
                     :attributes => []
                   },
                   :singular => true
                 },
                 'age' => {
-                  :name     => 'age',
-                  :prefix   => 'bla',
-                  :type     => 'xs:int',
-                  :singular => false
+                  :name      => 'age',
+                  :namespace => namespace,
+                  :type      => [xs, "int"],
+                  :singular  => false
                 }
               },
               :attributes => ['id'],
-              :prefix => 'bla'
+              :namespace  => namespace
             }
          },
          :elements => {
-            'bla:brush' => {
-              :name   => 'brush',
-              :prefix => 'bla',
-              :type   => 'bla:Brush'
+            [namespace, 'brush'] => {
+              :name      => 'brush',
+              :namespace => namespace,
+              :type      => [namespace, 'Brush']
             },
-            'bla:Color' => {
-              :name   => 'Color',
-              :prefix => 'bla',
-              :type   => {
+            [namespace, 'Color'] => {
+              :name      => 'Color',
+              :namespace => namespace,
+              :type      => {
                 :elements => {
                   'name' => {
-                    :name     => 'name',
-                    :prefix   => 'bla',
-                    :type     => 'xs:string',
-                    :singular => true
+                    :name      => 'name',
+                    :namespace => namespace,
+                    :type      => [xs, "string"],
+                    :singular  => true
                   },
                   'hex' => {
-                    :name     => 'hex',
-                    :prefix   => 'bla',
-                    :type     => 'xs:string',
-                    :singular => true
+                    :name      => 'hex',
+                    :namespace => namespace,
+                    :type      => [xs, "string"],
+                    :singular  => true
                   }
                 },
+                :namespace  => namespace,
                 :attributes => []
               }
             }
@@ -115,7 +118,7 @@ module LolSoap
 
       describe '#namespaces' do
         it 'returns a namespaces hash' do
-          subject.namespaces.must_equal({ 'bla' => namespace })
+          subject.namespaces.must_equal({ 'ns0' => namespace })
         end
       end
 
@@ -123,13 +126,13 @@ module LolSoap
         it 'returns a hash of types' do
           subject.types.length.must_equal 1
 
-          subject.types['bla:Brush'].tap do |t|
+          subject.types['Brush'].tap do |t|
             t.elements.length.must_equal 2
             t.element('handleColor').type.tap do |type|
               type.is_a?(WSDL::Type).must_equal true
               type.elements.keys.sort.must_equal %w(hex name)
             end
-            t.element('handleColor').prefix.must_equal 'bla'
+            t.element('handleColor').prefix.must_equal 'ns0'
             t.element('handleColor').singular?.must_equal true
             t.element('age').type.must_equal WSDL::NullType.new
             t.element('age').singular?.must_equal false
@@ -140,18 +143,11 @@ module LolSoap
 
       describe '#type' do
         it 'returns a single type' do
-          subject.type('bla:Brush').must_equal subject.types['bla:Brush']
+          subject.type(namespace, 'Brush').must_equal subject.types.fetch('Brush')
         end
 
         it 'returns a null object if a type is missing' do
-          subject.type('FooBar').must_equal WSDL::NullType.new
-        end
-      end
-
-      describe '#type_namespaces' do
-        it 'returns only the namespaces that are used by types' do
-          parser.namespaces['foo'] = 'bar'
-          subject.type_namespaces.must_equal 'bla' => namespace
+          subject.type(namespace, 'FooBar').must_equal WSDL::NullType.new
         end
       end
     end

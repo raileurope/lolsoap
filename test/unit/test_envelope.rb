@@ -5,25 +5,25 @@ module LolSoap
   describe Envelope do
     let(:wsdl) do
       OpenStruct.new(
-        :type_namespaces => { 'foo' => 'http://example.com/foo' },
-        :soap_version    => '1.2'
+        :namespaces   => { 'ns0' => 'http://example.com/foo' },
+        :soap_version => '1.2'
       )
     end
 
     let(:operation) do
-      OpenStruct.new(:input => OpenStruct.new(:prefix => 'foo', :name => 'WashHandsRequest'))
+      OpenStruct.new(:input => OpenStruct.new(:prefix => 'ns0', :name => 'WashHandsRequest'))
     end
 
     subject { Envelope.new(wsdl, operation) }
 
     let(:doc) { subject.doc }
     let(:header) { doc.at_xpath('/soap:Envelope/soap:Header', doc.namespaces) }
-    let(:input) { doc.at_xpath('/soap:Envelope/soap:Body/foo:WashHandsRequest', doc.namespaces) }
+    let(:input) { doc.at_xpath('/soap:Envelope/soap:Body/ns0:WashHandsRequest', doc.namespaces) }
 
     it 'has a skeleton SOAP envelope structure when first created' do
       doc.namespaces.must_equal(
         'xmlns:soap' => Envelope::SOAP_1_2,
-        'xmlns:foo'  => 'http://example.com/foo'
+        'xmlns:ns0'  => 'http://example.com/foo'
       )
 
       header.wont_equal nil

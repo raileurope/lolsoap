@@ -114,6 +114,12 @@ Development sponsored by [Loco2](http://loco2.com/).
 
 ## Changelog ##
 
+### 0.5 ###
+
+* Generate our own namespace prefixes rather than using ones from the
+  WSDL document. This fixes issues with WSDLs that use the same prefix
+  to denote different namespaces in different places.
+
 ### 0.4 ###
 
 * Don't raise an exception on when a SOAP fault is detected. Whether or

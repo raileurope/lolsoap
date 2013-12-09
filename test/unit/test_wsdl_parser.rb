@@ -7,22 +7,12 @@ module LolSoap
       File.read(TEST_ROOT + '/fixtures/stock_quote.wsdl')
     end
 
-    let(:doc) { Nokogiri::XML(raw_doc) }
+    let(:doc)        { Nokogiri::XML(raw_doc) }
+    let(:namespace)  { "http://example.com/stockquote.xsd" }
+    let(:namespace2) { "http://example.com/stockquote2.xsd" }
+    let(:xs)         { "http://www.w3.org/2001/XMLSchema"  }
 
     subject { WSDLParser.new(doc) }
-
-    describe '#namespaces' do
-      it 'returns the namespaces used' do
-        subject.namespaces.must_equal({
-          'tns'  => 'http://example.com/stockquote.wsdl',
-          'xsd1' => 'http://example.com/stockquote.xsd',
-          'xsd2' => 'http://example.com/stockquote2.xsd',
-          'xsd3' => 'http://example.com/stockquote.xsd',
-          'soap' => 'http://schemas.xmlsoap.org/wsdl/soap12/',
-          'xs'   => 'http://www.w3.org/2001/XMLSchema'
-        })
-      end
-    end
 
     describe '#endpoint' do
       it 'returns the SOAP 1.2 service endpoint' do
@@ -33,63 +23,64 @@ module LolSoap
     describe '#types' do
       it 'returns the types, with attributes and namespace' do
         subject.types.must_equal({
-          'xsd1:Price' => {
-            :prefix     => 'xsd1',
+          [namespace, 'Price'] => {
             :name       => 'Price',
+            :namespace  => namespace,
             :elements   => {},
             :attributes => ['currency']
           },
-          'xsd1:TradePriceRequest' => {
-            :prefix   => 'xsd1',
-            :name     => 'TradePriceRequest',
+          [namespace, 'TradePriceRequest'] => {
+            :name      => 'TradePriceRequest',
+            :namespace => namespace,
             :elements => {
               'accountId' => {
-                :name     => 'accountId',
-                :prefix   => 'xsd1',
-                :type     => 'xs:string',
-                :singular => true
+                :name      => 'accountId',
+                :namespace => namespace,
+                :type      => [xs, "string"],
+                :singular  => true
               },
               'tickerSymbol' => {
-                :name     => 'tickerSymbol',
-                :prefix   => 'xsd1',
-                :type     => 'xs:string',
-                :singular => false
+                :name      => 'tickerSymbol',
+                :namespace => namespace,
+                :type      => [xs, "string"],
+                :singular  => false
               },
               'specialTickerSymbol' => {
-                :name     => 'specialTickerSymbol',
-                :prefix   => 'xsd1',
-                :type     => 'xsd2:TickerSymbol',
-                :singular => false
+                :name      => 'specialTickerSymbol',
+                :namespace => namespace,
+                :type      => [namespace2, 'TickerSymbol'],
+                :singular  => false
               }
             },
             :attributes => ['signature', 'id']
           },
-          'xsd1:HistoricalPriceRequest' => {
-            :prefix   => 'xsd1',
-            :name     => 'HistoricalPriceRequest',
+          [namespace, 'HistoricalPriceRequest'] => {
+            :name      => 'HistoricalPriceRequest',
+            :namespace => namespace,
             :elements => {
               'accountId' => {
-                :name     => 'accountId',
-                :prefix   => 'xsd1',
-                :type     => 'xs:string',
-                :singular => true
+                :name      => 'accountId',
+                :namespace => namespace,
+                :type      => [xs, "string"],
+                :singular  => true
               },
               'dateRange' => {
-                :name     => 'dateRange',
-                :prefix   => 'xsd1',
-                :type     => {
-                  :elements => {
+                :name      => 'dateRange',
+                :namespace => namespace,
+                :type      => {
+                  :namespace => namespace,
+                  :elements  => {
                     'startDate' => {
-                      :name     => 'startDate',
-                      :prefix   => 'xsd1',
-                      :type     => 'xs:string',
-                      :singular => true
+                      :name      => 'startDate',
+                      :namespace => namespace,
+                      :type      => [xs, "string"],
+                      :singular  => true
                     },
                     'endDate' => {
-                      :name     => 'endDate',
-                      :prefix   => 'xsd1',
-                      :type     => 'xs:string',
-                      :singular => true
+                      :name      => 'endDate',
+                      :namespace => namespace,
+                      :type      => [xs, "string"],
+                      :singular  => true
                     }
                   },
                   :attributes => []
@@ -99,15 +90,15 @@ module LolSoap
             },
             :attributes => ['signature']
           },
-          'xsd2:TickerSymbol' => {
-            :prefix   => 'xsd2',
-            :name     => 'TickerSymbol',
-            :elements => {
+          [namespace2, 'TickerSymbol'] => {
+            :name      => 'TickerSymbol',
+            :namespace => namespace2,
+            :elements  => {
               'name' => {
-                :name     => 'name',
-                :prefix   => 'xsd2',
-                :type     => 'xs:string',
-                :singular => true
+                :name      => 'name',
+                :namespace => namespace2,
+                :type      => [xs, "string"],
+                :singular  => true
               }
             },
             :attributes => []
@@ -119,47 +110,49 @@ module LolSoap
     describe '#elements' do
       it 'returns the elements with inline types' do
         subject.elements.must_equal({
-          "xsd1:tradePriceRequest" => {
-            :name   => "tradePriceRequest",
-            :prefix => "xsd1",
-            :type   => "xsd1:TradePriceRequest"
+          [namespace, "tradePriceRequest"] => {
+            :name      => "tradePriceRequest",
+            :namespace => namespace,
+            :type      => [namespace, "TradePriceRequest"]
           },
-          "xsd1:TradePrice" => {
-            :name   => "TradePrice",
-            :prefix => "xsd1",
-            :type   => {
+          [namespace, "TradePrice"] => {
+            :name      => "TradePrice",
+            :namespace => namespace,
+            :type      => {
+              :namespace => namespace,
               :elements => {
-                'price' => {
-                  :name     => 'price',
-                  :prefix   => 'xsd1',
-                  :type     => 'xsd1:Price',
-                  :singular => true
+                'Price' => {
+                  :name      => 'Price',
+                  :namespace => namespace,
+                  :type      => [namespace, 'price'],
+                  :singular  => true
                 }
               },
               :attributes => []
             }
           },
-          "xsd1:historicalPriceRequest" => {
-            :name   => "historicalPriceRequest",
-            :prefix => "xsd1",
-            :type   => "xsd1:HistoricalPriceRequest"
+          [namespace, "historicalPriceRequest"] => {
+            :name      => "historicalPriceRequest",
+            :namespace => namespace,
+            :type      => [namespace, "HistoricalPriceRequest"]
           },
-          "xsd1:HistoricalPrice" => {
-            :name   => "HistoricalPrice",
-            :prefix => "xsd1",
-            :type   => {
+          [namespace, "HistoricalPrice"] => {
+            :name      => "HistoricalPrice",
+            :namespace => namespace,
+            :type      => {
+              :namespace => namespace,
               :elements => {
                 'date' => {
-                  :name     => 'date',
-                  :prefix   => 'xsd1',
-                  :type     => 'xs:date',
-                  :singular => true
+                  :name      => 'date',
+                  :namespace => namespace,
+                  :type      => [xs, 'date'],
+                  :singular  => true
                 },
                 'price' => {
-                  :name     => 'price',
-                  :prefix   => 'xsd1',
-                  :type     => 'xs:float',
-                  :singular => true
+                  :name      => 'price',
+                  :namespace => namespace,
+                  :type      => [xs, 'float'],
+                  :singular  => true
                 }
               },
               :attributes => []
@@ -172,10 +165,10 @@ module LolSoap
     describe '#messages' do
       it 'maps message names to types' do
         subject.messages.must_equal({
-          'GetLastTradePriceInput'   => 'xsd1:tradePriceRequest',
-          'GetLastTradePriceOutput'  => 'xsd1:TradePrice',
-          'GetHistoricalPriceInput'  => 'xsd1:historicalPriceRequest',
-          'GetHistoricalPriceOutput' => 'xsd1:HistoricalPrice'
+          'GetLastTradePriceInput'   => [namespace, 'tradePriceRequest'],
+          'GetLastTradePriceOutput'  => [namespace, 'TradePrice'],
+          'GetHistoricalPriceInput'  => [namespace, 'historicalPriceRequest'],
+          'GetHistoricalPriceOutput' => [namespace, 'HistoricalPrice']
         })
       end
     end
@@ -184,12 +177,12 @@ module LolSoap
       it 'is a hash containing input and output types' do
         subject.port_type_operations.must_equal({
           'GetLastTradePrice' => {
-            :input  => 'xsd1:tradePriceRequest',
-            :output => 'xsd1:TradePrice'
+            :input  => [namespace, 'tradePriceRequest'],
+            :output => [namespace, 'TradePrice']
           },
           'GetHistoricalPrice' => {
-            :input  => 'xsd1:historicalPriceRequest',
-            :output => 'xsd1:HistoricalPrice'
+            :input  => [namespace, 'historicalPriceRequest'],
+            :output => [namespace, 'HistoricalPrice']
           }
         })
       end
@@ -200,13 +193,13 @@ module LolSoap
         subject.operations.must_equal({
           'GetLastTradePrice' => {
             :action => 'http://example.com/GetLastTradePrice',
-            :input  => 'xsd1:tradePriceRequest',
-            :output => 'xsd1:TradePrice'
+            :input  => [namespace, 'tradePriceRequest'],
+            :output => [namespace, 'TradePrice']
           },
           'GetHistoricalPrice' => {
             :action => 'http://example.com/GetHistoricalPrice',
-            :input  => 'xsd1:historicalPriceRequest',
-            :output => 'xsd1:HistoricalPrice'
+            :input  => [namespace, 'historicalPriceRequest'],
+            :output => [namespace, 'HistoricalPrice']
           }
         })
       end

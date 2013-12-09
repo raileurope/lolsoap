@@ -23,11 +23,11 @@
       <element name="TradePrice">
          <complexType>
            <all>
-             <element name="xsd3:price" type="Price"/>
+             <element name="Price" type="xsd3:price"/>
            </all>
          </complexType>
       </element>
-      <element name="tradePriceRequest" type="TradePriceRequest" />
+      <element name="tradePriceRequest" type="xsd1:TradePriceRequest" />
       <complexType name="xsd1:TradePriceRequest" abstract="false">
         <complexContent>
           <extension base="xsd1:BaseRequest">
@@ -47,7 +47,7 @@
           </sequence>
         </complexType>
       </element>
-      <element name="historicalPriceRequest" type="HistoricalPriceRequest" />
+      <element name="historicalPriceRequest" type="xsd1:HistoricalPriceRequest" />
       <complexType name="xsd1:HistoricalPriceRequest">
         <complexContent>
           <extension base="xsd1:BaseRequest">
@@ -87,7 +87,7 @@
   </message>
 
   <message name="GetLastTradePriceOutput">
-    <part name="body" element="xsd3:TradePrice"/>
+    <part name="body" element="xsd1:TradePrice"/>
   </message>
 
   <message name="GetHistoricalPriceInput">
