@@ -216,7 +216,7 @@ module LolSoap
     end
 
     def soap_version
-      @soap_version ||= namespaces.values.include?(SOAP_1_2) ? '1.2' : '1.1'
+      @soap_version ||= doc.at_xpath("//s2:*", "s2" => SOAP_1_2) ? '1.2' : '1.1'
     end
 
     def ns
