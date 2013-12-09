@@ -36,7 +36,7 @@ class LolSoap::WSDL
     end
 
     def inspect
-      "<#{self.class} name=\"#{prefix_and_name.inspect}\" " \
+      "<#{self.class} name=\"#{prefix_and_name}\" " \
         "elements=#{elements.inspect} " \
         "attributes=#{attributes.inspect}>"
     end

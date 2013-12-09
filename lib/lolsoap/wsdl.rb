@@ -18,41 +18,37 @@ module LolSoap
     # The SOAP endpoint URL
     attr_reader :endpoint
 
-    # Hash of namespaces used in the WSDL document (keys are prefixes)
-    attr_reader :namespaces
-
-    # Namespaces used by the types (a subset of #namespaces)
-    attr_reader :type_namespaces
-
-    # Hash of namespace prefixes used in the WSDL document (keys are namespace URIs)
+    # Hash of generated prefixes to namespaces
     attr_reader :prefixes
+
+    # Hash of namespaces to generated prefixes
+    attr_reader :namespaces
 
     # The version of SOAP detected.
     attr_reader :soap_version
 
     def initialize(parser)
-      @types           = load_types(parser)
-      @operations      = load_operations(parser)
-      @endpoint        = parser.endpoint
-      @namespaces      = parser.namespaces
-      @type_namespaces = load_type_namespaces(parser)
-      @prefixes        = parser.prefixes
-      @soap_version    = parser.soap_version
+      @prefixes     = generate_prefixes(parser)
+      @namespaces   = prefixes.invert
+      @types        = load_types(parser)
+      @operations   = load_operations(parser)
+      @endpoint     = parser.endpoint
+      @soap_version = parser.soap_version
     end
 
     # Hash of types declared by the service
     def types
-      @types.dup
+      Hash[@types.values.map { |t| [t.name, t] }]
     end
 
     # Get a single type, or a NullType if the type doesn't exist
-    def type(name)
-      @types.fetch(name) { NullType.new }
+    def type(namespace, name)
+      @types.fetch([namespace, name]) { NullType.new }
     end
 
-    # Hash of operations that are supports by the SOAP service
+    # Hash of operations that are supported by the SOAP service
     def operations
-      @operations.dup
+      Hash[@operations.values.map { |o| [o.name, o] }]
     end
 
     # Get a single operation
@@ -60,11 +56,16 @@ module LolSoap
       @operations.fetch(name)
     end
 
+    # Get the prefix for a namespace
+    def prefix(namespace)
+      prefixes.fetch namespace
+    end
+
     def inspect
       "<#{self.class} " \
-      "namespaces=#{@namespaces.inspect} " \
-      "operations=#{@operations.keys.inspect} " \
-      "types=#{@types.keys.inspect}>"
+      "namespaces=#{namespaces.inspect} " \
+      "operations=#{operations.inspect} " \
+      "types=#{types.inspect}>"
     end
 
     private
@@ -72,8 +73,8 @@ module LolSoap
     # @private
     def load_types(parser)
       Hash[
-        parser.types.map do |prefixed_name, type|
-          [prefixed_name, build_type(type)]
+        parser.types.map do |id, type|
+          [id, build_type(type)]
         end
       ]
     end
@@ -82,27 +83,33 @@ module LolSoap
     def load_operations(parser)
       Hash[
         parser.operations.map do |k, op|
-          [k, Operation.new(self, op[:action], message_format(op[:input], parser), message_format(op[:output], parser))]
+          [k, Operation.new(self, k, op[:action], message_format(op[:input], parser), message_format(op[:output], parser))]
         end
       ]
     end
 
     # @private
-    def load_type_namespaces(parser)
-      Hash[
-        parser.types.merge(parser.elements).values.map do |el|
-          [el[:prefix], namespaces[el[:prefix]]]
+    def generate_prefixes(parser)
+      prefixes = {}
+      index    = 0
+
+      parser.types.merge(parser.elements).values.each do |el|
+        unless prefixes[el[:namespace]]
+          prefixes[el[:namespace]] = "ns#{index}"
+          index += 1
         end
-      ]
+      end
+
+      prefixes
     end
 
     # @private
     def build_type(params)
       Type.new(
         params[:name],
-        params[:prefix],
-        build_elements(params[:elements]),
-        params[:attributes]
+        prefix(params.fetch(:namespace)),
+        build_elements(params.fetch(:elements)),
+        params.fetch(:attributes)
       )
     end
 
@@ -120,7 +127,7 @@ module LolSoap
       Element.new(
         self,
         params[:name],
-        params[:prefix],
+        prefix(params[:namespace]),
         type_reference(params[:type]),
         params[:singular]
       )
@@ -128,16 +135,16 @@ module LolSoap
 
     # @private
     def type_reference(type)
-      if type.respond_to?(:to_str)
-        NamedTypeReference.new(type, self)
+      if type.is_a?(Array)
+        NamedTypeReference.new(*type, self)
       else
-        ImmediateTypeReference.new(build_type(type))
+        ImmediateTypeReference.new(type ? build_type(type) : NullType.new)
       end
     end
 
     # @private
     def message_format(element, parser)
-      build_element(parser.elements[element])
+      build_element(parser.elements.fetch(element))
     end
   end
 end

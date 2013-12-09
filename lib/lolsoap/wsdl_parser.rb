@@ -5,21 +5,17 @@ module LolSoap
   # @private
   class WSDLParser
     class Node
-      attr_reader :parser, :node, :target_namespace, :name, :prefix
+      attr_reader :parser, :node, :target_namespace, :name, :namespace
 
       def initialize(parser, node, target_namespace)
         @parser           = parser
         @node             = node
         @target_namespace = target_namespace
-        @prefix, @name    = prefix_and_name(node.attr('name'))
+        @namespace, @name = parser.namespace_and_name(node, node.attr('name').to_s, target_namespace)
       end
 
-      def name_with_prefix
-        "#{prefix}:#{name}"
-      end
-
-      def prefix_and_name(string)
-        parser.prefix_and_name(string, target_namespace)
+      def id
+        [namespace, name]
       end
     end
 
@@ -29,10 +25,11 @@ module LolSoap
           type = Type.new(parser, complex_type, target_namespace)
           {
             :elements   => type.elements,
+            :namespace  => type.namespace,
             :attributes => type.attributes
           }
-        else
-          prefix_and_name(node.attr('type').to_s).join(':')
+        elsif type = node.attr('type')
+          parser.namespace_and_name(node, type, target_namespace)
         end
       end
 
@@ -72,10 +69,10 @@ module LolSoap
             [
               element.name,
               {
-                :name     => element.name,
-                :prefix   => element.prefix,
-                :type     => element.type,
-                :singular => element.singular
+                :name      => element.name,
+                :namespace => element.namespace,
+                :type      => element.type,
+                :singular  => element.singular
               }
             ]
           end
@@ -83,7 +80,9 @@ module LolSoap
       end
 
       def element_nodes
-        node.xpath('*/xs:element | */*/xs:element | xs:complexContent/xs:extension/*/xs:element | xs:complexContent/xs:extension/*/*/xs:element', parser.ns).map { |el| Element.new(parser, el, target_namespace) }
+        node.xpath('*/xs:element | */*/xs:element | xs:complexContent/xs:extension/*/xs:element | xs:complexContent/xs:extension/*/*/xs:element', parser.ns).map { |el|
+          Element.new(parser, el, target_namespace)
+        }
       end
 
       def parent_elements
@@ -112,19 +111,6 @@ module LolSoap
       @doc = doc
     end
 
-    def namespaces
-      @namespaces ||= begin
-        namespaces = Hash[doc.collect_namespaces.map { |k, v| [k.sub(/^xmlns:/, ''), v] }]
-        namespaces.delete('xmlns')
-        namespaces
-      end
-    end
-
-    # We invert the hash in a deterministic way so that the results are repeatable.
-    def prefixes
-      @prefixes ||= Hash[namespaces.sort_by { |k, v| k }.uniq { |k, v| v }].invert
-    end
-
     def endpoint
       @endpoint ||= CGI.unescape(doc.at_xpath('/d:definitions/d:service/d:port/s:address/@location', ns).to_s)
     end
@@ -138,9 +124,9 @@ module LolSoap
         types = {}
         each_node('xs:complexType[not(@abstract="true")]') do |node, target_ns|
           type = Type.new(self, node, target_ns)
-          types[type.name_with_prefix] = {
+          types[type.id] = {
             :name       => type.name,
-            :prefix     => type.prefix,
+            :namespace  => type.namespace,
             :elements   => type.elements,
             :attributes => type.attributes
           }
@@ -150,7 +136,7 @@ module LolSoap
     end
 
     def type(name)
-      name = prefix_and_name(name).last
+      name = name.split(":").last
       if node = doc.at_xpath("//xs:complexType[@name='#{name}']", ns)
         target_namespace = node.at_xpath('parent::xs:schema/@targetNamespace', ns).to_s
         Type.new(self, node, target_namespace)
@@ -162,10 +148,10 @@ module LolSoap
         elements = {}
         each_node('xs:element') do |node, target_ns|
           element = Element.new(self, node, target_ns)
-          elements[element.name_with_prefix] = {
-            :name   => element.name,
-            :prefix => element.prefix,
-            :type   => element.type
+          elements[element.id] = {
+            :name      => element.name,
+            :namespace => element.namespace,
+            :type      => element.type
           }
         end
         elements
@@ -176,7 +162,7 @@ module LolSoap
       @messages ||= Hash[
         doc.xpath('/d:definitions/d:message', ns).map do |msg|
           element = msg.at_xpath('./d:part/@element', ns).to_s
-          [msg.attribute('name').to_s, prefix_and_name(element).join(':')]
+          [msg.attribute('name').to_s, namespace_and_name(msg, element)]
         end
       ]
     end
@@ -227,18 +213,16 @@ module LolSoap
       }
     end
 
-    def prefix_and_name(prefixed_name, default_namespace = nil)
-      prefix, name = prefixed_name.to_s.split(':')
-
-      if name
-        # Ensure we always use the same prefix for a given namespace
-        prefix = prefixes.fetch(namespaces.fetch(prefix))
+    def namespace_and_name(node, prefixed_name, default_namespace = nil)
+      if prefixed_name.include? ':'
+        prefix, name = prefixed_name.split(':')
+        namespace = node.namespaces.fetch("xmlns:#{prefix}")
       else
-        name   = prefix
-        prefix = prefixes.fetch(default_namespace)
+        name      = prefixed_name
+        namespace = default_namespace
       end
 
-      [prefix, name]
+      [namespace, name]
     end
 
     def each_node(xpath)

@@ -1,14 +1,15 @@
 class LolSoap::WSDL
   class NamedTypeReference
-    attr_reader :name, :wsdl
+    attr_reader :namespace, :name, :wsdl
 
-    def initialize(name, wsdl)
-      @name = name
-      @wsdl = wsdl
+    def initialize(namespace, name, wsdl)
+      @namespace = namespace
+      @name      = name
+      @wsdl      = wsdl
     end
 
     def type
-      wsdl.type(name)
+      wsdl.type(namespace, name)
     end
   end
 end

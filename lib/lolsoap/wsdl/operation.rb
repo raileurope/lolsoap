@@ -1,9 +1,10 @@
 class LolSoap::WSDL
   class Operation
-    attr_reader :wsdl, :action, :input, :output
+    attr_reader :wsdl, :name, :action, :input, :output
 
-    def initialize(wsdl, action, input, output)
+    def initialize(wsdl, name, action, input, output)
       @wsdl   = wsdl
+      @name   = name
       @action = action
       @input  = input
       @output = output
@@ -11,6 +12,7 @@ class LolSoap::WSDL
 
     def inspect
       "<#{self.class} " \
+      "name=#{name.inspect} " \
       "action=#{action.inspect} " \
       "input=#{input.inspect}>"
     end
