@@ -161,8 +161,8 @@ module LolSoap
     def messages
       @messages ||= Hash[
         doc.xpath('/d:definitions/d:message', ns).map do |msg|
-          element = msg.at_xpath('./d:part/@element', ns).to_s
-          [msg.attribute('name').to_s, namespace_and_name(msg, element)]
+          part = msg.at_xpath("d:part", ns)
+          [msg.attribute('name').to_s, namespace_and_name(part, part['element'])]
         end
       ]
     end

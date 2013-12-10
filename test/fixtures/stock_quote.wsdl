@@ -83,7 +83,7 @@
   </types>
 
   <message name="GetLastTradePriceInput">
-    <part name="body" element="xsd1:tradePriceRequest"/>
+    <part name="body" xmlns:foo="http://example.com/stockquote.xsd" element="foo:tradePriceRequest"/>
   </message>
 
   <message name="GetLastTradePriceOutput">
