@@ -27,6 +27,12 @@
            </all>
          </complexType>
       </element>
+      <element name="tradePriceRequestHeader">
+        <sequence>
+          <element name="username" type="xs:string"/>
+          <element name="password" type="xs:string"/>
+        </sequence>
+      </element>
       <element name="tradePriceRequest" type="xsd1:TradePriceRequest" />
       <complexType name="xsd1:TradePriceRequest" abstract="false">
         <complexContent>
@@ -82,6 +88,10 @@
     </schema>
   </types>
 
+  <message name="GetLastTradePriceInputHeader">
+    <part name="header" element="xsd1:tradePriceRequestHeader"/>
+  </message>
+
   <message name="GetLastTradePriceInput">
     <part name="body" xmlns:foo="http://example.com/stockquote.xsd" element="foo:tradePriceRequest"/>
   </message>
@@ -114,6 +124,7 @@
     <operation name="GetLastTradePrice">
       <soap:operation soapAction="http://example.com/GetLastTradePrice"/>
       <input>
+        <soap:header use="literal" message="GetLastTradePriceInputHeader" />
         <soap:body use="literal"/>
       </input>
       <output>
@@ -123,9 +134,11 @@
     <operation name="GetHistoricalPrice">
       <soap:operation soapAction="http://example.com/GetHistoricalPrice"/>
       <input>
+        <soap:header use="literal"/>
         <soap:body use="literal"/>
       </input>
       <output>
+        <soap:header use="literal"/>
         <soap:body use="literal"/>
       </output>
     </operation>

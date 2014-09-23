@@ -11,7 +11,7 @@ module LolSoap
     end
 
     let(:operation) do
-      OpenStruct.new(:input => OpenStruct.new(:prefix => 'ns0', :name => 'WashHandsRequest'))
+      OpenStruct.new(:input => OpenStruct.new(:body => OpenStruct.new(:prefix => 'ns0', :name => 'WashHandsRequest')))
     end
 
     subject { Envelope.new(wsdl, operation) }
@@ -62,7 +62,7 @@ module LolSoap
         builder = Object.new
 
         builder_klass = MiniTest::Mock.new
-        builder_klass.expect(:new, builder, [header])
+        builder_klass.expect(:new, builder, [header, nil])
 
         block = nil
         ret = subject.header(builder_klass) { |b| block = b }
@@ -75,7 +75,7 @@ module LolSoap
         builder = Object.new
 
         builder_klass = MiniTest::Mock.new
-        builder_klass.expect(:new, builder, [header])
+        builder_klass.expect(:new, builder, [header, nil])
 
         subject.header(builder_klass).must_equal builder
       end

@@ -98,6 +98,52 @@ module LolSoap
       end
     end
 
+    class Operation
+      attr_reader :parser, :node
+
+      def initialize(parser, node)
+        @parser = parser
+        @node   = node
+      end
+
+      def name
+        node.attribute('name').to_s
+      end
+
+      def action
+        node.at_xpath('./s:operation/@soapAction', parser.ns).to_s
+      end
+
+      def input
+        @input ||= OperationIO.new(
+          header(:input),
+          port_type_operation[:input]
+        )
+      end
+
+      def output
+        @output ||= OperationIO.new(
+          header(:output),
+          port_type_operation[:output]
+        )
+      end
+
+      private
+
+      def port_type_operation
+        parser.port_type_operations.fetch(name)
+      end
+
+      def header(direction)
+        if msg = node.at_xpath("./d:#{direction}/s:header/@message", parser.ns)
+          parser.messages.fetch(msg.to_s.split(':').last)
+        end
+      end
+    end
+
+    class OperationIO < Struct.new(:header, :body)
+    end
+
     SOAP_1_1 = 'http://schemas.xmlsoap.org/wsdl/soap/'
     SOAP_1_2 = 'http://schemas.xmlsoap.org/wsdl/soap12/'
 
@@ -184,16 +230,21 @@ module LolSoap
         binding = doc.at_xpath('/d:definitions/d:service/d:port/s:address/../@binding', ns).to_s.split(':').last
 
         Hash[
-          doc.xpath("/d:definitions/d:binding[@name='#{binding}']/d:operation", ns).map do |op|
-            name   = op.attribute('name').to_s
-            action = op.at_xpath('./s:operation/@soapAction', ns).to_s
+          doc.xpath("/d:definitions/d:binding[@name='#{binding}']/d:operation", ns).map do |node|
+            operation = Operation.new(self, node)
 
             [
-              name,
+              operation.name,
               {
-                :action => action,
-                :input  => port_type_operations.fetch(name)[:input],
-                :output => port_type_operations.fetch(name)[:output]
+                :action => operation.action,
+                :input  => {
+                  :header => operation.input.header,
+                  :body   => operation.input.body
+                },
+                :output => {
+                  :header => operation.output.header,
+                  :body   => operation.output.body
+                }
               }
             ]
           end

@@ -36,12 +36,12 @@ module LolSoap
 
     # The type of the element sent in the request body
     def input_type
-      envelope.input_type
+      envelope.input_body_type
     end
 
     # The type of the element that will be received in the response body
     def output_type
-      envelope.output_type
+      envelope.output_body_type
     end
 
     # The MIME type of the request. This is always application/soap+xml,

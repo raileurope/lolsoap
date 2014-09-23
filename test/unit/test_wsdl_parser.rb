@@ -110,6 +110,11 @@ module LolSoap
     describe '#elements' do
       it 'returns the elements with inline types' do
         subject.elements.must_equal({
+          [namespace, "tradePriceRequestHeader"] => {
+            :name      => "tradePriceRequestHeader",
+            :namespace => namespace,
+            :type      => nil
+          },
           [namespace, "tradePriceRequest"] => {
             :name      => "tradePriceRequest",
             :namespace => namespace,
@@ -165,10 +170,11 @@ module LolSoap
     describe '#messages' do
       it 'maps message names to types' do
         subject.messages.must_equal({
-          'GetLastTradePriceInput'   => [namespace, 'tradePriceRequest'],
-          'GetLastTradePriceOutput'  => [namespace, 'TradePrice'],
-          'GetHistoricalPriceInput'  => [namespace, 'historicalPriceRequest'],
-          'GetHistoricalPriceOutput' => [namespace, 'HistoricalPrice']
+          'GetLastTradePriceInputHeader' => [namespace, 'tradePriceRequestHeader'],
+          'GetLastTradePriceInput'       => [namespace, 'tradePriceRequest'],
+          'GetLastTradePriceOutput'      => [namespace, 'TradePrice'],
+          'GetHistoricalPriceInput'      => [namespace, 'historicalPriceRequest'],
+          'GetHistoricalPriceOutput'     => [namespace, 'HistoricalPrice']
         })
       end
     end
@@ -193,13 +199,16 @@ module LolSoap
         subject.operations.must_equal({
           'GetLastTradePrice' => {
             :action => 'http://example.com/GetLastTradePrice',
-            :input  => [namespace, 'tradePriceRequest'],
-            :output => [namespace, 'TradePrice']
+            :input  => {
+              header: [namespace, 'tradePriceRequestHeader'],
+              body:   [namespace, 'tradePriceRequest']
+            },
+            :output => { header: nil, body: [namespace, 'TradePrice'] }
           },
           'GetHistoricalPrice' => {
             :action => 'http://example.com/GetHistoricalPrice',
-            :input  => [namespace, 'historicalPriceRequest'],
-            :output => [namespace, 'HistoricalPrice']
+            :input  => { header: nil, body: [namespace, 'historicalPriceRequest'] },
+            :output => { header: nil, body: [namespace, 'HistoricalPrice'] }
           }
         })
       end

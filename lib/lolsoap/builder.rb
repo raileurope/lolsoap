@@ -46,7 +46,7 @@ module LolSoap
 
     def initialize(node, type = WSDL::NullType.new)
       @node = node
-      @type = type
+      @type = type || WSDL::NullType.new
     end
 
     # Add a tag manually, rather than through method_missing. This is so you can still

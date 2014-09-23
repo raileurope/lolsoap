@@ -38,12 +38,12 @@ module LolSoap
 
     it 'creates some header' do
       subject.header do |h|
-        h['ns0'].verySpecialBoolean true
+        h['ns0'].username 'LOCO2'
       end
 
-      el = doc.at_xpath('/soap:Envelope/soap:Header/ns0:verySpecialBoolean', doc.namespaces)
+      el = doc.at_xpath('/soap:Envelope/soap:Header/ns0:tradePriceRequestHeader/ns0:username', doc.namespaces)
       el.wont_equal nil
-      el.text.to_s.must_equal 'true'
+      el.text.to_s.must_equal 'LOCO2'
     end
   end
 end

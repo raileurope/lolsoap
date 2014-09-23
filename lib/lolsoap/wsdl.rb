@@ -3,6 +3,7 @@ require 'lolsoap/wsdl_parser'
 module LolSoap
   class WSDL
     require 'lolsoap/wsdl/operation'
+    require 'lolsoap/wsdl/operation_io'
     require 'lolsoap/wsdl/type'
     require 'lolsoap/wsdl/named_type_reference'
     require 'lolsoap/wsdl/immediate_type_reference'
@@ -83,7 +84,13 @@ module LolSoap
     def load_operations(parser)
       Hash[
         parser.operations.map do |k, op|
-          [k, Operation.new(self, k, op[:action], message_format(op[:input], parser), message_format(op[:output], parser))]
+          [k, Operation.new(
+            self,
+            k,
+            op[:action],
+            build_io(op[:input], parser),
+            build_io(op[:output], parser)
+          )]
         end
       ]
     end
@@ -143,8 +150,11 @@ module LolSoap
     end
 
     # @private
-    def message_format(element, parser)
-      build_element(parser.elements.fetch(element))
+    def build_io(io, parser)
+      OperationIO.new(
+        io[:header] && build_element(parser.elements[io[:header]]),
+        build_element(parser.elements[io[:body]])
+      )
     end
   end
 end

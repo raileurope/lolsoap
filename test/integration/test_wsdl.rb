@@ -8,8 +8,14 @@ module LolSoap
     it 'should successfully parse a WSDL document' do
       subject.operations.length.must_equal 2
       subject.operations.fetch('GetLastTradePrice').tap do |o|
-        o.input.name.must_equal 'tradePriceRequest'
-        o.action.must_equal     'http://example.com/GetLastTradePrice'
+        o.input.header.name.must_equal 'tradePriceRequestHeader'
+        o.input.body.name.must_equal 'tradePriceRequest'
+        o.action.must_equal 'http://example.com/GetLastTradePrice'
+      end
+
+      subject.operations.fetch('GetHistoricalPrice').tap do |o|
+        o.input.header.must_equal nil
+        o.input.body.name.must_equal 'historicalPriceRequest'
       end
 
       subject.types.length.must_equal 4
