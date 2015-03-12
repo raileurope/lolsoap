@@ -7,4 +7,5 @@ module LolSoap
   require 'lolsoap/response'
   require 'lolsoap/wsdl'
   require 'lolsoap/wsdl_parser'
+  require 'lolsoap/version'
 end
