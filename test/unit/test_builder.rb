@@ -5,26 +5,26 @@ module LolSoap
   describe Builder do
     let(:doc) { MiniTest::Mock.new }
     let(:node) do
-      node = OpenStruct.new(
+      n = OpenStruct.new(
         :document         => doc,
         :namespace_scopes => [OpenStruct.new(:prefix => 'b'), OpenStruct.new(:prefix => 'a')],
         :children         => MiniTest::Mock.new
       )
-      def node.<<(child); children << child; end
-      node
+      def n.<<(child); children << child; end
+      n
     end
     let(:type) do
-      type = OpenStruct.new(:prefix => 'a')
-      def type.element_prefix(name)
+      t = OpenStruct.new(:prefix => 'a')
+      def t.element_prefix(name)
         @element_prefixes = { 'bar' => 'b' }
         @element_prefixes.fetch(name) { 'a' }
       end
-      def type.has_attribute?(*); false; end
-      def type.sub_type(name)
+      def t.has_attribute?(*); false; end
+      def t.sub_type(name)
         @sub_types ||= { 'foo' => Object.new, 'bar' => Object.new, 'clone' => Object.new }
         @sub_types[name]
       end
-      type
+      t
     end
 
     subject { Builder.new(node, type) }
