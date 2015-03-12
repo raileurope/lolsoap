@@ -15,5 +15,10 @@ module LolSoap
       subject.headers['SOAPAction'].must_equal "http://example.com/GetLastTradePrice"
       subject.content.empty?.must_equal false
     end
+
+    it 'sets the encoding' do
+      subject.content.start_with?(%(<?xml version="1.0" encoding="UTF-8"?>)).must_equal true
+      subject.content.encoding.must_equal Encoding::UTF_8
+    end
   end
 end

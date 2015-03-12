@@ -6,7 +6,7 @@ module LolSoap
 
     def initialize(envelope)
       @envelope    = envelope
-      @xml_options = {}
+      @xml_options = default_xml_options
     end
 
     # @see Envelope#body
@@ -78,6 +78,12 @@ module LolSoap
     # The content to be sent in the HTTP request
     def content
       @content ||= envelope.to_xml(xml_options)
+    end
+
+    private
+
+    def default_xml_options
+      { encoding: charset }
     end
   end
 end
