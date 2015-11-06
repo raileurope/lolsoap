@@ -117,14 +117,14 @@ module LolSoap
       def input
         @input ||= OperationIO.new(
           header(:input),
-          port_type_operation[:input]
+          body(:input)
         )
       end
 
       def output
         @output ||= OperationIO.new(
           header(:output),
-          port_type_operation[:output]
+          body(:output)
         )
       end
 
@@ -135,9 +135,17 @@ module LolSoap
       end
 
       def header(direction)
-        if msg = node.at_xpath("./d:#{direction}/s:header/@message", parser.ns)
-          parser.messages.fetch(msg.to_s.split(':').last)
+        header_node = node.at_xpath("./d:#{direction}/s:header", parser.ns)
+        if header_node && message = header_node["message"]
+          parts = parser.messages.fetch(message.to_s.split(':').last)
+          parts[header_node['part']] || parts.values.first
         end
+      end
+
+      def body(direction)
+        parts     = port_type_operation[direction]
+        body_node = node.at_xpath("d:#{direction}/s:body", parser.ns)
+        parts[body_node['part'] || body_node['parts']] || parts.values.first
       end
     end
 
@@ -206,10 +214,19 @@ module LolSoap
 
     def messages
       @messages ||= Hash[
-        doc.xpath('/d:definitions/d:message', ns).map do |msg|
-          part = msg.at_xpath("d:part", ns)
-          [msg.attribute('name').to_s, namespace_and_name(part, part['element'])]
-        end
+        doc.xpath('/d:definitions/d:message', ns).map { |msg|
+          [
+            msg.attribute('name').to_s,
+            Hash[
+              msg.xpath('d:part', ns).map { |part|
+                [
+                  part.attribute('name').to_s,
+                  namespace_and_name(part, part['element'])
+                ]
+              }
+            ]
+          ]
+        }
       ]
     end
 

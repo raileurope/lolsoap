@@ -152,7 +152,7 @@ module LolSoap
     # @private
     def build_io(io, parser)
       OperationIO.new(
-        io[:header] && build_element(parser.elements[io[:header]]),
+        io[:header] && build_element(parser.elements.fetch(io[:header])),
         build_element(parser.elements[io[:body]])
       )
     end

@@ -93,6 +93,7 @@
   </message>
 
   <message name="GetLastTradePriceInput">
+    <part name="foo" xmlns:foo="http://example.com/stockquote.xsd" element="xs:string"/>
     <part name="body" xmlns:foo="http://example.com/stockquote.xsd" element="foo:tradePriceRequest"/>
   </message>
 
@@ -125,7 +126,7 @@
       <soap:operation soapAction="http://example.com/GetLastTradePrice"/>
       <input>
         <soap:header use="literal" message="GetLastTradePriceInputHeader" />
-        <soap:body use="literal"/>
+        <soap:body use="literal" parts="body"/>
       </input>
       <output>
         <soap:body use="literal"/>

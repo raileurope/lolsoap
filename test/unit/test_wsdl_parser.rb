@@ -168,27 +168,47 @@ module LolSoap
     end
 
     describe '#messages' do
-      it 'maps message names to types' do
+      it 'maps message names to part names and corresponding types' do
         subject.messages.must_equal({
-          'GetLastTradePriceInputHeader' => [namespace, 'tradePriceRequestHeader'],
-          'GetLastTradePriceInput'       => [namespace, 'tradePriceRequest'],
-          'GetLastTradePriceOutput'      => [namespace, 'TradePrice'],
-          'GetHistoricalPriceInput'      => [namespace, 'historicalPriceRequest'],
-          'GetHistoricalPriceOutput'     => [namespace, 'HistoricalPrice']
+          'GetLastTradePriceInputHeader' => {
+            'header' => [namespace, 'tradePriceRequestHeader']
+          },
+          'GetLastTradePriceInput'       => {
+            'foo'  => [xs, 'string'],
+            'body' => [namespace, 'tradePriceRequest']
+          },
+          'GetLastTradePriceOutput'      => {
+            'body' => [namespace, 'TradePrice']
+          },
+          'GetHistoricalPriceInput'      => {
+            'body' => [namespace, 'historicalPriceRequest']
+          },
+          'GetHistoricalPriceOutput'     => {
+            'body' => [namespace, 'HistoricalPrice']
+          }
         })
       end
     end
 
     describe '#port_type_operations' do
-      it 'is a hash containing input and output types' do
+      it 'maps operations to part names and corresponding types' do
         subject.port_type_operations.must_equal({
           'GetLastTradePrice' => {
-            :input  => [namespace, 'tradePriceRequest'],
-            :output => [namespace, 'TradePrice']
+            :input  => {
+              'foo'  => [xs, 'string'],
+              'body' => [namespace, 'tradePriceRequest']
+            },
+            :output => {
+              'body' => [namespace, 'TradePrice']
+            }
           },
           'GetHistoricalPrice' => {
-            :input  => [namespace, 'historicalPriceRequest'],
-            :output => [namespace, 'HistoricalPrice']
+            :input  => {
+              'body' => [namespace, 'historicalPriceRequest'],
+            },
+            :output => {
+              'body' => [namespace, 'HistoricalPrice']
+            }
           }
         })
       end
