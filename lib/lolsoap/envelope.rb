@@ -90,8 +90,12 @@ module LolSoap
       output.body
     end
 
-    def output_body_type
-      output_body.type
+    def output_body_content
+      output_body.content
+    end
+
+    def output_body_content_type
+      output_body.content_type
     end
 
     def to_xml(options = {})
