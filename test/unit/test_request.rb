@@ -44,5 +44,13 @@ module LolSoap
         subject.mime.must_equal 'text/xml'
       end
     end
+
+    describe '#output_type' do
+      it 'returns output body content type' do
+        content_type = Object.new
+        envelope.output_body_content_type = content_type
+        subject.output_type.must_equal content_type
+      end
+    end
   end
 end

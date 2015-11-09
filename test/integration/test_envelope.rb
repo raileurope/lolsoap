@@ -37,11 +37,13 @@ module LolSoap
     end
 
     it 'creates some header' do
-      subject.header do |h|
-        h['ns0'].username 'LOCO2'
+      subject.header do |header|
+        header.authentication do |auth|
+          auth['ns0'].username 'LOCO2'
+        end
       end
 
-      el = doc.at_xpath('/soap:Envelope/soap:Header/ns0:tradePriceRequestHeader/ns0:username', doc.namespaces)
+      el = doc.at_xpath('/soap:Envelope/soap:Header/ns0:authentication/ns0:username', doc.namespaces)
       el.wont_equal nil
       el.text.to_s.must_equal 'LOCO2'
     end

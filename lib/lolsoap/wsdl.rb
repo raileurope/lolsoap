@@ -10,6 +10,7 @@ module LolSoap
     require 'lolsoap/wsdl/null_type'
     require 'lolsoap/wsdl/element'
     require 'lolsoap/wsdl/null_element'
+    require 'lolsoap/wsdl/operation_io_part'
 
     # Create a new instance by parsing a raw string of XML
     def self.parse(raw)
@@ -114,7 +115,7 @@ module LolSoap
     def build_type(params)
       Type.new(
         params[:name],
-        prefix(params.fetch(:namespace)),
+        params[:prefix] || prefix(params.fetch(:namespace)),
         build_elements(params.fetch(:elements)),
         params.fetch(:attributes)
       )
@@ -152,9 +153,35 @@ module LolSoap
     # @private
     def build_io(io, parser)
       OperationIO.new(
-        io[:header] && build_element(parser.elements.fetch(io[:header])),
-        build_element(parser.elements[io[:body]])
+        build_io_part('Header', io[:header], parser),
+        build_io_part('Body', io[:body], parser)
       )
+    end
+
+    # @private
+    def build_io_part(name, elements, parser)
+      OperationIOPart.new(
+        self,
+        name,
+        type_reference(io_part_type(name, elements, parser))
+      )
+    end
+
+    # @private
+    def io_part_type(name, elements, parser)
+      return unless elements.any?
+
+      {
+        :name       => name,
+        :prefix     => 'soap',
+        :elements   => Hash[
+          elements.map { |el|
+            element = parser.elements.fetch(el)
+            [element[:name], element]
+          }
+        ],
+        :attributes => []
+      }
     end
   end
 end

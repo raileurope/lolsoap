@@ -13,8 +13,14 @@ module LolSoap
           :operations => {
             'washHands' => {
               :action => 'urn:washHands',
-              :input  => { :body => [namespace, 'brush'] },
-              :output => { :body => [namespace, 'Color'] }
+              :input  => {
+                :header => [],
+                :body   => [[namespace, 'brush']]
+              },
+              :output => {
+                :header => [],
+                :body   => [[namespace, 'Color']]
+              }
             }
           },
           :types => {
@@ -94,10 +100,35 @@ module LolSoap
           subject.operations['washHands'].tap do |op|
             op.wsdl.must_equal subject
             op.action.must_equal 'urn:washHands'
-            op.input.body.name.must_equal 'brush'
-            op.output.tap do |output|
-              output.body.is_a?(WSDL::Element).must_equal(true)
-              output.body.type.elements.keys.sort.must_equal %w(hex name)
+
+            op.input.header.tap do |header|
+              header.is_a?(WSDL::OperationIOPart).must_equal(true)
+              header.name.must_equal 'Header'
+              header.content.must_equal nil
+            end
+
+            op.input.body.tap do |body|
+              body.is_a?(WSDL::OperationIOPart).must_equal(true)
+              body.name.must_equal 'Body'
+              body.content.is_a?(WSDL::Element).must_equal(true)
+              body.content.name.must_equal 'brush'
+            end
+
+            op.output.header.tap do |header|
+              header.is_a?(WSDL::OperationIOPart).must_equal(true)
+              header.name.must_equal 'Header'
+              header.content.must_equal nil
+            end
+
+            op.output.body.tap do |body|
+              body.is_a?(WSDL::OperationIOPart).must_equal(true)
+              body.name.must_equal 'Body'
+
+              body.content.tap do |content|
+                content.is_a?(WSDL::Element).must_equal(true)
+                content.name.must_equal 'Color'
+                content.type.elements.keys.sort.must_equal %w(hex name)
+              end
             end
           end
         end

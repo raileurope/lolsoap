@@ -26,14 +26,14 @@ module LolSoap
     #     b.some 'data'
     #   end
     def body(klass = Builder)
-      builder = klass.new(body_content, input_body_type)
+      builder = klass.new(body_content, input_body_content_type)
       yield builder if block_given?
       builder
     end
 
     # Build the header of the envelope
     def header(klass = Builder)
-      builder = klass.new(header_content, input_header_type)
+      builder = klass.new(header_content, input_header_content_type)
       yield builder if block_given?
       builder
     end
@@ -54,16 +54,24 @@ module LolSoap
       input.header
     end
 
-    def input_header_type
-      input_header && input_header.type
+    def input_header_content
+      input_header.content
+    end
+
+    def input_header_content_type
+      input_header.content_type
     end
 
     def input_body
       input.body
     end
 
-    def input_body_type
-      input_body.type
+    def input_body_content
+      input_body.content
+    end
+
+    def input_body_content_type
+      input_body.content_type
     end
 
     def output
@@ -82,8 +90,12 @@ module LolSoap
       output.body
     end
 
-    def output_body_type
-      output_body.type
+    def output_body_content
+      output_body.content
+    end
+
+    def output_body_content_type
+      output_body.content_type
     end
 
     def to_xml(options = {})
@@ -105,7 +117,7 @@ module LolSoap
     private
 
     # @private
-    def header_content; @header_content || @header; end
+    def header_content; @header_content; end
 
     # @private
     def body_content; @body_content; end
@@ -117,24 +129,29 @@ module LolSoap
       namespaces = Hash[wsdl.namespaces.map { |prefix, uri| [prefix, root.add_namespace(prefix, uri)] }]
       namespaces[soap_prefix] = root.add_namespace(soap_prefix, soap_namespace)
 
-      @header = doc.create_element 'Header'
-      if input_header
-        @header_content = doc.create_element input_header.name
+      @header = doc.create_element input_header.name
+      @body   = doc.create_element input_body.name
+
+      [root, @header, @body].each { |el| el.namespace = namespaces[soap_prefix] }
+
+      if input_header_content
+        @header_content = doc.create_element input_header_content.name
+        @header_content.namespace = namespaces[input_header_content.prefix]
         @header << @header_content
       else
-        @header_content = nil
+        @header_content = @header
       end
 
-      body = doc.create_element 'Body'
-      @body_content = doc.create_element input_body.name
+      if input_body_content
+        @body_content = doc.create_element input_body_content.name
+        @body_content.namespace = namespaces[input_body_content.prefix]
+        @body << @body_content
+      else
+        @body_content = @body
+      end
 
-      [root, @header, body].each { |el| el.namespace = namespaces[soap_prefix] }
-      @header_content.namespace = namespaces[input_header.prefix] if @header_content
-      @body_content.namespace = namespaces[input_body.prefix]
-
-      body << @body_content
       root << @header
-      root << body
+      root << @body
     end
   end
 end

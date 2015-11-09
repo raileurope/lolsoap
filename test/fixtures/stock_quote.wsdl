@@ -27,10 +27,15 @@
            </all>
          </complexType>
       </element>
-      <element name="tradePriceRequestHeader">
+      <element name="authentication">
         <sequence>
           <element name="username" type="xs:string"/>
           <element name="password" type="xs:string"/>
+        </sequence>
+      </element>
+      <element name="tradePriceRequestHeader">
+        <sequence>
+          <element name="requestID" type="xs:string"/>
         </sequence>
       </element>
       <element name="tradePriceRequest" type="xsd1:TradePriceRequest" />
@@ -90,6 +95,7 @@
 
   <message name="GetLastTradePriceInputHeader">
     <part name="header" element="xsd1:tradePriceRequestHeader"/>
+    <part name="header2" element="xsd1:authentication"/>
   </message>
 
   <message name="GetLastTradePriceInput">
@@ -125,7 +131,8 @@
     <operation name="GetLastTradePrice">
       <soap:operation soapAction="http://example.com/GetLastTradePrice"/>
       <input>
-        <soap:header use="literal" message="GetLastTradePriceInputHeader" />
+        <soap:header use="literal" message="GetLastTradePriceInputHeader" part="header" />
+        <soap:header use="literal" message="GetLastTradePriceInputHeader" part="header2" />
         <soap:body use="literal" parts="body"/>
       </input>
       <output>
