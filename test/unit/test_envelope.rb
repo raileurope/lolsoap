@@ -11,7 +11,15 @@ module LolSoap
     end
 
     let(:operation) do
-      OpenStruct.new(:input => OpenStruct.new(:body => OpenStruct.new(:prefix => 'ns0', :name => 'WashHandsRequest')))
+      OpenStruct.new(
+        :input => OpenStruct.new(
+          :header => OpenStruct.new(:name => 'Header'),
+          :body   => OpenStruct.new(
+            :name    => 'Body',
+            :content => OpenStruct.new(:prefix => 'ns0', :name => 'WashHandsRequest')
+          )
+        )
+      )
     end
 
     subject { Envelope.new(wsdl, operation) }

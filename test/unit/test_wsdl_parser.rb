@@ -110,6 +110,11 @@ module LolSoap
     describe '#elements' do
       it 'returns the elements with inline types' do
         subject.elements.must_equal({
+          [namespace, "authentication"] => {
+            :name      => "authentication",
+            :namespace => namespace,
+            :type      => nil
+          },
           [namespace, "tradePriceRequestHeader"] => {
             :name      => "tradePriceRequestHeader",
             :namespace => namespace,
@@ -171,7 +176,8 @@ module LolSoap
       it 'maps message names to part names and corresponding types' do
         subject.messages.must_equal({
           'GetLastTradePriceInputHeader' => {
-            'header' => [namespace, 'tradePriceRequestHeader']
+            'header'  => [namespace, 'tradePriceRequestHeader'],
+            'header2' => [namespace, 'authentication']
           },
           'GetLastTradePriceInput'       => {
             'foo'  => [xs, 'string'],
@@ -191,44 +197,47 @@ module LolSoap
     end
 
     describe '#port_type_operations' do
-      it 'maps operations to part names and corresponding types' do
+      it 'maps operations to messages' do
         subject.port_type_operations.must_equal({
           'GetLastTradePrice' => {
-            :input  => {
-              'foo'  => [xs, 'string'],
-              'body' => [namespace, 'tradePriceRequest']
-            },
-            :output => {
-              'body' => [namespace, 'TradePrice']
-            }
+            :input  => 'tns:GetLastTradePriceInput',
+            :output => 'tns:GetLastTradePriceOutput',
           },
           'GetHistoricalPrice' => {
-            :input  => {
-              'body' => [namespace, 'historicalPriceRequest'],
-            },
-            :output => {
-              'body' => [namespace, 'HistoricalPrice']
-            }
+            :input  => 'tns:GetHistoricalPriceInput',
+            :output => 'tns:GetHistoricalPriceOutput'
           }
         })
       end
     end
 
     describe '#operations' do
-      it 'is a hash of operations with their action and input type' do
+      it 'maps operations to actions, input and output parts' do
         subject.operations.must_equal({
           'GetLastTradePrice' => {
             :action => 'http://example.com/GetLastTradePrice',
             :input  => {
-              header: [namespace, 'tradePriceRequestHeader'],
-              body:   [namespace, 'tradePriceRequest']
+              header: [
+                [namespace, 'tradePriceRequestHeader'],
+                [namespace, 'authentication']
+              ],
+              body:   [[namespace, 'tradePriceRequest']]
             },
-            :output => { header: nil, body: [namespace, 'TradePrice'] }
+            :output => {
+              header: [],
+              body:   [[namespace, 'TradePrice']]
+            }
           },
           'GetHistoricalPrice' => {
             :action => 'http://example.com/GetHistoricalPrice',
-            :input  => { header: nil, body: [namespace, 'historicalPriceRequest'] },
-            :output => { header: nil, body: [namespace, 'HistoricalPrice'] }
+            :input  => {
+              header: [],
+              body:   [[namespace, 'historicalPriceRequest']]
+            },
+            :output => {
+              header: [],
+              body:   [[namespace, 'HistoricalPrice']]
+            }
           }
         })
       end

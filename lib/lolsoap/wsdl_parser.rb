@@ -4,6 +4,8 @@ require 'cgi'
 module LolSoap
   # @private
   class WSDLParser
+    class ParseError < StandardError; end
+
     class Node
       attr_reader :parser, :node, :target_namespace, :name, :namespace
 
@@ -115,41 +117,61 @@ module LolSoap
       end
 
       def input
-        @input ||= OperationIO.new(
-          header(:input),
-          body(:input)
-        )
+        @input ||= operation_io(:input)
       end
 
       def output
-        @output ||= OperationIO.new(
-          header(:output),
-          body(:output)
-        )
+        @output ||= operation_io(:output)
       end
-
-      private
 
       def port_type_operation
         parser.port_type_operations.fetch(name)
       end
 
-      def header(direction)
-        header_node = node.at_xpath("./d:#{direction}/s:header", parser.ns)
-        if header_node && message = header_node["message"]
-          parts = parser.messages.fetch(message.to_s.split(':').last)
-          parts[header_node['part']] || parts.values.first
-        end
-      end
+      private
 
-      def body(direction)
-        parts     = port_type_operation[direction]
-        body_node = node.at_xpath("d:#{direction}/s:body", parser.ns)
-        parts[body_node['part'] || body_node['parts']] || parts.values.first
+      def operation_io(direction)
+        OperationIO.new(parser, self, node.at_xpath("d:#{direction}", parser.ns))
       end
     end
 
-    class OperationIO < Struct.new(:header, :body)
+    class OperationIO < Struct.new(:parser, :operation, :node)
+      def name
+        node.name
+      end
+
+      def header
+        @header ||= part_elements(:header)
+      end
+
+      def body
+        @body ||= part_elements(:body)
+      end
+
+      private
+
+      def operation_message
+        operation.port_type_operation[name.to_sym]
+      end
+
+      def part_elements(name)
+        nodes = node.xpath("s:#{name}", parser.ns)
+        return [] unless nodes
+
+        nodes.map { |node|
+          parts = parser.messages.fetch((node['message'] || operation_message).to_s.split(':').last)
+
+          parts.fetch(node['parts'] || node['part']) do |part_name|
+            if parts.size == 1
+              if name == :body
+                parts.values.first
+              end
+            else
+              raise ParseError, "Can't determine which part of #{message_name} to use as #{operation.name} #{self.name} #{name}"
+            end
+          end
+        }.compact
+      end
     end
 
     SOAP_1_1 = 'http://schemas.xmlsoap.org/wsdl/soap/'
@@ -233,11 +255,13 @@ module LolSoap
     def port_type_operations
       @port_type_operations ||= Hash[
         doc.xpath('/d:definitions/d:portType/d:operation', ns).map do |op|
-          input  = op.at_xpath('./d:input/@message',  ns).to_s.split(':').last
-          output = op.at_xpath('./d:output/@message', ns).to_s.split(':').last
-          name   = op.attribute('name').to_s
-
-          [name, { :input => messages.fetch(input), :output => messages.fetch(output) }]
+          [
+            op.attribute('name').to_s,
+            {
+              :input  => op.at_xpath('./d:input/@message',  ns).to_s,
+              :output => op.at_xpath('./d:output/@message', ns).to_s
+            }
+          ]
         end
       ]
     end
