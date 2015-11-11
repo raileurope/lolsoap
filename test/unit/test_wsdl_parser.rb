@@ -141,6 +141,11 @@ module LolSoap
               :attributes => []
             }
           },
+          [namespace, "specialTickerSymbol"] => {
+            :name      => "specialTickerSymbol",
+            :namespace => namespace,
+            :type      => [namespace2, 'TickerSymbol']
+          },
           [namespace, "historicalPriceRequest"] => {
             :name      => "historicalPriceRequest",
             :namespace => namespace,

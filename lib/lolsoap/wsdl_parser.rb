@@ -46,6 +46,31 @@ module LolSoap
       end
     end
 
+    class ReferencedElement
+      attr_reader :reference, :element
+
+      def initialize(reference, element)
+        @reference = reference
+        @element   = element
+      end
+
+      def name
+        element.name
+      end
+
+      def namespace
+        element.namespace
+      end
+
+      def type
+        element.type
+      end
+
+      def singular
+        reference.singular
+      end
+    end
+
     class Type < Node
       def elements
         parent_elements.merge(own_elements)
@@ -83,7 +108,12 @@ module LolSoap
 
       def element_nodes
         node.xpath('*/xs:element | */*/xs:element | xs:complexContent/xs:extension/*/xs:element | xs:complexContent/xs:extension/*/*/xs:element', parser.ns).map { |el|
-          Element.new(parser, el, target_namespace)
+          element = Element.new(parser, el, target_namespace)
+          if reference = el.attribute('ref')
+            ReferencedElement.new(element, parser.element(reference.to_s))
+          else
+            element
+          end
         }
       end
 
@@ -212,11 +242,7 @@ module LolSoap
     end
 
     def type(name)
-      name = name.split(":").last
-      if node = doc.at_xpath("//xs:complexType[@name='#{name}']", ns)
-        target_namespace = node.at_xpath('parent::xs:schema/@targetNamespace', ns).to_s
-        Type.new(self, node, target_namespace)
-      end
+      find_node name, Type, 'complexType'
     end
 
     def elements
@@ -232,6 +258,10 @@ module LolSoap
         end
         elements
       end
+    end
+
+    def element(name)
+      find_node name, Element, 'element'
     end
 
     def messages
@@ -326,6 +356,13 @@ module LolSoap
         end
       end
     end
+
+    def find_node(name, node_class, selector)
+      name = name.split(":").last
+      if node = doc.at_xpath("//xs:#{selector}[@name='#{name}']", ns)
+        target_namespace = node.at_xpath('parent::xs:schema/@targetNamespace', ns).to_s
+        node_class.new(self, node, target_namespace)
+      end
+    end
   end
 end
-
