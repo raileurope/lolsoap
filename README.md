@@ -114,6 +114,16 @@ Development sponsored by [Loco2](http://loco2.com/).
 
 ## Changelog ##
 
+### 0.7 ###
+
+* Added support for element references in type definitions
+* Added support for operations with multipart header/body
+* Added support for multipart messages in WSDL
+
+### 0.6 ###
+
+* Support SOAP Header types
+
 ### 0.5 ###
 
 * Generate our own namespace prefixes rather than using ones from the
