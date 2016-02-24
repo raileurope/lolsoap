@@ -122,11 +122,37 @@ module LolSoap
       end
 
       def own_attributes
+        defined_attributes + referenced_attributes
+      end
+
+      def defined_attributes
         node.xpath('xs:attribute/@name | */xs:extension/xs:attribute/@name', parser.ns).map(&:text)
+      end
+
+      def referenced_attributes
+        node.xpath('xs:attributeGroup[@ref] | */xs:extension/xs:attributeGroup[@ref]', parser.ns).map { |group|
+          parser.attribute_group(*parser.namespace_and_name(group, group.attribute('ref').to_s))
+        }.flat_map(&:attributes)
       end
 
       def parent_attributes
         base_type ? base_type.attributes : []
+      end
+    end
+
+    class AttributeGroup < Node
+      def attributes
+        own_attributes + referenced_attributes
+      end
+
+      def own_attributes
+        node.xpath('xs:attribute/@name', parser.ns).map(&:text)
+      end
+
+      def referenced_attributes
+        node.xpath('xs:attributeGroup[@ref]', parser.ns).map { |group|
+          parser.attribute_group(*parser.namespace_and_name(group, group.attribute('ref').to_s))
+        }.flat_map(&:attributes)
       end
     end
 
@@ -262,6 +288,10 @@ module LolSoap
 
     def element(namespace, name)
       find_node namespace, name, Element, 'element'
+    end
+
+    def attribute_group(namespace, name)
+      find_node namespace, name, AttributeGroup, 'attributeGroup'
     end
 
     def messages

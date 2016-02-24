@@ -13,6 +13,9 @@
     <schema targetNamespace="http://example.com/stockquote.xsd"
             xmlns:xsd3="http://example.com/stockquote.xsd"
             xmlns="http://www.w3.org/2001/XMLSchema">
+      <attributeGroup name="BaseRequestAttributes">
+        <attribute name="signature" type="xs:string"/>
+      </attributeGroup>
       <complexType name="Price">
         <simpleContent>
           <extension base="xs:string">
@@ -80,7 +83,7 @@
         <sequence>
           <element name="accountId" type="xs:string" maxOccurs="1"/>
         </sequence>
-        <attribute name="signature" type="xs:string"/>
+        <attributeGroup ref="tns:BaseRequestAttributes" />
       </complexType>
     </schema>
 
