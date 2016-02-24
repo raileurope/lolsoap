@@ -82,8 +82,8 @@ module LolSoap
 
       def base_type
         @base_type ||= begin
-          if extension = node.at_xpath('*/xs:extension/@base', parser.ns)
-            parser.type(extension.to_s)
+          if extension = node.at_xpath('*/xs:extension', parser.ns)
+            parser.type(*parser.namespace_and_name(extension, extension.attribute('base').to_s))
           end
         end
       end
@@ -110,7 +110,7 @@ module LolSoap
         node.xpath('*/xs:element | */*/xs:element | xs:complexContent/xs:extension/*/xs:element | xs:complexContent/xs:extension/*/*/xs:element', parser.ns).map { |el|
           element = Element.new(parser, el, target_namespace)
           if reference = el.attribute('ref')
-            ReferencedElement.new(element, parser.element(reference.to_s))
+            ReferencedElement.new(element, parser.element(*parser.namespace_and_name(el, reference.to_s)))
           else
             element
           end
@@ -241,8 +241,8 @@ module LolSoap
       end
     end
 
-    def type(name)
-      find_node name, Type, 'complexType'
+    def type(namespace, name)
+      find_node namespace, name, Type, 'complexType'
     end
 
     def elements
@@ -260,8 +260,8 @@ module LolSoap
       end
     end
 
-    def element(name)
-      find_node name, Element, 'element'
+    def element(namespace, name)
+      find_node namespace, name, Element, 'element'
     end
 
     def messages
@@ -338,7 +338,11 @@ module LolSoap
     def namespace_and_name(node, prefixed_name, default_namespace = nil)
       if prefixed_name.include? ':'
         prefix, name = prefixed_name.split(':')
-        namespace = node.namespaces.fetch("xmlns:#{prefix}")
+        if prefix == 'tns' && schema = node.at_xpath('ancestor::xs:schema', ns)
+          namespace = schema.attribute('targetNamespace').to_s
+        else
+          namespace = node.namespaces.fetch("xmlns:#{prefix}")
+        end
       else
         name      = prefixed_name
         namespace = default_namespace
@@ -357,9 +361,11 @@ module LolSoap
       end
     end
 
-    def find_node(name, node_class, selector)
-      name = name.split(":").last
-      if node = doc.at_xpath("//xs:#{selector}[@name='#{name}']", ns)
+    def find_node(namespace, name, node_class, selector)
+      target = schemas.xpath("../xs:schema[@targetNamespace='#{namespace}']", ns)
+      target = schemas if target.size == 0
+
+      if node = target.at_xpath("xs:#{selector}[@name='#{name.split(':').last}']", ns)
         target_namespace = node.at_xpath('parent::xs:schema/@targetNamespace', ns).to_s
         node_class.new(self, node, target_namespace)
       end
