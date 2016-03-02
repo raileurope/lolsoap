@@ -114,6 +114,11 @@ Development sponsored by [Loco2](http://loco2.com/).
 
 ## Changelog ##
 
+### 0.8 ###
+
+* Use namespaces when looking up definitions
+* Added support for referenced attribute groups
+
 ### 0.7 ###
 
 * Added support for element references in type definitions
