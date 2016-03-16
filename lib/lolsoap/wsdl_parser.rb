@@ -368,11 +368,7 @@ module LolSoap
     def namespace_and_name(node, prefixed_name, default_namespace = nil)
       if prefixed_name.include? ':'
         prefix, name = prefixed_name.split(':')
-        if prefix == 'tns' && schema = node.at_xpath('ancestor::xs:schema', ns)
-          namespace = schema.attribute('targetNamespace').to_s
-        else
-          namespace = node.namespaces.fetch("xmlns:#{prefix}")
-        end
+        namespace    = node.namespaces.fetch("xmlns:#{prefix}")
       else
         name      = prefixed_name
         namespace = default_namespace
