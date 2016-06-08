@@ -1,5 +1,6 @@
 require 'helper'
 require 'lolsoap/builder'
+require 'pp'
 
 module LolSoap
   describe Builder do
@@ -99,6 +100,12 @@ module LolSoap
       it 'returns the type' do
         subject.__type__.must_equal type
       end
+    end
+
+    it 'can be pretty printed' do
+      output = ''
+      PP.pp(subject, output)
+      output.include?("LolSoap::Builder").must_equal true
     end
   end
 end

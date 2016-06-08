@@ -94,6 +94,12 @@ module LolSoap
       true
     end
 
+    def pretty_print(pp)
+      pp.group(2, "#(LolSoap::Builder #{sprintf("0x%x", object_id)} {", "})") do
+        pp.pp @node
+      end
+    end
+
     private
 
     # alias method_missing __tag__
