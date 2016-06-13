@@ -45,6 +45,12 @@ request.body do |b|
   ...
 end
 
+# Request header can be built in a similar way:
+request.header do |h|
+  h.username 'zomg'
+  ...
+end
+
 # See the full request XML
 puts request.content
 
