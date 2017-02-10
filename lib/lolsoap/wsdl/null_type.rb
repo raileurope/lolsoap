@@ -9,7 +9,7 @@ class LolSoap::WSDL
     end
 
     def element(name)
-      NullType.new
+      NullElement.new
     end
 
     def ==(other)
