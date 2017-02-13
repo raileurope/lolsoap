@@ -2,6 +2,8 @@ require 'helper'
 require 'lolsoap/builder'
 require 'pp'
 
+require 'pp'
+
 module LolSoap
   describe Builder do
     let(:doc) { MiniTest::Mock.new }
@@ -88,6 +90,15 @@ module LolSoap
       expect_node_added node.namespace_scopes[0], 'foo' do
         subject['b'].foo
       end
+    end
+
+    # see https://github.com/loco2/lolsoap/issues/18
+    # would raise if pretty print causes doc.create_element to be called:
+    #   NoMethodError: unmocked method :create_element
+    it 'can be pretty printed' do
+      out = ''
+      PP.pp(subject, out)
+      out.include?("LolSoap::Builder").must_equal true
     end
 
     describe '#__node__' do

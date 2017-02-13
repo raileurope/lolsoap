@@ -15,17 +15,17 @@ module LolSoap
   #   builder['ns2'].someTag
   #   # => <ns2:someTag/>
   class Builder
-    RESERVED_METHODS = %w(object_id respond_to_missing? inspect === to_s)
+    RESERVED_METHODS = %w(object_id respond_to_missing? inspect === to_s instance_variables instance_eval)
 
     alias :__class__ :class
     instance_methods.each do |m|
-      undef_method m unless RESERVED_METHODS.include?(m.to_s) || m =~ /^__/
+      undef_method m unless RESERVED_METHODS.include?(m.to_s) || m =~ /^__/ || m =~ /^pretty_print/
     end
 
     # @private
     class Prefix
       instance_methods.each do |m|
-        undef_method m unless RESERVED_METHODS.include?(m.to_s) || m =~ /^__/
+        undef_method m unless RESERVED_METHODS.include?(m.to_s) || m =~ /^__/ || m =~ /^pretty_print/
       end
 
       def initialize(owner, prefix)
