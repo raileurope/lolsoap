@@ -106,10 +106,12 @@ module LolSoap
       'soap'
     end
 
+    # Namespace used for SOAP envelope tags
     def soap_namespace
       soap_version == '1.2' ? SOAP_1_2 : SOAP_1_1
     end
 
+    # The SOAP version in use
     def soap_version
       wsdl.soap_version
     end
