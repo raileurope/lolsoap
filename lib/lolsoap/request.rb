@@ -12,7 +12,8 @@ module LolSoap
     end
 
     # @see Envelope
-    def_delegators :envelope, :body, :header, :soap_namespace
+    def_delegators :envelope, :builder=, :body, :header, :soap_namespace
+
     # URL to be POSTed to
     def_delegator :envelope, :endpoint, :url
 
