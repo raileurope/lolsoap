@@ -23,7 +23,6 @@ module LolSoap
         b.lol
         b.id 42
       end
-
       el = doc.at_xpath('//ns0:tradePriceRequest/ns0:tickerSymbol', doc.namespaces)
       el.wont_equal nil
       el.text.to_s.must_equal 'LOCO2'
@@ -34,6 +33,28 @@ module LolSoap
 
       attr = doc.at_xpath('//ns0:tradePriceRequest/@id', doc.namespaces)
       attr.to_s.must_equal "42"
+    end
+
+    it 'creates some input from hash' do
+      subject.builder = :hash
+      subject.body(
+        tickerSymbol: 'LOCO2',
+        specialTickerSymbol: {
+          name: 'LOCOLOCOLOCO'
+        },
+        lol: nil,
+        id: 42
+      )
+      el = doc.at_xpath('//ns0:tradePriceRequest/ns0:tickerSymbol', doc.namespaces)
+      el.wont_equal nil
+      el.text.to_s.must_equal 'LOCO2'
+
+      el = doc.at_xpath('//ns0:tradePriceRequest/ns0:specialTickerSymbol/ns1:name', doc.namespaces)
+      el.wont_equal nil
+      el.text.to_s.must_equal 'LOCOLOCOLOCO'
+
+      attr = doc.at_xpath('//ns0:tradePriceRequest/@id', doc.namespaces)
+      attr.to_s.must_equal '42'
     end
 
     it 'creates some header' do
