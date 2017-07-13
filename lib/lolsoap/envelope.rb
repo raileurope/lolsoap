@@ -1,9 +1,12 @@
 require 'nokogiri'
-require 'lolsoap/builder'
+# require 'lolsoap/builder'
+require 'lolsoap/builder/hash_params'
+require 'lolsoap/builder/block_params'
+
 
 module LolSoap
   class Envelope
-    attr_reader :wsdl, :operation, :doc
+    attr_reader :wsdl, :operation, :doc, :builder
 
     # @private
     SOAP_1_1 = 'http://schemas.xmlsoap.org/soap/envelope/'
@@ -12,11 +15,18 @@ module LolSoap
     SOAP_1_2 = 'http://www.w3.org/2003/05/soap-envelope'
 
     def initialize(wsdl, operation, doc = Nokogiri::XML::Document.new)
-      @wsdl      = wsdl
-      @operation = operation
-      @doc       = doc
-
+      @wsdl        = wsdl
+      @operation   = operation
+      @doc         = doc
+      self.builder = :block
       initialize_doc
+    end
+
+    def builder=(label)
+      @builder = {
+        hash:  LolSoap::Builder::HashParams,
+        block: LolSoap::Builder::BlockParams
+      }.fetch(label)
     end
 
     # Build the body of the envelope
@@ -25,17 +35,27 @@ module LolSoap
     #   env.body do |b|
     #     b.some 'data'
     #   end
-    def body(klass = Builder)
-      builder = klass.new(body_content, input_body_content_type)
-      yield builder if block_given?
-      builder
+    #
+    # @example
+    #   env.body(some: 'data')
+    #
+    def body(*args)
+      hash, klass = parse_args(args)
+      @builder = klass if klass
+      b = builder.new(body_content, input_body_content_type)
+      b.parse(hash) if hash
+      yield b       if block_given?
+      b
     end
 
     # Build the header of the envelope
-    def header(klass = Builder)
-      builder = klass.new(header_content, input_header_content_type)
-      yield builder if block_given?
-      builder
+    def header(*args)
+      hash, klass = parse_args(args)
+      @builder = klass if klass
+      b = builder.new(header_content, input_header_content_type)
+      b.parse(hash) if hash
+      yield b       if block_given?
+      b
     end
 
     def endpoint
@@ -117,6 +137,20 @@ module LolSoap
     end
 
     private
+
+    # @private
+    # compatibilty with previous version
+    def parse_args(args)
+      hash = klass = false
+      args.each do |arg|
+        if arg.is_a?(Hash)
+          hash  = arg
+        else
+          klass = arg
+        end
+      end
+      [hash, klass]
+    end
 
     # @private
     def header_content; @header_content; end
