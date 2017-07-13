@@ -41,11 +41,32 @@ module LolSoap
       input.children.length.must_equal 0
     end
 
+    describe '#builder' do
+      it 'sets the builder to hash' do
+        subject.builder = :hash
+        subject.builder.name.must_equal 'LolSoap::Builder::HashParams'
+      end
+
+      it 'sets the builder to block' do
+        subject.builder = :block
+        subject.builder.name.must_equal 'LolSoap::Builder::BlockParams'
+      end
+
+      it 'sets the builder default to block' do
+        subject.builder.name.must_equal 'LolSoap::Builder::BlockParams'
+      end
+
+      it 'wont set the builder to lol' do
+        proc { subject.builder = :lol }.must_raise KeyError
+      end
+    end
+
     describe '#body' do
       it 'yields and returns a builder object for the body' do
         builder = Object.new
 
         builder_klass = MiniTest::Mock.new
+        builder_klass.expect(:is_a?, false, [Hash])
         builder_klass.expect(:new, builder, [input, operation.input])
 
         block = nil
@@ -59,6 +80,7 @@ module LolSoap
         builder = Object.new
 
         builder_klass = MiniTest::Mock.new
+        builder_klass.expect(:is_a?, false, [Hash])
         builder_klass.expect(:new, builder, [input, operation.input])
 
         subject.body(builder_klass).must_equal builder
@@ -70,6 +92,7 @@ module LolSoap
         builder = Object.new
 
         builder_klass = MiniTest::Mock.new
+        builder_klass.expect(:is_a?, false, [Hash])
         builder_klass.expect(:new, builder, [header, nil])
 
         block = nil
@@ -83,6 +106,7 @@ module LolSoap
         builder = Object.new
 
         builder_klass = MiniTest::Mock.new
+        builder_klass.expect(:is_a?, false, [Hash])
         builder_klass.expect(:new, builder, [header, nil])
 
         subject.header(builder_klass).must_equal builder

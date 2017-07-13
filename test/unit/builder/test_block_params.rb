@@ -1,9 +1,9 @@
 require 'helper'
-require 'lolsoap/builder'
+require 'lolsoap/builder/block_params'
 require 'pp'
 
 module LolSoap
-  describe Builder do
+  describe Builder::BlockParams do
     let(:doc) { MiniTest::Mock.new }
     let(:node) do
       n = OpenStruct.new(
@@ -28,7 +28,7 @@ module LolSoap
       t
     end
 
-    subject { Builder.new(node, type) }
+    subject { Builder::BlockParams.new(node, type) }
 
     def expect_node_added(namespace, *args)
       sub_node = MiniTest::Mock.new

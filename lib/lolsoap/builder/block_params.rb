@@ -1,6 +1,6 @@
 require 'lolsoap/wsdl'
 
-module LolSoap
+module LolSoap::Builder
   # Used to build XML, with namespaces automatically added.
   #
   # @example General
@@ -14,7 +14,8 @@ module LolSoap
   #   builder = Builder.new(node, type)
   #   builder['ns2'].someTag
   #   # => <ns2:someTag/>
-  class Builder
+  class BlockParams
+
     RESERVED_METHODS = %w(object_id respond_to_missing? inspect === to_s)
 
     alias :__class__ :class
@@ -102,7 +103,6 @@ module LolSoap
 
     private
 
-    # alias method_missing __tag__
     def method_missing(name, *args, &block)
       if @type.has_attribute?(name.to_s)
         __attribute__(name, *args)
