@@ -2,7 +2,7 @@ require 'lolsoap/wsdl'
 require 'byebug'
 require 'awesome_print'
 
-module LolSoap::Builder
+class LolSoap::Builder < SimpleDelegator
   # Used to build XML, with namespaces automatically added.
   #
   # @example General
@@ -22,22 +22,19 @@ module LolSoap::Builder
     end
 
     #
-
-    def parse(hash, node: @node, type: @type)
+    def content(hash, node: @node, type: @type)
       # TODO : a before_parse callback
       # -> sort hash with type.elements_names
       # -> replace tag name by @type.elements_names where identical tr('_', '').downcase
-
       hash.each do |key, val|
-        # TODO : avoid this mess by allowing attributes on root elem
-        if type.has_attribute?(key.to_s)
-          node[key] = val
-        else
-          make_tag(
-            node,
-            extract_params!(type, key, val)
-          )
-        end
+        make_tag(node, extract_params!(type, key, val))
+      end
+    end
+
+    # Use when starting from an existing node
+    def attributes(hash, node: @node, type: @type)
+      hash.each do |key, val|
+        node[key] = val
       end
     end
 
@@ -46,40 +43,39 @@ module LolSoap::Builder
     # @private
     # TODO : smells I'm missing an object
     def extract_params!(type, key, val)
-      content = sub_hash = hash = nil
-
-      if key.is_a?(Hash)
-        name   = key.delete(:tag).to_s
-        prefix = key.delete(:ns) || type.element_prefix(name)
-        hash   = key
-      else
-        name   = key.to_s
-        prefix = type.element_prefix(name)
-      end
-
+      content = sub_hash = prefix = nil
+      
       if val.is_a?(Hash)
         sub_hash = val
       else
         content = val
       end
 
+      if key.is_a?(Hash)
+        name   = key.delete(:tag).to_s
+        prefix = key.delete(:ns).to_s
+        content = *content << key unless key.empty?
+      else
+        name = key.to_s
+      end
+
       sub_type = type.sub_type(name)
 
-      { name: name, prefix: prefix, attributes: hash, sub_hash: sub_hash,
+      { name: name, prefix: prefix || type.element_prefix(name), sub_hash: sub_hash,
         content: content, sub_type: sub_type }
     end
 
     # @private
     def make_tag(node, prefix:, name:, sub_type:,
-                 sub_hash:, content: [], attributes:)
+                 sub_hash:, content: [])
 
-      # TODO : check if we validate with @type.has_attribute?
-      args = content
-      args << attributes if attributes
-      sub_node = node.document.create_element(name, args)
+      sub_node = node.document.create_element(name, content)
       sub_node.namespace = node.namespace_scopes.find { |n| n.prefix == prefix }
       node << sub_node
-      parse(sub_hash, node: sub_node, type: sub_type) if sub_hash
+      if sub_hash
+        builder = LolSoap::Builder.new(sub_node, sub_type)
+        builder.content(sub_hash)
+      end
     end
   end
 end

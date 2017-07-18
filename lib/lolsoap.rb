@@ -1,6 +1,5 @@
 module LolSoap
-  require 'lolsoap/builder/hash_params'
-  require 'lolsoap/builder/block_params'
+  require 'lolsoap/builder'
   require 'lolsoap/client'
   require 'lolsoap/envelope'
   require 'lolsoap/fault'

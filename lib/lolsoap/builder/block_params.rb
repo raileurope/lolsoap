@@ -1,17 +1,17 @@
 require 'lolsoap/wsdl'
 
-module LolSoap::Builder
+class LolSoap::Builder < SimpleDelegator
   # Used to build XML, with namespaces automatically added.
   #
   # @example General
-  #   builder = Builder.new(node, type)
+  #   builder = BlockParams.new(node, type)
   #   builder.someTag do |t|
   #     t.foo 'bar'
   #   end
   #   # => <ns1:someTag><ns1:foo>bar</ns1:foo></ns1:someTag>
   #
   # @example Explicitly specifying a namespace prefix
-  #   builder = Builder.new(node, type)
+  #   builder = BlockParams.new(node, type)
   #   builder['ns2'].someTag
   #   # => <ns2:someTag/>
   class BlockParams
@@ -65,7 +65,7 @@ module LolSoap::Builder
     end
 
     # @private
-    def __prefixed_tag__(prefix, sub_type, name, *args)
+    def __prefixed_tag__(prefix, sub_type, name, *args, &block)
       sub_node = @node.document.create_element(name.to_s, *args)
       sub_node.namespace = @node.namespace_scopes.find { |n| n.prefix == prefix }
 
@@ -103,6 +103,7 @@ module LolSoap::Builder
 
     private
 
+    # alias method_missing __tag__
     def method_missing(name, *args, &block)
       if @type.has_attribute?(name.to_s)
         __attribute__(name, *args)

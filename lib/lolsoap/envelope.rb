@@ -1,12 +1,10 @@
 require 'nokogiri'
-# require 'lolsoap/builder'
-require 'lolsoap/builder/hash_params'
-require 'lolsoap/builder/block_params'
+require 'lolsoap/builder'
 
 
 module LolSoap
   class Envelope
-    attr_reader :wsdl, :operation, :doc, :builder
+    attr_reader :wsdl, :operation, :doc
 
     # @private
     SOAP_1_1 = 'http://schemas.xmlsoap.org/soap/envelope/'
@@ -15,18 +13,11 @@ module LolSoap
     SOAP_1_2 = 'http://www.w3.org/2003/05/soap-envelope'
 
     def initialize(wsdl, operation, doc = Nokogiri::XML::Document.new)
-      @wsdl        = wsdl
-      @operation   = operation
-      @doc         = doc
-      self.builder = :block
-      initialize_doc
-    end
+      @wsdl      = wsdl
+      @operation = operation
+      @doc       = doc
 
-    def builder=(label)
-      @builder = {
-        hash:  LolSoap::Builder::HashParams,
-        block: LolSoap::Builder::BlockParams
-      }.fetch(label)
+      initialize_doc
     end
 
     # Build the body of the envelope
@@ -34,28 +25,20 @@ module LolSoap
     # @example
     #   env.body do |b|
     #     b.some 'data'
+    #     b.id   42
     #   end
     #
     # @example
-    #   env.body(some: 'data')
+    #   env.body.content(some: 'data')
+    #   env.body.attributes(id: 42)
     #
-    def body(*args)
-      hash, klass = parse_args(args)
-      @builder = klass if klass
-      b = builder.new(body_content, input_body_content_type)
-      b.parse(hash) if hash
-      yield b       if block_given?
-      b
+    def body(klass = Builder, &block)
+      klass.new(body_content, input_body_content_type, &block)
     end
 
     # Build the header of the envelope
-    def header(*args)
-      hash, klass = parse_args(args)
-      @builder = klass if klass
-      b = builder.new(header_content, input_header_content_type)
-      b.parse(hash) if hash
-      yield b       if block_given?
-      b
+    def header(klass = Builder, &block)
+      klass.new(header_content, input_header_content_type, &block)
     end
 
     def endpoint
@@ -126,31 +109,15 @@ module LolSoap
       'soap'
     end
 
-    # Namespace used for SOAP envelope tags
     def soap_namespace
       soap_version == '1.2' ? SOAP_1_2 : SOAP_1_1
     end
 
-    # The SOAP version in use
     def soap_version
       wsdl.soap_version
     end
 
     private
-
-    # @private
-    # compatibilty with previous version
-    def parse_args(args)
-      hash = klass = false
-      args.each do |arg|
-        if arg.is_a?(Hash)
-          hash  = arg
-        else
-          klass = arg
-        end
-      end
-      [hash, klass]
-    end
 
     # @private
     def header_content; @header_content; end

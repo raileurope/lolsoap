@@ -45,10 +45,10 @@ module LolSoap
       [doc, sub_node, node].each(&:verify)
     end
 
-    describe '#parse' do
+    describe '#content' do
       it 'adds an element to the node, using the correct namespace' do
         expect_node_added(node.namespace_scopes[1], %w[foo bar]) do
-          subject.parse(foo: 'bar')
+          subject.content(foo: 'bar')
         end
       end
     end

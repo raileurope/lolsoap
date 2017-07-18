@@ -36,15 +36,14 @@ module LolSoap
     end
 
     it 'creates some input from hash' do
-      subject.builder = :hash
-      subject.body(
+      subject.body.content(
         tickerSymbol: 'LOCO2',
         specialTickerSymbol: {
           name: 'LOCOLOCOLOCO'
         },
-        lol: nil,
-        id: 42
+        lol: nil
       )
+      subject.body.attributes(id: 42)
       el = doc.at_xpath('//ns0:tradePriceRequest/ns0:tickerSymbol', doc.namespaces)
       el.wont_equal nil
       el.text.to_s.must_equal 'LOCO2'

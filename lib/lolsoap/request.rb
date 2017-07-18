@@ -1,8 +1,6 @@
 module LolSoap
   # Represents a HTTP request containing a SOAP Envelope
   class Request
-    extend Forwardable
-
     attr_reader   :envelope
     attr_accessor :xml_options
 
@@ -11,22 +9,40 @@ module LolSoap
       @xml_options = default_xml_options
     end
 
-    # @see Envelope
-    def_delegators :envelope, :builder=, :body, :header, :soap_namespace
+    # @see Envelope#body
+    def body(&block)
+      envelope.body(&block)
+    end
 
-    # URL to be POSTed to
-    def_delegator :envelope, :endpoint, :url
+    # @see Envelope#header
+    def header(&block)
+      envelope.header(&block)
+    end
 
-    # The SOAP version in use, private method
+    # Namespace used for SOAP envelope tags
+    def soap_namespace
+      envelope.soap_namespace
+    end
+
+    # The SOAP version in use
     def soap_version
       envelope.soap_version
     end
 
+    # URL to be POSTed to
+    def url
+      envelope.endpoint
+    end
+
     # The type of the element sent in the request body
-    def_delegator :envelope, :input_body_content_type, :input_type
+    def input_type
+      envelope.input_body_content_type
+    end
 
     # The type of the element that will be received in the response body
-    def_delegator :envelope, :output_body_content_type, :output_type
+    def output_type
+      envelope.output_body_content_type
+    end
 
     # The MIME type of the request. This is always application/soap+xml,
     # but it could be overridden in a subclass.
