@@ -103,6 +103,5 @@ class LolSoap::Builder < SimpleDelegator
         key, params: parse_val(val)
       )
     end
-
   end
 end
