@@ -1,7 +1,6 @@
 require 'helper'
 require 'lolsoap/builder/hash_params'
 require 'pp'
-require 'awesome_print'
 
 module LolSoap
   describe Builder::HashParams do
@@ -53,19 +52,60 @@ module LolSoap
       end
     end
 
-    describe '#extract_params!' do
-      it 'extracts' do
-        subject.class.send(:public, :extract_params!)
-        subject.extract_params!(
-          type, {
-            ns: node.namespace_scopes[1],
-            tag: 'foo'
-          }, 'bar'
+    describe '#parse_hash' do
+      it 'parses %i[ns name] ' do
+        subject.class.send(:public, :parse_hash)
+        subject.parse_hash(
+          [node.namespace_scopes[1], :foo], 'bar'
         ).must_equal(
-          name: 'foo', prefix: node.namespace_scopes[1], attributes: {},
-          sub_hash: nil, content: 'bar', sub_type: type.sub_type('foo')
+          name: 'foo', prefix: node.namespace_scopes[1], args: ['bar']
         )
       end
+
+      it 'parses :name' do
+        subject.class.send(:public, :parse_hash)
+        subject.parse_hash(:foo, 'bar').must_equal(
+          name: 'foo', args: ['bar']
+        )
+      end
+
+      it 'parses [:name, { attribute: value }]' do
+        subject.class.send(:public, :parse_hash)
+        subject.parse_hash(
+          [:foo, id: 42], 'bar'
+        ).must_equal(
+          name: 'foo', args: ['bar', { id: 42 }]
+        )
+      end
+
+      it 'parses [:ns, :name, { attribute: value }]' do
+        subject.class.send(:public, :parse_hash)
+        subject.parse_hash(
+          [node.namespace_scopes[1], :foo, id: 42], 'bar'
+        ).must_equal(
+          name: 'foo', prefix: node.namespace_scopes[1], args: ['bar', { id: 42 }]
+        )
+      end
+
+      it 'parses :name, {}' do
+        subject.class.send(:public, :parse_hash)
+        subject.parse_hash(
+          :someTag, foo: 'bar'
+        ).must_equal(
+          name: 'someTag', sub_hash: { foo: 'bar' }, args: []
+        )
+      end
+
+      it 'parses :name, -> {}' do
+        subject.class.send(:public, :parse_hash)
+        block = -> { 'lol' }
+        subject.parse_hash(
+          :someTag, block
+        ).must_equal(
+          name: 'someTag', args: [], block: block
+        )
+      end
+
     end
   end
 end
