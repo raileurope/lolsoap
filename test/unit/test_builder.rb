@@ -1,7 +1,6 @@
 require 'helper'
 require 'lolsoap/builder'
 require 'pp'
-require 'byebug'
 
 module LolSoap
   describe Builder do
