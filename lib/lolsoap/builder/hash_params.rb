@@ -19,13 +19,9 @@ class LolSoap::Builder < SimpleDelegator
   #   # => <ns1:someTag id=42>bar</ns1:someTag>
   #
 
-  # TODO : test after fixing mocks in test_builder  
   # @example Mixing hashes and blocks
   #   builder = HashParams.new(node, type)
-  #   builder.content(someTag: Proc.new do |t|
-  #     t.foo  'bar'
-  #   end)
-  #
+  #   builder.content(someTag: -> (t) { t.foo  'bar' })
   #   # => <ns1:someTag><ns1:foo>bar</ns1:foo></ns1:someTag>
   #
 
@@ -35,11 +31,8 @@ class LolSoap::Builder < SimpleDelegator
       @type = type || WSDL::NullType.new
     end
 
-    #
+    # Parses the hash to build the nodes
     def content(hash)
-      # TODO : a before_parse callback working on a parsed hash
-      # -> sort hash with type.elements_names
-      # -> replace tag name by @type.elements_names where identical tr('_', '').downcase
       hash.each do |key, val|
         make_tag(parse_hash(key, val))
       end
@@ -60,8 +53,8 @@ class LolSoap::Builder < SimpleDelegator
 
       @node << sub_node
 
-      LolSoap::Builder.new(sub_node, @type.sub_type(name), &block).tap do |builder|
-        builder.content(sub_hash) if sub_hash
+      LolSoap::Builder.new(sub_node, @type.sub_type(name), &block).tap do |b|
+        b.content(sub_hash) if sub_hash
       end
     end
 
