@@ -24,6 +24,7 @@ module LolSoap
         b.id 42
       end
       el = doc.at_xpath('//ns0:tradePriceRequest/ns0:tickerSymbol', doc.namespaces)
+
       el.wont_equal nil
       el.text.to_s.must_equal 'LOCO2'
 
