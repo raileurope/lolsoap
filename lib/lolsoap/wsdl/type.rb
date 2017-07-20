@@ -15,11 +15,6 @@ class LolSoap::WSDL
       @elements.dup
     end
 
-    # @return [Array]
-    def elements_names
-      @elements.keys
-    end
-
     def element(name)
       @elements.fetch(name) { NullElement.new }
     end
