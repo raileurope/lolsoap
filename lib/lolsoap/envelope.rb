@@ -1,7 +1,6 @@
 require 'nokogiri'
 require 'lolsoap/builder'
 
-
 module LolSoap
   class Envelope
     attr_reader :wsdl, :operation, :doc
