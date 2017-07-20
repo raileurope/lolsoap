@@ -5,7 +5,7 @@ require 'lolsoap/builder/block_params'
 module LolSoap
   # Instanciate the class adapted to params
   class Builder < SimpleDelegator
-    def initialize(node, type)
+    def initialize(node, type = WSDL::NullType.new)
       if block_given?
         yield super(BlockParams.new(node, type))
       else
