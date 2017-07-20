@@ -7,27 +7,33 @@ module LolSoap
     let(:doc) { MiniTest::Mock.new }
 
     let(:node) do
-      n = OpenStruct.new(
-        :document         => doc,
-        :namespace_scopes => [OpenStruct.new(:prefix => 'b'), OpenStruct.new(:prefix => 'a')],
-        :children         => MiniTest::Mock.new
-      )
-      def n.<<(child); children << child; end
-      n
+      OpenStruct.new(
+        document:         doc,
+        namespace_scopes: [OpenStruct.new(prefix: 'b'), OpenStruct.new(:prefix => 'a')],
+        children:         MiniTest::Mock.new
+      ).tap do |n|
+        def n.<<(child)
+          children << child
+        end
+      end
     end
 
     let(:type) do
-      t = OpenStruct.new(:prefix => 'a')
-      def t.element_prefix(name)
-        @element_prefixes = { 'bar' => 'b' }
-        @element_prefixes.fetch(name) { 'a' }
+      OpenStruct.new(prefix: 'a').tap do |t|
+        def t.element_prefix(name)
+          @element_prefixes = { 'bar' => 'b' }
+          @element_prefixes.fetch(name) { 'a' }
+        end
+
+        def t.has_attribute?(*)
+          false
+        end
+
+        def t.sub_type(name)
+          @sub_types ||= { 'foo' => Object.new, 'bar' => Object.new, 'clone' => Object.new }
+          @sub_types[name]
+        end
       end
-      def t.has_attribute?(*); false; end
-      def t.sub_type(name)
-        @sub_types ||= { 'foo' => Object.new, 'bar' => Object.new, 'clone' => Object.new }
-        @sub_types[name]
-      end
-      t
     end
 
     subject { Builder::HashParams.new(node, type) }
