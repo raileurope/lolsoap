@@ -56,6 +56,25 @@ module LolSoap
       attr.to_s.must_equal '42'
     end
 
+    it 'creates some input from hash containing block' do
+      subject.body.content(
+        tickerSymbol: 'LOCO2',
+        specialTickerSymbol: ->(s) { s.name 'LOCOLOCOLOCO' },
+        lol: nil
+      )
+      subject.body.attributes(id: 42)
+      el = doc.at_xpath('//ns0:tradePriceRequest/ns0:tickerSymbol', doc.namespaces)
+      el.wont_equal nil
+      el.text.to_s.must_equal 'LOCO2'
+
+      el = doc.at_xpath('//ns0:tradePriceRequest/ns0:specialTickerSymbol/ns1:name', doc.namespaces)
+      el.wont_equal nil
+      el.text.to_s.must_equal 'LOCOLOCOLOCO'
+
+      attr = doc.at_xpath('//ns0:tradePriceRequest/@id', doc.namespaces)
+      attr.to_s.must_equal '42'
+    end
+
     it 'creates some header' do
       subject.header do |header|
         header.authentication do |auth|
