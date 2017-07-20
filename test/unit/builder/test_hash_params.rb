@@ -105,7 +105,6 @@ module LolSoap
           name: 'someTag', args: [], block: block
         )
       end
-
     end
   end
 end
