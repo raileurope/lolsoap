@@ -13,7 +13,9 @@ class LolSoap::Callbacks
 
   class << self
     def in(key)
-      Selected.new(*@registered.map { |c| c.procs[key] })
+      Selected.new(
+        @registered.map { |c| c.procs[key] }.flatten
+      )
     end
 
     def register(*klass)
