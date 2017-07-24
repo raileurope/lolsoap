@@ -38,7 +38,7 @@ class LolSoap::Builder < SimpleDelegator
       # Array of hashes means it's a repeatable element
       args =
         if h_or_ary.is_a? Array
-          h_or_ary.map { |h| hash_to_args(h) }.flatten
+          h_or_ary.flat_map { |h| hash_to_args(h) }
         else
           hash_to_args(h_or_ary)
         end
