@@ -33,9 +33,16 @@ class LolSoap::Builder < SimpleDelegator
     end
 
     # Parses the hash to build the nodes
-    def content(hash)
-      return nil if hash.empty?
-      args = hash.map { |key, val| parse_hash(key, val) }
+    def content(h_or_ary)
+      return nil if h_or_ary.empty?
+      # Array of hashes means it's a repeatable element
+      args =
+        if h_or_ary.is_a? Array
+          h_or_ary.map { |h| hash_to_args(h) }.flatten
+        else
+          hash_to_args(h_or_ary)
+        end
+
       # Uncomment if / after Callbacks merge
       # LolSoap::Callbacks.in('hash_params.before_build').expose(args, @node, @type)
       args.each { |h| make_tag(h) }
@@ -64,7 +71,7 @@ class LolSoap::Builder < SimpleDelegator
     private
 
     def parse_val(val, params: { args: [] })
-      if val.is_a?(Hash)
+      if val.respond_to? :each
         params[:sub_hash] = val
       elsif val.is_a?(Proc)
         params[:block] = val
@@ -98,6 +105,10 @@ class LolSoap::Builder < SimpleDelegator
       parse_key(
         key, params: parse_val(val)
       )
+    end
+
+    def hash_to_args(hash)
+      hash.map { |key, val| parse_hash(key, val) }
     end
   end
 end

@@ -1,6 +1,7 @@
 require 'helper'
 require 'lolsoap/envelope'
 require 'lolsoap/wsdl'
+require 'byebug'
 
 module LolSoap
   describe Envelope do
@@ -39,9 +40,10 @@ module LolSoap
     it 'creates some input from hash' do
       subject.body.content(
         tickerSymbol: 'LOCO2',
-        specialTickerSymbol: {
-          name: 'LOCOLOCOLOCO'
-        },
+        specialTickerSymbol: [
+          { name: 'LOCOLOCOLOCO' },
+          { name: 'LOLLOLLOL' }
+        ],
         lol: nil
       )
       subject.body.attributes(id: 42)
@@ -49,9 +51,9 @@ module LolSoap
       el.wont_equal nil
       el.text.to_s.must_equal 'LOCO2'
 
-      el = doc.at_xpath('//ns0:tradePriceRequest/ns0:specialTickerSymbol/ns1:name', doc.namespaces)
+      el = doc.xpath('//ns0:tradePriceRequest/ns0:specialTickerSymbol/ns1:name', doc.namespaces)
       el.wont_equal nil
-      el.text.to_s.must_equal 'LOCOLOCOLOCO'
+      el.map(&:text).must_equal %w[LOCOLOCOLOCO LOLLOLLOL]
 
       attr = doc.at_xpath('//ns0:tradePriceRequest/@id', doc.namespaces)
       attr.to_s.must_equal '42'

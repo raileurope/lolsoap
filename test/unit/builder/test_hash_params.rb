@@ -102,6 +102,15 @@ module LolSoap
         )
       end
 
+      it 'parses :name, []' do
+        subject.class.send(:public, :parse_hash)
+        subject.parse_hash(
+          :someTag, [foo: 'bar']
+        ).must_equal(
+          name: 'someTag', sub_hash: [foo: 'bar'], args: []
+        )
+      end
+
       it 'parses :name, -> {}' do
         subject.class.send(:public, :parse_hash)
         block = -> { 'lol' }
