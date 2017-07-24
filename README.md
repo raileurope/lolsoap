@@ -45,6 +45,32 @@ request.body do |b|
   ...
 end
 
+# You can also use a hash to populate the request.
+request.body.content(lolSpirit: {
+  lolDuration: 'lolever'
+})
+# If you have attributes, use an array as a key.
+request.body.content(lolSpirit: {
+  [:lolDuration, lolFactor: '11'] => 'lolever'
+})
+# You can attach attributes to the node you are working on.
+request.body.attributes(id: 42)
+# You can use blocks in hashes.
+request.body.content(lolSpirit: ->(s) { s.lolDuration 'lolever' }})
+
+# You can also use a hash to populate the request.
+request.body.content(lolSpirit: {
+  lolDuration: 'lolever'
+})
+# If you have attributes, use an array as a key.
+request.body.content(lolSpirit: {
+  [:lolDuration, lolFactor: '11'] => 'lolever'
+})
+# You can attach attributes to the node you are working on.
+request.body.attributes(id: 42)
+# You can use blocks in hashes.
+request.body.content(lolSpirit: ->(s) { s.lolDuration 'lolever' }})
+
 # Request header can be built in a similar way:
 request.header do |h|
   h.username 'zomg'

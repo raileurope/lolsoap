@@ -42,19 +42,6 @@ module LolSoap
     end
 
     describe '#body' do
-      it 'yields and returns a builder object for the body' do
-        builder = Object.new
-
-        builder_klass = MiniTest::Mock.new
-        builder_klass.expect(:new, builder, [input, operation.input])
-
-        block = nil
-        ret = subject.body(builder_klass) { |b| block = b }
-
-        ret.must_equal builder
-        block.must_equal builder
-      end
-
       it "doesn't require a block" do
         builder = Object.new
 
@@ -66,19 +53,6 @@ module LolSoap
     end
 
     describe '#header' do
-      it 'yields and returns the xml builder object for the header' do
-        builder = Object.new
-
-        builder_klass = MiniTest::Mock.new
-        builder_klass.expect(:new, builder, [header, nil])
-
-        block = nil
-        ret = subject.header(builder_klass) { |b| block = b }
-
-        ret.must_equal builder
-        block.must_equal builder
-      end
-
       it "doesn't require a block" do
         builder = Object.new
 

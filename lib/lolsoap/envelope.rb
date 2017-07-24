@@ -24,18 +24,20 @@ module LolSoap
     # @example
     #   env.body do |b|
     #     b.some 'data'
+    #     b.id   42
     #   end
-    def body(klass = Builder)
-      builder = klass.new(body_content, input_body_content_type)
-      yield builder if block_given?
-      builder
+    #
+    # @example
+    #   env.body.content(some: 'data')
+    #   env.body.attributes(id: 42)
+    #
+    def body(klass = Builder, &block)
+      klass.new(body_content, input_body_content_type, &block)
     end
 
     # Build the header of the envelope
-    def header(klass = Builder)
-      builder = klass.new(header_content, input_header_content_type)
-      yield builder if block_given?
-      builder
+    def header(klass = Builder, &block)
+      klass.new(header_content, input_header_content_type, &block)
     end
 
     def endpoint
