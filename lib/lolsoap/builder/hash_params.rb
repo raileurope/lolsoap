@@ -43,8 +43,7 @@ class LolSoap::Builder < SimpleDelegator
           hash_to_args(h_or_ary)
         end
 
-      # Uncomment if / after Callbacks merge
-      # LolSoap::Callbacks.in('hash_params.before_build').expose(args, @node, @type)
+      LolSoap::Callbacks.in('hash_params.before_build').expose(args, @node, @type)
       args.each { |h| make_tag(h) }
     end
 
