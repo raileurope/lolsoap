@@ -1,4 +1,5 @@
 require 'lolsoap/wsdl'
+require 'lolsoap/callbacks'
 
 class LolSoap::Builder < SimpleDelegator
   # Used to build XML, with namespaces automatically added.
@@ -33,9 +34,11 @@ class LolSoap::Builder < SimpleDelegator
 
     # Parses the hash to build the nodes
     def content(hash)
-      hash.each do |key, val|
-        make_tag(parse_hash(key, val))
-      end
+      return nil if hash.empty?
+      args = hash.map { |key, val| parse_hash(key, val) }
+      # Uncomment if / after Callbacks merge
+      # LolSoap::Callbacks.in('hash_params.before_build').expose(args, @node, @type)
+      args.each { |h| make_tag(h) }
     end
 
     # Use when starting from an existing node
