@@ -31,7 +31,7 @@ class LolSoap::Callbacks
     end
   end
 
-  # Stores, removes and selects the callbacks hashes in the class ivar
+  # Stores, removes and selects the callbacks hashes in the class ivar.
   class << self
     def in(key)
       Selected.new(
@@ -56,7 +56,7 @@ class LolSoap::Callbacks
     enable
   end
 
-  # @param key [String] the unique self explanatory name of the hook
+  # @param key [String] the unique self explanatory name of the hook.
   def for(key)
     callbacks[key] ||= []
   end
