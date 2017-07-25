@@ -35,7 +35,7 @@ class LolSoap::Callbacks
   class << self
     def in(key)
       Selected.new(
-        @registered.flat_map { |c| c.procs[key] }
+        @registered.flat_map { |c| c.callbacks[key] }
       )
     end
 
@@ -48,16 +48,17 @@ class LolSoap::Callbacks
     end
   end
 
+  attr_reader :callbacks
+
   # Manages callbacks in insatances so we can manage sets of callbacks.
   def initialize
+    @callbacks = {}
     enable
-    @procs = {}
   end
 
-  attr_accessor :procs
   # @param key [String] the unique self explanatory name of the hook
   def for(key)
-    procs[key] ||= []
+    callbacks[key] ||= []
   end
 
   def enable
