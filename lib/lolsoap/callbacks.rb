@@ -1,4 +1,4 @@
-# Used to add user processing in definded hooks.
+# Used to add user processing in defined hooks.
 #
 # @example General
 #  bing_ads_callbacks = LolSoap::Callbacks.new
@@ -31,7 +31,7 @@ class LolSoap::Callbacks
     end
   end
 
-  # Stores, removes and selects the callbacks hashes in the class ivar.
+  # Stores, removes and selects the callback hashes in the class ivar.
   class << self
     def in(key)
       Selected.new(
