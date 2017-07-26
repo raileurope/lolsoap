@@ -50,7 +50,7 @@ class LolSoap::Callbacks
 
   attr_reader :callbacks
 
-  # Manages callbacks in insatances so we can manage sets of callbacks.
+  # Manages callbacks in instances so we can manage sets of callbacks.
   def initialize
     @callbacks = {}
     enable
