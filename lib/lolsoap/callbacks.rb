@@ -1,3 +1,4 @@
+require 'byebug'
 # Used to add user processing in defined hooks.
 #
 # @example General
@@ -18,8 +19,6 @@
 # google_ads_callbacks.enable
 #
 class LolSoap::Callbacks
-  @registered = []
-
   # Aggregates all callbacks on the selected key to call them.
   class Selected
     def initialize(callbacks = [])
@@ -33,18 +32,20 @@ class LolSoap::Callbacks
 
   # Stores, removes and selects the callback hashes in the class ivar.
   class << self
+    Thread.current[:registered] = []
+
     def in(key)
       Selected.new(
-        @registered.flat_map { |c| c.callbacks[key] }
+        Thread.current[:registered].flat_map { |c| c.callbacks[key] }
       )
     end
 
     def register(*klass)
-      @registered |= klass
+      Thread.current[:registered] |= klass
     end
 
     def unregister(klass)
-      @registered.delete(klass)
+      Thread.current[:registered].delete(klass)
     end
   end
 
