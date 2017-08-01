@@ -11,15 +11,10 @@ module LolSoap
 
     after do
       @lol_callbacks.disable
-      @lol_callbacks = nil
     end
 
     it 'can store one callback' do
-      @lol_callbacks.procs.size.must_equal 1
-    end
-
-    it 'can regiter the callback' do
-      Callbacks.instance_variable_get(:@registered).size.must_equal 1
+      @lol_callbacks.callbacks.size.must_equal 1
     end
 
     it 'can call a callback' do
@@ -36,18 +31,27 @@ module LolSoap
       Callbacks.in('a.b').expose('lol', ary)
       ary.must_equal ['Lol lol', 'lol more', 'lol again']
       temp.disable
-      temp = nil
     end
 
     it 'can be disabled' do
       @lol_callbacks.disable
-      Callbacks.instance_variable_get(:@registered).size.must_equal 0
+      temp = Callbacks.new
+      temp.for('a.b') << ->(name, mutable) { mutable << "any #{name} ?" }
+      ary = []
+      Callbacks.in('a.b').expose('lol', ary)
+      ary.must_equal ['any lol ?']
+      temp.disable
     end
 
     it 'can be enabled' do
       @lol_callbacks.disable
       @lol_callbacks.enable
-      Callbacks.instance_variable_get(:@registered).size.must_equal 1
+      temp = Callbacks.new
+      temp.for('a.b') << ->(name, mutable) { mutable << "any #{name} ?" }
+      ary = []
+      Callbacks.in('a.b').expose('lol', ary)
+      ary.must_equal ['Lol lol', 'any lol ?']
+      temp.disable
     end
   end
 end
