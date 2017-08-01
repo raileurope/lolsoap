@@ -26,7 +26,6 @@ module LolSoap
         element = type.element(child.name)
         output  = self.class.new(child, element.type).output
         val     = hash[child.name]
-
         if output
           if val
             if val.is_a?(Array)
@@ -41,6 +40,7 @@ module LolSoap
           hash[child.name] = element.singular? ? nil : []
         end
       end
+      LolSoap::Callbacks.in('hash_builder.after_children_hash').expose(hash, node, type)
       hash
     end
 
