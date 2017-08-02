@@ -29,7 +29,7 @@ class LolSoap::Callbacks
     end
   end
 
-  # Stores, removes and selects the callback hashes in the class ivar.
+  # Stores, removes and selects the callback hashes in current thread.
   class << self
     Thread.current[:registered] = []
 
