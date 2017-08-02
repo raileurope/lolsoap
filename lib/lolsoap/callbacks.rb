@@ -1,4 +1,3 @@
-require 'byebug'
 # Used to add user processing in defined hooks.
 #
 # @example General
