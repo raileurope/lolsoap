@@ -33,6 +33,18 @@ module LolSoap
       temp.disable
     end
 
+    it 'can route callbacks' do
+      temp = Callbacks.new
+      temp.for('c.d') << ->(name, mutable) { mutable << "#{name} c.D" }
+      ary = []
+      yra = []
+      Callbacks.in('c.d').expose('lol', yra)
+      Callbacks.in('a.b').expose('lol', ary)
+      ary.must_equal ['Lol lol']
+      yra.must_equal ['lol c.D']
+      temp.disable
+    end
+
     it 'can be disabled' do
       @lol_callbacks.disable
       temp = Callbacks.new
