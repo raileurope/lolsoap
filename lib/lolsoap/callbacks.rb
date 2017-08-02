@@ -35,7 +35,7 @@ class LolSoap::Callbacks
 
     def in(key)
       Selected.new(
-        Thread.current[:registered].flat_map { |c| c.callbacks[key] }
+        Thread.current[:registered].flat_map { |c| c.callbacks[key] }.compact
       )
     end
 
