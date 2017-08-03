@@ -56,14 +56,16 @@ class LolSoap::Builder < SimpleDelegator
     end
 
     # @private
-    def make_tag(name:, prefix: @type.element_prefix(name),
+    def make_tag(name:,
+                 prefix: @type.element_prefix(name),
+                 sub_type: @type.sub_type(name),
                  sub_hash: nil, args: [], block: nil)
       sub_node = @node.document.create_element(name, *args)
       sub_node.namespace = @node.namespace_scopes.find { |n| n.prefix == prefix }
 
       @node << sub_node
 
-      LolSoap::Builder.new(sub_node, @type.sub_type(name), &block).tap do |b|
+      LolSoap::Builder.new(sub_node, sub_type, &block).tap do |b|
         b.content(sub_hash) if sub_hash
       end
     end
