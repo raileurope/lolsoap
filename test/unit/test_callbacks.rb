@@ -23,6 +23,17 @@ module LolSoap
       ary.must_equal ['Lol lol']
     end
 
+    it 'can call a callback in a thread' do
+      ary = []
+      Thread.new do
+        Callbacks.new.tap do |lc|
+          lc.for('a.b') << ->(name, mutable) { mutable << "Lol #{name}" }
+        end
+        Callbacks.in('a.b').expose('lol', ary)
+      end.join
+      ary.must_equal ['Lol lol']
+    end
+
     it 'can call multiple callbacks' do
       temp = Callbacks.new
       temp.for('a.b') << ->(name, mutable) { mutable << "#{name} more" }
