@@ -29,10 +29,16 @@ class LolSoap::Callbacks
     end
   end
 
+  class << self
+    attr_accessor :store
+  end
+
+  @store = []
+
   # Selects the callback hashes in current thread.
   def self.in(key)
     Selected.new(
-      Thread.current[:registered_callbacks].flat_map do |c|
+      store.flat_map do |c|
         c.callbacks[key]
       end.compact
     )
@@ -43,7 +49,6 @@ class LolSoap::Callbacks
   # Manages callbacks in instances so we can manage sets of callbacks.
   def initialize
     @callbacks = {}
-    Thread.current[:registered_callbacks] ||= []
     enable
   end
 
@@ -53,10 +58,10 @@ class LolSoap::Callbacks
   end
 
   def enable
-    Thread.current[:registered_callbacks] |= [self]
+    self.class.store |= [self]
   end
 
   def disable
-    Thread.current[:registered_callbacks].delete(self)
+    self.class.store.delete(self)
   end
 end
