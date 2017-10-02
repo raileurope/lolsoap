@@ -1,7 +1,6 @@
 require 'helper'
 require 'lolsoap/envelope'
 require 'lolsoap/wsdl'
-require 'byebug'
 
 module LolSoap
   describe Envelope do
