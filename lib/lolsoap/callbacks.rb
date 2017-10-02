@@ -31,6 +31,8 @@ class LolSoap::Callbacks
 
   # Selects the callback hashes in current thread.
   def self.in(key)
+    Thread.current[:registered_callbacks] ||= []
+
     Selected.new(
       Thread.current[:registered_callbacks].flat_map do |c|
         c.callbacks[key]
