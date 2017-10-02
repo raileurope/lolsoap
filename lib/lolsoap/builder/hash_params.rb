@@ -1,5 +1,4 @@
 require 'lolsoap/wsdl'
-require 'lolsoap/callbacks'
 
 class LolSoap::Builder < SimpleDelegator
   # Used to build XML, with namespaces automatically added.
