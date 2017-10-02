@@ -1,6 +1,5 @@
 require 'helper'
 require 'lolsoap/callbacks.rb'
-require 'byebug'
 
 module LolSoap
   describe Callbacks do
