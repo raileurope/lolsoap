@@ -25,12 +25,22 @@ class LolSoap::Callbacks
     end
 
     def expose(*args)
-      @callbacks.each { |c| c.call(*args) }
+      @callbacks.each { |c|
+        c.call(*args)
+      }
     end
   end
 
   class << self
     attr_accessor :store
+
+    def register(callbacks)
+      self.store = callbacks
+    end
+
+    def flush_callbacks
+      self.store = []
+    end
   end
 
   @store = []
@@ -38,30 +48,9 @@ class LolSoap::Callbacks
   # Selects the callback hashes in current thread.
   def self.in(key)
     Selected.new(
-      store.flat_map do |c|
-        c.callbacks[key]
+      self.store.flat_map do |c|
+        c[key]
       end.compact
     )
-  end
-
-  attr_reader :callbacks
-
-  # Manages callbacks in instances so we can manage sets of callbacks.
-  def initialize
-    @callbacks = {}
-    enable
-  end
-
-  # @param key [String] the unique self explanatory name of the hook.
-  def for(key)
-    callbacks[key] ||= []
-  end
-
-  def enable
-    self.class.store |= [self]
-  end
-
-  def disable
-    self.class.store.delete(self)
   end
 end

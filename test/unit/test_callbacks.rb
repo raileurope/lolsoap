@@ -4,77 +4,78 @@ require 'lolsoap/callbacks.rb'
 module LolSoap
   describe Callbacks do
     before do
-      @lol_callbacks = Callbacks.new.tap do |lc|
-        lc.for('a.b') << ->(name, mutable) { mutable << "Lol #{name}" }
-      end
-    end
-
-    after do
-      @lol_callbacks.disable
+      Callbacks.register([
+        {"a.b" => ->(name, mutable) { mutable << "Before #{name}" }},
+      ])
     end
 
     it 'can store one callback' do
-      @lol_callbacks.callbacks.size.must_equal 1
+      Callbacks.store.size.must_equal 1
     end
 
     it 'can call a callback' do
       ary = []
       Callbacks.in('a.b').expose('lol', ary)
-      ary.must_equal ['Lol lol']
+      ary.must_equal ['Before lol']
+    end
+
+    it 'can call a callback normal' do
+      ary = []
+
+      Callbacks.register([
+        {"a.b" => ->(name, mutable) { mutable << "Normal #{name}" }},
+      ])
+
+      Callbacks.in('a.b').expose('newOne', ary)
+
+      ary.must_equal ['Normal newOne']
     end
 
     it 'can call a callback in a thread' do
       ary = []
+
       Thread.new do
-        Callbacks.new.tap do |lc|
-          lc.for('a.b') << ->(name, mutable) { mutable << "Lol #{name}" }
-        end
-        Callbacks.in('a.b').expose('lol', ary)
+        Callbacks.register([
+          {"a.b" => ->(name, mutable) { mutable << "Thread #{name}" }},
+        ])
+
+        Callbacks.in('a.b').expose('TnewOne', ary)
       end.join
-      ary.must_equal ['Lol lol']
+
+      ary.must_equal ['Thread TnewOne']
     end
 
-    it 'can call multiple callbacks' do
-      temp = Callbacks.new
-      temp.for('a.b') << ->(name, mutable) { mutable << "#{name} more" }
-      temp.for('a.b') << ->(name, mutable) { mutable << "#{name} again" }
-      ary = []
-      Callbacks.in('a.b').expose('lol', ary)
-      ary.must_equal ['Lol lol', 'lol more', 'lol again']
-      temp.disable
-    end
 
     it 'can route callbacks' do
-      temp = Callbacks.new
-      temp.for('c.d') << ->(name, mutable) { mutable << "#{name} c.D" }
       ary = []
       yra = []
-      Callbacks.in('c.d').expose('lol', yra)
-      Callbacks.in('a.b').expose('lol', ary)
-      ary.must_equal ['Lol lol']
-      yra.must_equal ['lol c.D']
-      temp.disable
+
+      Callbacks.register([
+        {"a.b" => ->(name, mutable) { mutable << "Route1 #{name}" }},
+        {"x.y" => ->(name, mutable) { mutable << "Route2 #{name}" }},
+      ])
+
+      Callbacks.in('a.b').expose('TnewOne', ary)
+      Callbacks.in('x.y').expose('TnewTwo', yra)
+
+      ary.must_equal ['Route1 TnewOne']
+      yra.must_equal ['Route2 TnewTwo']
     end
 
-    it 'can be disabled' do
-      @lol_callbacks.disable
-      temp = Callbacks.new
-      temp.for('a.b') << ->(name, mutable) { mutable << "any #{name} ?" }
+    it 'can be flush' do
       ary = []
-      Callbacks.in('a.b').expose('lol', ary)
-      ary.must_equal ['any lol ?']
-      temp.disable
-    end
 
-    it 'can be enabled' do
-      @lol_callbacks.disable
-      @lol_callbacks.enable
-      temp = Callbacks.new
-      temp.for('a.b') << ->(name, mutable) { mutable << "any #{name} ?" }
-      ary = []
-      Callbacks.in('a.b').expose('lol', ary)
-      ary.must_equal ['Lol lol', 'any lol ?']
-      temp.disable
+      Callbacks.register([
+        {"a.b" => ->(name, mutable) { mutable << "Normal #{name}" }},
+      ])
+
+      Callbacks.in('a.b').expose('newOne', ary)
+
+      Callbacks.store.size.must_equal 1
+      ary.must_equal ['Normal newOne']
+
+      Callbacks.flush_callbacks
+      Callbacks.store.size.must_equal 0
     end
   end
 end
