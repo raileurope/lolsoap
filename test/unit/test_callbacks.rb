@@ -3,24 +3,16 @@ require 'lolsoap/callbacks.rb'
 
 module LolSoap
   describe Callbacks do
-    before do
-      Callbacks.register(
-        {"a.b" => [->(name, mutable) { mutable << "Before #{name}" }]}
-      )
-    end
-
     after do
       Callbacks.flush_callbacks
     end
 
     it 'can store one callback' do
-      Callbacks.store.size.must_equal 1
-    end
+      Callbacks.register(
+        {"a.b" => [->(name, mutable) { mutable << "Before #{name}" }]}
+      )
 
-    it 'can call a callback' do
-      ary = []
-      Callbacks.in('a.b').expose('lol', ary)
-      ary.must_equal ['Before lol']
+      Callbacks.store.size.must_equal 1
     end
 
     it 'can call a callback normal' do
