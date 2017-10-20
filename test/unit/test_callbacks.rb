@@ -27,20 +27,6 @@ module LolSoap
       ary.must_equal ['Normal newOne']
     end
 
-    it 'can call a callback in a thread' do
-      ary = []
-
-      Thread.new do
-        Callbacks.register(
-          {"a.b" => [->(name, mutable) { mutable << "Thread #{name}" }]}
-        )
-
-        Callbacks.in('a.b').expose('TnewOne', ary)
-      end.join
-
-      ary.must_equal ['Thread TnewOne']
-    end
-
     it 'can call multiple callbacks' do
       ary = []
 
