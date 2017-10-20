@@ -19,15 +19,17 @@
 #
 class LolSoap::Callbacks
   # Aggregates all callbacks on the selected key to call them.
+  @store = {}
+
   class Selected
-    def initialize(callbacks = [])
-      @callbacks = callbacks
+    def initialize(callbacks)
+      @callbacks = callbacks || []
     end
 
     def expose(*args)
-      @callbacks.each { |c|
-        c.call(*args)
-      }
+      @callbacks.each do |callback|
+        callback.call(*args)
+      end
     end
   end
 
@@ -39,18 +41,11 @@ class LolSoap::Callbacks
     end
 
     def flush_callbacks
-      self.store = []
+      self.store = {}
     end
-  end
 
-  @store = []
-
-  # Selects the callback hashes in current thread.
-  def self.in(key)
-    Selected.new(
-      self.store.flat_map do |c|
-        c[key]
-      end.compact
-    )
+    def in(key)
+      Selected.new(self.store[key])
+    end
   end
 end
