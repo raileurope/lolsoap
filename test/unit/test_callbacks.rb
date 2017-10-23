@@ -15,7 +15,7 @@ module LolSoap
       Callbacks.store.size.must_equal 1
     end
 
-    it 'can call a callback normal' do
+    it 'can call a callback in the current thread' do
       ary = []
 
       Callbacks.register(
@@ -60,7 +60,7 @@ module LolSoap
       yra.must_equal ['Route2 TnewTwo']
     end
 
-    it 'can be flush' do
+    it 'can be flushed' do
       ary = []
 
       Callbacks.register(
