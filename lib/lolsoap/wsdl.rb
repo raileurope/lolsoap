@@ -135,7 +135,7 @@ module LolSoap
       Element.new(
         self,
         params[:name],
-        prefix(params[:namespace]),
+        params[:namespace] && prefix(params[:namespace]),
         type_reference(params[:type]),
         params[:singular]
       )

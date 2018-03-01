@@ -68,7 +68,21 @@ module LolSoap
       sub_node = @node.document.create_element(name.to_s, *args)
       sub_node.namespace = @node.namespace_scopes.find { |n| n.prefix == prefix }
 
-      @node << sub_node
+      # Nokogiri doesn't currently allow to add a child element without a
+      # namespace to a parent with a namespace: the child inherits the parent's
+      # namespace.  It's a known issue:
+      # https://github.com/sparklemotion/nokogiri/issues/1469 Until it's fixed,
+      # we'll use this workaround: store the parent's namespace, set it to nil
+      # temporarily, add the child and re-add the original namespace to the
+      # parent.
+      if sub_node.namespace.nil?
+        parent_namespace = @node.namespace
+        @node.namespace = nil
+        @node << sub_node
+        @node.namespace = parent_namespace
+      else
+        @node << sub_node
+      end
 
       builder = __class__.new(sub_node, sub_type)
       yield builder if block_given?

@@ -120,6 +120,10 @@ Development sponsored by [Loco2](http://loco2.com/).
 
 ## Changelog ##
 
+### 0.9 ###
+
+* Support unqualified form for elements in a schema
+
 ### 0.8 ###
 
 * Use namespaces when looking up definitions
