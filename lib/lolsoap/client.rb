@@ -1,3 +1,5 @@
+require 'delegate'
+
 require 'lolsoap/wsdl'
 require 'lolsoap/request'
 require 'lolsoap/envelope'
