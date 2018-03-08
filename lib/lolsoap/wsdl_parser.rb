@@ -6,25 +6,55 @@ module LolSoap
   class WSDLParser
     class ParseError < StandardError; end
 
-    class Node
-      attr_reader :parser, :node, :target_namespace, :name, :namespace
+    class Schema < Struct.new(:target_namespace, :element_form_default)
+      UNQUALIFIED = 'unqualified'
 
-      def initialize(parser, node, target_namespace)
-        @parser           = parser
-        @node             = node
-        @target_namespace = target_namespace
-        @namespace, @name = parser.namespace_and_name(node, node.attr('name').to_s, target_namespace)
+      def self.from_node(node)
+        new(
+          node.attr('targetNamespace').to_s,
+          node.attr('elementFormDefault')
+        )
+      end
+
+      def default_form
+        element_form_default || UNQUALIFIED
+      end
+    end
+
+    class Node
+      attr_reader :parser, :node, :schema, :name, :namespace
+
+      def initialize(parser, schema, node)
+        @parser = parser
+        @node   = node
+        @schema = schema
       end
 
       def id
         [namespace, name]
       end
+
+      def target_namespace
+        schema.target_namespace
+      end
     end
 
     class Element < Node
+      QUALIFIED = 'qualified'
+
+      attr_reader :form
+
+      def initialize(*params)
+        super(*params)
+
+        @form = node.attr('form') || schema.default_form
+
+        @namespace, @name = parser.namespace_and_name(node, node.attr('name').to_s, default_namespace)
+      end
+
       def type
         if complex_type = node.at_xpath('xs:complexType', parser.ns)
-          type = Type.new(parser, complex_type, target_namespace)
+          type = Type.new(parser, schema, complex_type)
           {
             :elements   => type.elements,
             :namespace  => type.namespace,
@@ -37,6 +67,14 @@ module LolSoap
 
       def singular
         max_occurs.empty? || max_occurs == '1'
+      end
+
+      def qualified?
+        form == QUALIFIED
+      end
+
+      def default_namespace
+        target_namespace
       end
 
       private
@@ -72,6 +110,12 @@ module LolSoap
     end
 
     class Type < Node
+      def initialize(*params)
+        super(*params)
+
+        @namespace, @name = parser.namespace_and_name(node, node.attr('name').to_s, target_namespace)
+      end
+
       def elements
         parent_elements.merge(own_elements)
       end
@@ -108,7 +152,8 @@ module LolSoap
 
       def element_nodes
         node.xpath('*/xs:element | */*/xs:element | xs:complexContent/xs:extension/*/xs:element | xs:complexContent/xs:extension/*/*/xs:element', parser.ns).map { |el|
-          element = Element.new(parser, el, target_namespace)
+          element = TypeElement.new(parser, schema, el)
+
           if reference = el.attribute('ref')
             ReferencedElement.new(element, parser.element(*parser.namespace_and_name(el, reference.to_s)))
           else
@@ -137,6 +182,12 @@ module LolSoap
 
       def parent_attributes
         base_type ? base_type.attributes : []
+      end
+    end
+
+    class TypeElement < Element
+      def default_namespace
+        target_namespace if qualified?
       end
     end
 
@@ -254,8 +305,8 @@ module LolSoap
     def types
       @types ||= begin
         types = {}
-        each_node('xs:complexType[not(@abstract="true")]') do |node, target_ns|
-          type = Type.new(self, node, target_ns)
+        each_node('xs:complexType[not(@abstract="true")]') do |node, schema|
+          type = Type.new(self, schema, node)
           types[type.id] = {
             :name       => type.name,
             :namespace  => type.namespace,
@@ -274,8 +325,8 @@ module LolSoap
     def elements
       @elements ||= begin
         elements = {}
-        each_node('xs:element') do |node, target_ns|
-          element = Element.new(self, node, target_ns)
+        each_node('xs:element') do |node, schema|
+          element = Element.new(self, schema, node)
           elements[element.id] = {
             :name      => element.name,
             :namespace => element.namespace,
@@ -378,11 +429,10 @@ module LolSoap
     end
 
     def each_node(xpath)
-      schemas.each do |schema|
-        target_namespace = schema.attr('targetNamespace').to_s
-
-        schema.xpath(xpath, ns).each do |node|
-          yield node, target_namespace
+      schemas.each do |schema_node|
+        schema = Schema.from_node(schema_node)
+        schema_node.xpath(xpath, ns).each do |node|
+          yield node, schema
         end
       end
     end
@@ -392,8 +442,8 @@ module LolSoap
       target = schemas if target.size == 0
 
       if node = target.at_xpath("xs:#{selector}[@name='#{name.split(':').last}']", ns)
-        target_namespace = node.at_xpath('parent::xs:schema/@targetNamespace', ns).to_s
-        node_class.new(self, node, target_namespace)
+        schema = Schema.from_node(node.at_xpath('parent::xs:schema', ns))
+        node_class.new(self, schema, node)
       end
     end
   end

@@ -96,7 +96,7 @@ module LolSoap
             :elements  => {
               'name' => {
                 :name      => 'name',
-                :namespace => namespace2,
+                :namespace => nil,
                 :type      => [xs, "string"],
                 :singular  => true
               }

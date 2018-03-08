@@ -28,7 +28,7 @@ module LolSoap
       el.wont_equal nil
       el.text.to_s.must_equal 'LOCO2'
 
-      el = doc.at_xpath('//ns0:tradePriceRequest/ns0:specialTickerSymbol/ns1:name', doc.namespaces)
+      el = doc.at_xpath('//ns0:tradePriceRequest/ns0:specialTickerSymbol/name', doc.namespaces)
       el.wont_equal nil
       el.text.to_s.must_equal 'LOCOLOCOLOCO'
 
