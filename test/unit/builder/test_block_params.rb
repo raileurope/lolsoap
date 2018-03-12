@@ -43,6 +43,8 @@ module LolSoap
 
       doc.expect(:create_element, sub_node, args)
       sub_node.expect(:namespace=, nil, [namespace])
+      sub_node.expect(:namespace, namespace)
+
       node.children.expect(:<<, nil, [sub_node])
 
       yield sub_node

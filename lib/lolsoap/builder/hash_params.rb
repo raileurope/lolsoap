@@ -62,7 +62,15 @@ class LolSoap::Builder < SimpleDelegator
       sub_node = @node.document.create_element(name, *args)
       sub_node.namespace = @node.namespace_scopes.find { |n| n.prefix == prefix }
 
-      @node << sub_node
+      # See LolSoap::Builder::BlockParams#__prefixed_tag__
+      if sub_node.namespace.nil?
+        parent_namespace = @node.namespace
+        @node.namespace = nil
+        @node << sub_node
+        @node.namespace = parent_namespace
+      else
+        @node << sub_node
+      end
 
       LolSoap::Builder.new(sub_node, sub_type, &block).tap do |b|
         b.content(sub_hash) if sub_hash

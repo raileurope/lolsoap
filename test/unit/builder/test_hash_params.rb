@@ -38,11 +38,12 @@ module LolSoap
 
     subject { Builder::HashParams.new(node, type) }
 
-    def expect_node_added(namespace, args)
+    def expect_node_added(namespace_to_add, args)
       sub_node = MiniTest::Mock.new
+      def sub_node.namespace; "namespace"; end
 
       doc.expect(:create_element, sub_node, args)
-      sub_node.expect(:namespace=, nil, [namespace])
+      sub_node.expect(:namespace=, nil, [namespace_to_add])
       node.children.expect(:<<, nil, [sub_node])
 
       yield sub_node
