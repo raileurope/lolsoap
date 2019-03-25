@@ -28,6 +28,11 @@ module LolSoap
         o.input.body.content.name.must_equal 'historicalPriceRequest'
       end
 
+      subject.abstract_types.length.must_equal 1
+      subject.abstract_types.fetch('BaseRequest').tap do |t|
+        t.prefix.must_equal 'ns0'
+      end
+
       subject.types.length.must_equal 4
       subject.types.fetch('TradePriceRequest').tap do |t|
         t.prefix.must_equal 'ns0'

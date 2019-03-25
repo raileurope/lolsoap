@@ -107,6 +107,26 @@ module LolSoap
       end
     end
 
+    describe "#abstract_types" do
+      it 'returns the abstract types, with attributes and namespace' do
+        subject.abstract_types.must_equal({
+          [namespace, "BaseRequest"] => {
+            :name => "BaseRequest",
+            :namespace => "http://example.com/stockquote.xsd",
+            :elements => {
+              "accountId" => {
+                :name => "accountId",
+                :namespace => "http://example.com/stockquote.xsd",
+                :type => [xs, "string"],
+                :singular=>true
+              }
+            },
+            :attributes=>["signature"]
+          },
+        })
+      end
+    end
+
     describe '#elements' do
       it 'returns the elements with inline types' do
         subject.elements.must_equal({

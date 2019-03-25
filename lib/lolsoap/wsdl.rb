@@ -13,8 +13,8 @@ module LolSoap
     require 'lolsoap/wsdl/operation_io_part'
 
     # Create a new instance by parsing a raw string of XML
-    def self.parse(raw)
-      new(WSDLParser.parse(raw))
+    def self.parse(raw, options={})
+      new(WSDLParser.parse(raw), options)
     end
 
     # The SOAP endpoint URL
@@ -29,13 +29,15 @@ module LolSoap
     # The version of SOAP detected.
     attr_reader :soap_version
 
-    def initialize(parser)
-      @prefixes     = generate_prefixes(parser)
-      @namespaces   = prefixes.invert
-      @types        = load_types(parser)
-      @operations   = load_operations(parser)
-      @endpoint     = parser.endpoint
+    def initialize(parser, options={})
+      @prefixes = generate_prefixes(parser)
+      @namespaces = prefixes.invert
+      @abstract_types = load_types(parser.abstract_types)
+      @types = load_types(parser.types)
+      @operations = load_operations(parser)
+      @endpoint = parser.endpoint
       @soap_version = parser.soap_version
+      @allow_abstract_types = options[:allow_abstract_types]
     end
 
     # Hash of types declared by the service
@@ -43,9 +45,23 @@ module LolSoap
       Hash[@types.values.map { |t| [t.name, t] }]
     end
 
+    # Hash of abstract types declared by the service
+    def abstract_types
+      Hash[@abstract_types.values.map { |t| [t.name, t] }]
+    end
+
     # Get a single type, or a NullType if the type doesn't exist
     def type(namespace, name)
-      @types.fetch([namespace, name]) { NullType.new }
+      if @allow_abstract_types
+        @types.fetch([namespace, name]) { abstract_type(namespace, name) }
+      else
+        @types.fetch([namespace, name]) { NullType.new }
+      end
+    end
+
+    # Get a single abstract type, or a NullType if the type doesn't exist
+    def abstract_type(namespace, name)
+      @abstract_types.fetch([namespace, name]) { NullType.new }
     end
 
     # Hash of operations that are supported by the SOAP service
@@ -73,9 +89,9 @@ module LolSoap
     private
 
     # @private
-    def load_types(parser)
+    def load_types(types)
       Hash[
-        parser.types.map do |id, type|
+        types.map do |id, type|
           [id, build_type(type)]
         end
       ]
