@@ -59,8 +59,16 @@ module LolSoap
               :attributes => ['id'],
               :namespace  => namespace
             }
-         },
-         :elements => {
+          },
+          :abstract_types => {
+            [namespace, 'BaseBrush'] => {
+              :name => 'BaseBrush',
+              :elements => {},
+              :attributes => ['id'],
+              :namespace  => namespace
+            },
+          },
+          :elements => {
             [namespace, 'brush'] => {
               :name      => 'brush',
               :namespace => namespace,
@@ -172,6 +180,16 @@ module LolSoap
         end
       end
 
+      describe '#abstract_types' do
+        it 'returns a hash of abstract types' do
+          subject.abstract_types.length.must_equal 1
+
+          subject.abstract_types['BaseBrush'].tap do |t|
+            t.attributes.must_equal ['id']
+          end
+        end
+      end
+
       describe '#type' do
         it 'returns a single type' do
           subject.type(namespace, 'Brush').must_equal subject.types.fetch('Brush')
@@ -179,6 +197,28 @@ module LolSoap
 
         it 'returns a null object if a type is missing' do
           subject.type(namespace, 'FooBar').must_equal WSDL::NullType.new
+        end
+
+        it 'returns a null object for abstract types' do
+          subject.type(namespace, 'BaseBrush').must_equal WSDL::NullType.new
+        end
+
+        describe 'when abstract types are allowed' do
+          subject { WSDL.new(parser, :allow_abstract_types => true) }
+
+          it 'returns an abstract type' do
+            subject.type(namespace, 'BaseBrush').must_equal subject.abstract_types.fetch('BaseBrush')
+          end
+        end
+      end
+
+      describe '#abstract_type' do
+        it 'returns a single type' do
+          subject.abstract_type(namespace, 'BaseBrush').must_equal subject.abstract_types.fetch('BaseBrush')
+        end
+
+        it 'returns a null object if a type is missing' do
+          subject.abstract_type(namespace, 'FooBar').must_equal WSDL::NullType.new
         end
       end
     end

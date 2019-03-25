@@ -307,12 +307,18 @@ module LolSoap
         types = {}
         each_node('xs:complexType[not(@abstract="true")]') do |node, schema|
           type = Type.new(self, schema, node)
-          types[type.id] = {
-            :name       => type.name,
-            :namespace  => type.namespace,
-            :elements   => type.elements,
-            :attributes => type.attributes
-          }
+          types[type.id] = type_record(type)
+        end
+        types
+      end
+    end
+
+    def abstract_types
+      @abstract_types ||= begin
+        types = {}
+        each_node('xs:complexType[@abstract="true"]') do |node, schema|
+          type = Type.new(self, schema, node)
+          types[type.id] = type_record(type)
         end
         types
       end
@@ -445,6 +451,16 @@ module LolSoap
         schema = Schema.from_node(node.at_xpath('parent::xs:schema', ns))
         node_class.new(self, schema, node)
       end
+    end
+
+    private
+    def type_record(type)
+      {
+        :name       => type.name,
+        :namespace  => type.namespace,
+        :elements   => type.elements,
+        :attributes => type.attributes
+      }
     end
   end
 end
