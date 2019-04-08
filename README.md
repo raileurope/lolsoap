@@ -120,6 +120,10 @@ Development sponsored by [Loco2](http://loco2.com/).
 
 ## Changelog ##
 
+### 0.10 ###
+
+* Added support for using WSDL with abstract types in operation definitions
+
 ### 0.9 ###
 
 * Support unqualified form for elements in a schema
