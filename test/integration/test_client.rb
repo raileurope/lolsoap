@@ -14,6 +14,7 @@ module LolSoap
     it 'builds a response' do
       request = subject.request('GetLastTradePrice')
       response = subject.response(request, File.read(TEST_ROOT + '/fixtures/stock_quote_response.xml'))
+      # well, it's not nil, but is it what we want?
       response.body.wont_equal nil
     end
   end
