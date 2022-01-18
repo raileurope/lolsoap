@@ -48,7 +48,7 @@ module LolSoap
 
     def ox_body
       # doc.nodes.first.locate('/soap:Envelope/soap:Body')
-      doc.locate('soap:Envelope/soap:Body').first.nodes.first
+      doc.locate('soap:Envelope/soap:Body').first&.nodes&.first
     end
 
     # The XML node for the body of the envelope
