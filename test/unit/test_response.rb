@@ -19,7 +19,7 @@ module LolSoap
     let(:nokogiri_doc) { Nokogiri::XML(raw_file) }
     let(:doc) {
       if use_ox
-        Ox.load(raw_file, { mode: :generic, effort: :strict })
+        Ox.load(raw_file, { mode: :generic, effort: :strict, strip_namespace: true })
       else
         nokogiri_doc
       end
@@ -42,7 +42,6 @@ module LolSoap
         # require 'pry'; binding.pry
         # Not sure this is a really sensible test anymore. How do get rid of xpath dependency?
         if use_ox
-          # require 'pry'; binding.pry
           subject.body.must_equal nokogiri_doc.at_xpath('/soap:Envelope/soap:Body/m:GetStockPriceResponse')
         else
           subject.body.must_equal doc.at_xpath('/soap:Envelope/soap:Body/m:GetStockPriceResponse')
@@ -80,7 +79,7 @@ module LolSoap
     it 'should return the soap fault' do
       response = Response.new(
         request,
-        use_ox ? Ox.load(fault_file, { mode: :generic, effort: :strict }) : Nokogiri::XML(fault_file),
+        use_ox ? Ox.load(fault_file, { mode: :generic, effort: :strict, strip_namespace: true }) : Nokogiri::XML(fault_file),
         fault_file,
         use_ox: use_ox
       )

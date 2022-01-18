@@ -28,7 +28,7 @@ module LolSoap
     def self.ox_parse(request, raw)
       new(
         request,
-        Ox.load(raw, { mode: :generic, effort: :strict }),
+        Ox.load(raw, { mode: :generic, effort: :strict, strip_namespace: true }),
         raw,
         use_ox: true
       )
@@ -37,7 +37,7 @@ module LolSoap
     def initialize(request, doc, raw = nil, use_ox: false)
       @request = request
       @doc     = doc
-      @raw = raw # Only needed in Ox mode
+      @raw = raw # Only needed in Ox mode - and then only if a hash is wanted
       @use_ox = use_ox
     end
 
@@ -48,9 +48,9 @@ module LolSoap
 
     def ox_body
       # doc.nodes.first.locate('/soap:Envelope/soap:Body')
-      body_node = doc.locate('soap:Body')
-      body_node = doc.locate('s:Body') if body_node.empty?
-      body_node.first&.nodes&.first
+      target_node = doc.locate('Envelope/Body')
+      target_node = doc.locate('Body') if target_node.empty?
+      target_node.first&.nodes&.first
     end
 
     # The XML node for the body of the envelope
@@ -76,7 +76,7 @@ module LolSoap
     end
 
     def ox_header
-      doc.locate('soap:Envelope/soap:Header').first&.nodes&.first
+      doc.locate('Envelope/Header').first&.nodes&.first
     end
 
     # SOAP fault, if any
@@ -90,7 +90,7 @@ module LolSoap
     end
 
     def ox_fault
-      node = doc.locate('soap:Envelope/soap:Body/soap:Fault').first
+      node = doc.locate('Envelope/Body/Fault').first
       FaultOx.new(request, node) if node
     end
   end
