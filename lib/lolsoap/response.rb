@@ -6,8 +6,7 @@ require 'ox'
 
 module LolSoap
   class Response
-    USE_OX = true # "dual booting"
-    attr_reader :request, :doc, :raw
+    attr_reader :request, :doc, :raw, :use_ox
 
     def self.old_parse(request, raw)
       new(
@@ -16,27 +15,30 @@ module LolSoap
           raw, nil, nil,
           Nokogiri::XML::ParseOptions::DEFAULT_XML &
             Nokogiri::XML::ParseOptions::STRICT
-        )
+        ),
+        use_ox: false
       )
     end
 
     # Create a new instance from a raw XML string
-    def self.parse(request, raw)
-      USE_OX ? ox_parse(request, raw) : old_parse(request, raw)
+    def self.parse(request, raw, use_ox: false)
+      use_ox ? ox_parse(request, raw) : old_parse(request, raw)
     end
 
     def self.ox_parse(request, raw)
       new(
         request,
         Ox.load(raw, { mode: :generic, effort: :strict }),
-        raw
+        raw,
+        use_ox: true
       )
     end
 
-    def initialize(request, doc, raw = nil)
+    def initialize(request, doc, raw = nil, use_ox: false)
       @request = request
       @doc     = doc
       @raw = raw # Only needed in Ox mode
+      @use_ox = use_ox
     end
 
     # Namespace used for SOAP Envelope tags
@@ -53,12 +55,12 @@ module LolSoap
     def body
       # require 'pry'; binding.pry
       # puts doc.at_xpath('/soap:Envelope/soap:Body/*', 'soap' => soap_namespace)
-      @body ||= USE_OX ? ox_body : doc.at_xpath('/soap:Envelope/soap:Body/*', 'soap' => soap_namespace)
+      @body ||= use_ox ? ox_body : doc.at_xpath('/soap:Envelope/soap:Body/*', 'soap' => soap_namespace)
     end
 
     # Convert the body node to a Hash, using WSDL type data to determine the structure
     def body_hash(builder = HashBuilder)
-      USE_OX ? ox_body_hash : builder.new(body, request.output_type).output
+      use_ox ? ox_body_hash : builder.new(body, request.output_type).output
     end
 
     def ox_body_hash
@@ -68,7 +70,7 @@ module LolSoap
 
     # The XML node for the header of the envelope
     def header
-      USE_OX ? ox_header : doc.at_xpath('/soap:Envelope/soap:Header', 'soap' => soap_namespace)
+      use_ox ? ox_header : doc.at_xpath('/soap:Envelope/soap:Header', 'soap' => soap_namespace)
     end
 
     def ox_header
@@ -78,7 +80,7 @@ module LolSoap
     # SOAP fault, if any
     def fault
       @fault ||= begin
-        return ox_fault if USE_OX
+        return ox_fault if use_ox
 
         node = doc.at_xpath('/soap:Envelope/soap:Body/soap:Fault', 'soap' => soap_namespace)
         Fault.new(request, node) if node

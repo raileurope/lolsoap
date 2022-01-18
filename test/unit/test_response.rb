@@ -14,24 +14,25 @@ module LolSoap
 
     let(:raw_file) { File.read(TEST_ROOT + '/fixtures/stock_quote_response.xml') }
     let(:fault_file) { File.read(TEST_ROOT + '/fixtures/stock_quote_fault.xml') }
+    let(:use_ox) { true }
 
     let(:nokogiri_doc) { Nokogiri::XML(raw_file) }
     let(:doc) {
-      if LolSoap::Response::USE_OX
+      if use_ox
         Ox.load(raw_file, { mode: :generic, effort: :strict })
       else
         nokogiri_doc
       end
     }
 
-    subject { Response.new(request, doc, raw_file) }
+    subject { Response.new(request, doc, raw_file, use_ox: use_ox) }
 
     describe '.parse' do
       it 'raises an error if there is invalid XML' do
-        if LolSoap::Response::USE_OX
-          lambda { Response.parse(request, '<a') }.must_raise Ox::ParseError
+        if use_ox
+          lambda { Response.parse(request, '<a', use_ox: true) }.must_raise Ox::ParseError
         else
-          lambda { Response.parse(request, '<a') }.must_raise Nokogiri::XML::SyntaxError
+          lambda { Response.parse(request, '<a', use_ox: false) }.must_raise Nokogiri::XML::SyntaxError
         end
       end
     end
@@ -40,7 +41,7 @@ module LolSoap
       it 'returns the first node under the envelope body' do
         # require 'pry'; binding.pry
         # Not sure this is a really sensible test anymore. How do get rid of xpath dependency?
-        if LolSoap::Response::USE_OX
+        if use_ox
           # require 'pry'; binding.pry
           subject.body.must_equal nokogiri_doc.at_xpath('/soap:Envelope/soap:Body/m:GetStockPriceResponse')
         else
@@ -54,7 +55,7 @@ module LolSoap
         builder = OpenStruct.new(:output => Object.new)
         builder_klass = MiniTest::Mock.new
         # Finding it hard to make this a "unit" test rather than calling ox_body_hash and hence HashBuilderOx
-        if LolSoap::Response::USE_OX
+        if use_ox
           builder_klass.expect(:new, builder, [subject.body, request.output_type])
         else
           builder_klass.expect(:new, builder, [subject.body, request.output_type])
@@ -68,7 +69,7 @@ module LolSoap
       it 'returns the header element' do
         # rubbish test, as they are both nil!!
         # Not sure this is a really sensible test anymore. How do get rid of xpath dependency?
-        if LolSoap::Response::USE_OX
+        if use_ox
           subject.header.must_equal nokogiri_doc.at_xpath('/soap:Envelope/soap:Header')
         else
           subject.header.must_equal doc.at_xpath('/soap:Envelope/soap:Header')
@@ -79,8 +80,9 @@ module LolSoap
     it 'should return the soap fault' do
       response = Response.new(
         request,
-        LolSoap::Response::USE_OX ? Ox.load(fault_file, { mode: :generic, effort: :strict }) : Nokogiri::XML(fault_file),
-        fault_file
+        use_ox ? Ox.load(fault_file, { mode: :generic, effort: :strict }) : Nokogiri::XML(fault_file),
+        fault_file,
+        use_ox: use_ox
       )
       response.fault.wont_equal nil
     end
