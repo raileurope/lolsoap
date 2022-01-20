@@ -24,7 +24,7 @@ module LolSoap
       end
     end
 
-    describe 'SOAP 1.1' do
+    describe 'SOAP 1.2' do
       let(:request) { OpenStruct.new(:soap_version => '1.2', :soap_namespace => Envelope::SOAP_1_2) }
       let(:node) do
         doc = Nokogiri::XML(File.read(TEST_ROOT + '/fixtures/stock_quote_fault.xml'))
@@ -36,7 +36,7 @@ module LolSoap
       instance_eval(&examples)
     end
 
-    describe 'SOAP 1.2' do
+    describe 'SOAP 1.1' do
       let(:request) { OpenStruct.new(:soap_version => '1.1', :soap_namespace => Envelope::SOAP_1_1) }
       let(:node) do
         doc = Nokogiri::XML(File.read(TEST_ROOT + '/fixtures/stock_quote_fault_soap_1_1.xml'))
