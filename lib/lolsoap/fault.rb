@@ -35,5 +35,9 @@ module LolSoap
         'soap' => soap_namespace
       ).to_xml
     end
+
+    def at(selector)
+      node.at(selector)
+    end
   end
 end

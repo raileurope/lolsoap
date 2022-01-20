@@ -10,6 +10,9 @@
     </soap:Reason>
     <soap:Detail>
       <Foo>Some detail</Foo>
+      <SecretInfo>
+        <WellHidden>Secret hidden info</WellHidden>
+      </SecretInfo>
     </soap:Detail>
   </soap:Fault>
 </soap:Body>

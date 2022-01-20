@@ -1,9 +1,9 @@
 require 'helper'
 require 'lolsoap/envelope'
-require 'lolsoap/fault'
+require 'lolsoap/fault_ox'
 
 module LolSoap
-  describe Fault do
+  describe FaultOx do
     examples = proc do
       describe '#code' do
         it 'returns the code' do
@@ -19,7 +19,7 @@ module LolSoap
 
       describe '#detail' do
         it 'returns the detail' do
-          subject.detail.must_equal '<Foo>Some detail</Foo>'
+          subject.detail.strip.must_equal '<Foo>Some detail</Foo>'
         end
       end
 
@@ -31,25 +31,25 @@ module LolSoap
     end
 
     describe 'SOAP 1.2' do
-      let(:request) { OpenStruct.new(:soap_version => '1.2', :soap_namespace => Envelope::SOAP_1_2) }
+      let(:request) { OpenStruct.new(soap_version: '1.2', soap_namespace: Envelope::SOAP_1_2) }
       let(:node) do
-        doc = Nokogiri::XML(File.read(TEST_ROOT + '/fixtures/stock_quote_fault.xml'))
-        doc.at_xpath('//soap:Fault', 'soap' => Envelope::SOAP_1_2)
+        doc = Ox.load(File.read("#{TEST_ROOT}/fixtures/stock_quote_fault.xml"))
+        doc.locate('soap:Envelope/soap:Body/soap:Fault').first
       end
 
-      subject { Fault.new(request, node) }
+      subject { FaultOx.new(request, node) }
 
       instance_eval(&examples)
     end
 
     describe 'SOAP 1.1' do
-      let(:request) { OpenStruct.new(:soap_version => '1.1', :soap_namespace => Envelope::SOAP_1_1) }
+      let(:request) { OpenStruct.new(soap_version: '1.1', soap_namespace: Envelope::SOAP_1_1) }
       let(:node) do
-        doc = Nokogiri::XML(File.read(TEST_ROOT + '/fixtures/stock_quote_fault_soap_1_1.xml'))
-        doc.at_xpath('//soap:Fault', 'soap' => Envelope::SOAP_1_1)
+        doc = Ox.load(File.read("#{TEST_ROOT}/fixtures/stock_quote_fault_soap_1_1.xml"))
+        doc.locate('soap:Envelope/soap:Body/soap:Fault').first
       end
 
-      subject { Fault.new(request, node) }
+      subject { FaultOx.new(request, node) }
 
       instance_eval(&examples)
     end

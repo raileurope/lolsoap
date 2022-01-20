@@ -4,7 +4,12 @@
     <soap:Fault>
       <faultcode>soap:Sender</faultcode>
       <faultstring>Omg! stock market has crashed!</faultstring>
-      <detail><Foo>Some detail</Foo></detail>
+      <detail>
+        <Foo>Some detail</Foo>
+        <SecretInfo>
+          <WellHidden>Secret hidden info</WellHidden>
+        </SecretInfo>
+      </detail>
     </soap:Fault>
   </soap:Body>
 </soap:Envelope>
