@@ -71,6 +71,22 @@ p response.body
 p response.body_hash
 ```
 
+## Using the Ox parser ##
+
+Version 0.12.0 added support for using [Ox](https://github.com/ohler55/ox)
+rather than Nokogiri as the underlying XML parser. Ox is more performant
+than Nokogiri, but has fewer features (for example, no xpath support).
+
+The usage is simple:
+
+``` ruby
+client = LolSoap::Client.new(File.read('lolapi.wsdl'), use_ox: true)
+```
+
+Be aware that this means the underlying `body`` will be Ox::Element,
+so if you had code that assumed it was a Nokogiri::XML::Document, it may
+not work without modifications.
+
 ## Bugs/Features ##
 
 * Assumes that you are able to supply a WSDL document for the service.
@@ -119,6 +135,10 @@ request.header.__node__ << wsse.to_xml
 Development sponsored by [Loco2](http://loco2.com/).
 
 ## Changelog ##
+
+### 0.12 ###
+
+* Added the option to use Ox rather than Nokogiri as the underlying XML parser
 
 ### 0.11 ###
 
