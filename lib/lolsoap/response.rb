@@ -90,7 +90,7 @@ module LolSoap
     end
 
     def ox_fault
-      node = doc.locate('Envelope/Body/Fault').first
+      node = doc.locate('Envelope/Body/Fault').first || doc.locate('Body/Fault').first
       FaultOx.new(request, node) if node
     end
   end
