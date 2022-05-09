@@ -17,17 +17,20 @@ module LolSoap
 
     def code
       path = soap_version == '1.2' ? 'soap:Code/soap:Value' : 'faultcode'
-      node.locate(path).first.nodes.first
+      query_result = node.locate(path).empty? ? node.locate('Code/Value') : node.locate(path)
+      query_result.first.nodes.first
     end
 
     def reason
       path = soap_version == '1.2' ? 'soap:Reason/soap:Text' : 'faultstring'
-      node.locate(path).first.nodes.first
+      query_result = node.locate(path).empty? ? node.locate('Reason/Text') : node.locate(path)
+      query_result.first.nodes.first
     end
 
     def detail
       path = soap_version == '1.2' ? 'soap:Detail' : 'detail'
-      Ox.dump(node.locate(path).first.nodes.first)
+      query_result = node.locate(path).empty? ? node.locate('Detail') : node.locate(path)
+      Ox.dump(query_result.first.nodes.first)
     end
 
     # Defined to work similarly to Nokogiri's `at` method

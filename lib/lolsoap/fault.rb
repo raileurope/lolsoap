@@ -16,24 +16,27 @@ module LolSoap
     end
 
     def code
-      node.at_xpath(
-        soap_version == '1.2' ? './soap:Code/soap:Value' : './faultcode',
-        'soap' => soap_namespace
-      ).text.to_s
+      selector = soap_version == '1.2' ? './soap:Code/soap:Value' : './faultcode'
+      query_result = node.at_xpath(selector, 'soap' => soap_namespace) ||
+                     node.at_xpath('./Code/Value', 'soap' => soap_namespace)
+      element = query_result.element? ? query_result : query_result.element
+      element.text.to_s
     end
 
     def reason
-      node.at_xpath(
-        soap_version == '1.2' ? './soap:Reason/soap:Text' : './faultstring',
-        'soap' => soap_namespace
-      ).text.to_s
+      selector = soap_version == '1.2' ? './soap:Reason/soap:Text' : './faultstring'
+      query_result = node.at_xpath(selector, 'soap' => soap_namespace) ||
+                     node.at_xpath('./Reason/Text', 'soap' => soap_namespace)
+      element = query_result.element? ? query_result : query_result.element
+      element.text.to_s
     end
 
     def detail
-      node.at_xpath(
-        soap_version == '1.2' ? './soap:Detail/*' : './detail/*',
-        'soap' => soap_namespace
-      ).to_xml
+      selector = soap_version == '1.2' ? './soap:Detail/*' : './detail/*'
+      query_result = node.at_xpath(selector, 'soap' => soap_namespace) ||
+                     node.at_xpath('./Detail/*', 'soap' => soap_namespace)
+      element = query_result.element? ? query_result : query_result.element
+      element.to_xml
     end
 
     def at(selector)
