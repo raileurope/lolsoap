@@ -120,6 +120,10 @@ Development sponsored by [Loco2](http://loco2.com/).
 
 ## Changelog ##
 
+### 0.11 ###
+
+* Use `frozen_string_literal` to improve speed/memory usage
+
 ### 0.10 ###
 
 * Added support for using WSDL with abstract types in operation definitions
