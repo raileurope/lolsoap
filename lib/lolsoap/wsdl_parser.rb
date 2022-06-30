@@ -24,12 +24,13 @@ module LolSoap
     end
 
     class Node
-      attr_reader :parser, :node, :schema, :name, :namespace
+      attr_reader :parser, :node, :schema, :name, :namespace, :namespaces
 
       def initialize(parser, schema, node)
         @parser = parser
         @node   = node
         @schema = schema
+        @namespaces = parser.try(:namespaces)&.merge(schema.try(:namespaces))
       end
 
       def id
@@ -49,9 +50,9 @@ module LolSoap
       def initialize(*params)
         super(*params)
 
-        @form = node.attr('form') || schema.default_form
+        @form = initialize_form
 
-        @namespace, @name = parser.namespace_and_name(node, node.attr('name').to_s, default_namespace)
+        @namespace, @name = initialize_namespace_and_name
       end
 
       def type
@@ -80,6 +81,14 @@ module LolSoap
       end
 
       private
+
+      def initialize_namespace_and_name
+        parser.namespace_and_name(node, node.attr('name').to_s, default_namespace)
+      end
+
+      def initialize_form
+        node.attr('form') || schema.default_form
+      end
 
       def max_occurs
         @max_occurs ||= node.attribute('maxOccurs').to_s
@@ -115,7 +124,7 @@ module LolSoap
       def initialize(*params)
         super(*params)
 
-        @namespace, @name = parser.namespace_and_name(node, node.attr('name').to_s, target_namespace)
+        @namespace, @name = initialize_namespace_and_name
       end
 
       def elements
@@ -135,6 +144,10 @@ module LolSoap
       end
 
       private
+
+      def initialize_namespace_and_name
+        parser.namespace_and_name(node, node.attr('name').to_s, target_namespace)
+      end
 
       def own_elements
         Hash[

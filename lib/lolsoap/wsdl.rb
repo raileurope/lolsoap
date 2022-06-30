@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'lolsoap/wsdl_parser'
+require 'lolsoap/wsdl_ox_parser'
 
 module LolSoap
   class WSDL
@@ -16,7 +17,11 @@ module LolSoap
 
     # Create a new instance by parsing a raw string of XML
     def self.parse(raw, options={})
-      new(WSDLParser.parse(raw), options)
+      if options[:use_ox]
+        new(WSDLOxParser.parse(raw), options)
+      else
+        new(WSDLParser.parse(raw), options)
+      end
     end
 
     # The SOAP endpoint URL
